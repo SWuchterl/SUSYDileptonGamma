@@ -1,0 +1,8 @@
+
+.gitignore~
+*.root
+*.pyc
+scratch
+*.pcm
+*.d
+
