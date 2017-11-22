@@ -20,9 +20,16 @@ class Weighter {
     float getWeight(float value) {
       return h ? h->GetBinContent( h->FindFixBin(value) ) : 1.;
     }
+    
+    float getError(float value) {
+      return h ? h->GetBinError( h->FindFixBin(value) ) : 1.;
+    }
 
     float getWeight(float x, float y) {
       return h ? h->GetBinContent( h->FindFixBin(x,y) ) : 1.;
+    }
+    float getError(float x, float y) {
+      return h ? h->GetBinError( h->FindFixBin(x,y) ) : 1.;
     }
 
     void fillOverflow2d() {

@@ -15,16 +15,81 @@
 
 #include "TreeParticles.hpp"
 #include "UserFunctions.h"
-//#include "Weighter.h"
+#include "Weighter.h"
 //#include "CutFlow.h"
 //#include "Resolution.h"
 
 #include <iostream>
 
+#include "config.h"
+
+
 using namespace std;
 
 
+struct selPhoton : public tree::Photon{
+   public:
+   void setAll(const tree::Photon& g){
+      p=g.p;
+      sigmaIetaIeta=g.sigmaIetaIeta; // full 5x5
+      sigmaIphiIphi=g.sigmaIphiIphi;
+      hOverE=g.hOverE;
+      hasPixelSeed=g.hasPixelSeed;
+      passElectronVeto=g.passElectronVeto;
+      r9=g.r9;
+      sigmaPt=g.sigmaPt;
+      //hasGainSwitch=g.hasGainSwitch;
+//
+      //cIso=g.cIso;
+      //nIso=g.nIso;
+      //pIso=g.pIso;
+      //cIsoWorst=g.cIsoWorst;
+//
+      //isTrue=g.isTrue;
+      //isTrueAlternative=g.isTrueAlternative;
+      //pMultifit=g.pMultifit;
+      //pUncorrected=g.pUncorrected;
 
+      isLoose=g.isLoose;
+      isMedium=g.isMedium;
+      isTight=g.isTight;
+
+      isMediumMVA=g.isMediumMVA;
+      mvaValue=g.mvaValue;
+      //mvaCategory=g.mvaCategory;
+   }
+   TLorentzVector vec;
+   float deltaR1;
+   float deltaR2;
+};
+
+struct selJet : public tree::Jet{
+   public:
+   void setAll(const tree::Jet& j){
+      p=j.p;
+      isLoose = j.isLoose;
+      hasPhotonMatch= j.hasPhotonMatch;
+      hasElectronMatch=j.hasElectronMatch;
+      hasMuonMatch=j.hasMuonMatch;
+      bDiscriminator=j.bDiscriminator;
+      uncert=j.uncert;
+      chf=j.chf;
+      //nhf=j.nhf;
+      //cef=j.cef;
+      //nef=j.nef;
+      //nch=j.nch;
+      //nconstituents=j.nconstituents;
+      //ptRes=j.ptRes;
+      //phiRes=j.phiRes;
+      //sfRes=j.sfRes;
+      //sfResUp=j.sfResUp;
+      //sfResDn=j.sfResDn;
+      //uncorJecFactor=j.uncorJecFactor; // uncorrected jet momentum over corrected jet momentum
+   }
+   TLorentzVector vec;
+   float deltaR1;
+   float deltaR2;
+};
 
 
 class selEvent {
@@ -38,12 +103,11 @@ class selEvent {
     bool trigDiMu;
     bool trigMuEle;
     bool trigHt;
-  
-    //Decisions for Selection
-    //bool l1_
 
     //additional variables
     //leptons
+    TLorentzVector l1;
+    TLorentzVector l2;
     float pt1;  
     float pt2;  
     float phi1;  
@@ -59,14 +123,17 @@ class selEvent {
     float miniIso1;
     float miniIso2;
     //photon
-    vector<tree::Photon> selPhotons;
-    //float pt;
-    //float eta;
-    //float phi;
-    //float miniIso;
+    //vector<tree::Photon> selPhotons;
+    vector<selPhoton> selPhotons;
+    vector<selJet> selJets;
     //MET
     float ETmiss;
 };
+
+
+
+
+
 
 
 
@@ -85,23 +152,36 @@ class HistogramProducer : public TSelector {
   virtual Int_t Version() const { return 2; }
   
   //void Cleaning();
-  bool Cleaning(string selection);
-  void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Photon& g,const tree::Particle met ,const string particle);
-  void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2,const tree::Particle met ,const string particle);
-  bool CheckParticles(string selection);
+  bool Cleaning();
+  void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Photon& g,const tree::Particle met ,const particleType particle);
+  void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2,const tree::Particle met ,const particleType particle);
+  bool CheckParticles();
   bool Check2Ele();
   bool Check2Mu();
   
   bool matchGenParticle(const tree::Particle& pa);
   
-  bool SelectEvent(string selection);
+  bool SelectEvent(selectionType selection);
 
-  bool testSelection(const tree::Electron& pa);
-  bool testSelection(const tree::Muon& pa);
-  bool testSelection(const tree::Photon& pa);
+  bool testSelection(const tree::Electron& pa, selectionType,bool leading);
+  bool testSelection(const tree::Muon& pa, selectionType,bool leading);
+  bool testSelection(const selPhoton& pa, selectionType);
+  bool testSelection(const selJet& pa, selectionType);
   
-  void InitHistograms();
+  void InitAllHistos();
+  void InitScaleFactors();
+  void InitScaleFactorsAlternative();
+  float GetScaleFactorAndError(float pt, float eta,bool isFastSim, bool isEle);
+  float GetScaleFactorAndErrorAlternative(float pt, float eta,bool isFastSim, bool isEle, int runNr);
+  map<Histograms1D,TH1F> InitHistograms(const selectionType selection);
+  map<Histograms2D,TH2F> Init2DHistograms(const selectionType selection);
+  //void InitTriggerStudies();
   void FillHistograms();
+  void FillHistograms2D();
+  //void FillTriggerStudies();
+
+  bool GenPhotonVeto();
+
 
     //Tree Variables
   TTreeReader fReader;
@@ -131,15 +211,15 @@ class HistogramProducer : public TSelector {
   TTreeReaderValue<ULong64_t> evtNo;
   TTreeReaderValue<UInt_t> runNo;
   TTreeReaderValue<UInt_t> lumNo;
-  TTreeReaderValue<Bool_t> hlt_ht200;
-  TTreeReaderValue<Bool_t> hlt_ht250;
-  TTreeReaderValue<Bool_t> hlt_ht300;
-  TTreeReaderValue<Bool_t> hlt_ht350;
-  TTreeReaderValue<Bool_t> hlt_ht400;
-  TTreeReaderValue<Bool_t> hlt_ht475;
-  TTreeReaderValue<Bool_t> hlt_ht600;
-  TTreeReaderValue<Bool_t> hlt_ht650;
-  TTreeReaderValue<Bool_t> hlt_ht800;
+  //TTreeReaderValue<Bool_t> hlt_ht200;
+  //TTreeReaderValue<Bool_t> hlt_ht250;
+  //TTreeReaderValue<Bool_t> hlt_ht300;
+  //TTreeReaderValue<Bool_t> hlt_ht350;
+  //TTreeReaderValue<Bool_t> hlt_ht400;
+  //TTreeReaderValue<Bool_t> hlt_ht475;
+  //TTreeReaderValue<Bool_t> hlt_ht600;
+  //TTreeReaderValue<Bool_t> hlt_ht650;
+  //TTreeReaderValue<Bool_t> hlt_ht800;
   TTreeReaderValue<Bool_t> hlt_ele17_ele12_iso;
   TTreeReaderValue<Bool_t> hlt_ele23_ele12_iso;
   TTreeReaderValue<Bool_t> hlt_mu17_mu8_iso;
@@ -147,22 +227,22 @@ class HistogramProducer : public TSelector {
   TTreeReaderValue<Bool_t> hlt_mu17_mu8_iso_dz;
   TTreeReaderValue<Bool_t> hlt_mu17_tkMu8_iso_dz;
   TTreeReaderValue<Bool_t> hlt_tkMu17_tkMu8_iso_dz;
-  TTreeReaderValue<Bool_t> hlt_mu17_ele12_iso;
-  TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso;
-  TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso_dz;
-  TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso;
-  TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso_dz;
-  TTreeReaderValue<Bool_t> hlt_mu8_ele17_iso;
-  TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso;
-  TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso_dz;
-  TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso;
-  TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso_dz;
+  //TTreeReaderValue<Bool_t> hlt_mu17_ele12_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso_dz;
+  //TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso_dz;
+  //TTreeReaderValue<Bool_t> hlt_mu8_ele17_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso_dz;
+  //TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso;
+  //TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso_dz;
   TTreeReaderValue<Bool_t> hlt_doubleEle33;
   TTreeReaderValue<Bool_t> hlt_doubleEle33_mw;
   TTreeReaderValue<Bool_t> hlt_mu27_tkMu8;
   TTreeReaderValue<Bool_t> hlt_mu30_tkMu11;
-  TTreeReaderValue<Bool_t> hlt_mu30_ele30;
-  TTreeReaderValue<Bool_t> hlt_mu33_ele33;
+  //TTreeReaderValue<Bool_t> hlt_mu30_ele30;
+  //TTreeReaderValue<Bool_t> hlt_mu33_ele33;
 
   // signal scan
   TTreeReaderValue<UShort_t> signal_nBinos;
@@ -181,16 +261,18 @@ class HistogramProducer : public TSelector {
 
   int nEntries;
 
-  map<string,TH1F> h1Map;
+
+  map<string,map<Histograms1D,TH1F>> h1Maps;
+  map<string,map<Histograms2D,TH2F>> h2Maps;
   TH1F cutFlow;
   string inputName;
 
-  //vector<selEvent> selectedEvents;
+
   selEvent selectedEvent;
 
 
 
-    //TriggerDecisions(sum)
+  //TriggerDecisions(sum)
   bool trigDiEle;
   bool trigDiMu;
   bool trigMuEle;
@@ -204,6 +286,8 @@ class HistogramProducer : public TSelector {
   //additional variables
   bool isDiElectron;
   //leptons
+  TLorentzVector lep1;
+  TLorentzVector lep2;
   float pt1;  
   float pt2;  
   float phi1;  
@@ -224,10 +308,37 @@ class HistogramProducer : public TSelector {
   float miniIso;
   //MET
   float ETmiss;
+  //float runNo;
     
+
+  //scale factors
+  Weighter DiEleWeighterID;
+  Weighter DiEleWeighterIso;
+  Weighter DiEleWeighterConv;
+  Weighter DiEleWeighterTrack;
+  Weighter DiMuWeighterID;
+  Weighter DiMuWeighterID_BCDEF;
+  Weighter DiMuWeighterID_GH;
+  Weighter DiMuWeighterIso;
+  Weighter DiMuWeighterIso_BCDEF;
+  Weighter DiMuWeighterIso_GH;
+  Weighter DiMuWeighterIP2D;
+  Weighter DiMuWeighterSIP3D;
+  Weighter DiMuWeighterTrack;
+  Weighter DiMuWeighterTrack_BCDEF;
+  Weighter DiMuWeighterTrack_GH;
+  Weighter FastSimDiEleWeighterID;
+  Weighter FastSimDiEleWeighterIso;
+  Weighter FastSimDiEleWeighterConv;
+  Weighter FastSimDiMuWeighterID;
+  Weighter FastSimDiMuWeighterIso;
+  Weighter FastSimDiMuWeighterIP2D;
+  Weighter FastSimDiMuWeighterSIP3D;
 
   bool isData;
   bool isSignal;
+
+  bool noPromptPhotons;
 
   double startTime;
   ClassDef(HistogramProducer, 1)

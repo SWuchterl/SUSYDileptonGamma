@@ -1,0 +1,8 @@
+
+Universe   = vanilla
+Executable = run.sh
+Arguments  = ../scratch/v02/SMS-TChiNG_900_nTuple.root 
+Log        = logs/SMS-TChiNG_900_nTuple.root.log
+Output     = logs/SMS-TChiNG_900_nTuple.root.out
+Error      = logs/SMS-TChiNG_900_nTuple.root.error
+Queue

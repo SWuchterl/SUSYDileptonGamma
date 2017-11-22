@@ -2,6 +2,7 @@
 #include <regex>
 #include <TH2F.h>
 #include <TRandom2.h>
+//#include <iostream>
 
 const float photonsEtaMaxBarrel = 1.4442;
 //const float photonsEtaMinEndcap = 1.566;
@@ -9,6 +10,92 @@ const float photonsEtaMaxBarrel = 1.4442;
 // Changed values to reduce e->g backgronud
 const float photonsEtaMinEndcap = 1.6;
 const float photonsEtaMaxEndcap = 2.5;
+
+//|eta|1: 0-0.8
+//|eta|2: 0.8-1.479
+//|eta|3: 1.479-2.5  
+
+const float aWPeta1 = 0.77;
+const float bWPeta1 = 0.52;
+const float aWPeta2 = 0.56;
+const float bWPeta2 = 0.11;
+const float aWPeta3 = 0.48;
+const float bWPeta3 = -0.01;
+
+
+bool isRunABCDEF(int No){
+    return ((No>273149)&&(No<278809));
+    }
+
+
+
+
+
+bool ElectronTightMVA(const float eta, const float pt, const float mvaValue){
+  
+   float cut;
+   float slope;
+   if (pt<15.){
+      if (fabs(eta)<0.8){
+         cut = aWPeta1; 
+      }else{
+         if (fabs(eta)<1.479){
+            cut = aWPeta2; 
+         }else{
+            if(fabs(eta)<2.5){
+               cut = aWPeta3; 
+            }else{
+               cut = 9999.; 
+            }
+         }
+      }
+   }else{
+      if ((pt>15.) && (pt<25.)){
+         if (fabs(eta)<0.8){
+            slope = (bWPeta1-aWPeta1)/10.; 
+            cut = fmin( aWPeta1, fmax(bWPeta1 , aWPeta1 + slope*(pt-15.) ) );
+         }else{
+            if (fabs(eta)<1.479){
+               slope = (bWPeta2-aWPeta2)/10.; 
+               cut = fmin( aWPeta2, fmax(bWPeta2 , aWPeta2 + slope*(pt-15.) ) ); 
+            }else{
+               if(fabs(eta)<2.5){
+                  slope = (bWPeta3-aWPeta3)/10.; 
+                  cut = fmin( aWPeta3, fmax(bWPeta3 , aWPeta3 + slope*(pt-15) ) );
+               }else{
+                  cut = 9999.; 
+               }
+            }
+         }         
+      }else{
+         if (pt > 25.){
+            if (fabs(eta)<0.8){
+               cut = bWPeta1; 
+            }else{
+               if (fabs(eta)<1.479){
+                  cut = bWPeta2; 
+               }else{
+                  if(fabs(eta)<2.5){
+                     cut = bWPeta3; 
+                  }else{
+                     cut = 9999.; 
+                  }
+               }
+            }    
+         }else{
+            cut=9999.;
+         }
+      }
+   }
+   if (mvaValue > cut){
+      return true;
+   }else{
+      return false;
+   }
+}
+
+
+
 
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BtagRecommendation80XReReco
 enum bTaggingEnum { CSVv2L, CSVv2M, CSVv2T };

@@ -7,7 +7,7 @@ import argparse
 import os
 from configs import runConfig as config
 
-def run(infile="", selector="HistogramProducer.cc", ext=False):
+def run(infile="", selector="HistogramProducer.cc", ext=False,amount=100.):
     # load libraries
     ROOT.gSystem.Load("pluginTreeWriterTreeWriterAuto.so")
     #lib = "AutoDict_map_int_pair_int_int____cxx.so"
@@ -37,14 +37,16 @@ if __name__ == "__main__":
     parser.add_argument('file', default="", nargs="?")
     parser.add_argument('--ext', action='store_true')
     parser.add_argument('--signal', action='store_true')
+    parser.add_argument('--amount',action='store',default=100.)
 
     args = parser.parse_args()
-    signalScans = ["SMS-T5Wg_nTuple.root", "SMS-T6Wg_nTuple.root", "SMS-T5Wg_mGo2150To2500_nTuple.root", "SMS-T6Wg_mSq1850To2150_nTuple.root", "SMS-TChiWG_nTuple.root", "SMS-TChiNG_nTuple.root"]
+    #signalScans = ["SMS-T5Wg_nTuple.root", "SMS-T6Wg_nTuple.root", "SMS-T5Wg_mGo2150To2500_nTuple.root", "SMS-T6Wg_mSq1850To2150_nTuple.root", "SMS-TChiWG_nTuple.root", "SMS-TChiNG_nTuple.root"]
+    signalScans = ["nothing"]
     
     #if (args.file==""):
         
     
     if os.path.basename(args.file) in signalScans or args.signal:
-        run(args.file, "SignalScan.cc")
+        run(args.file, "SignalScan.cc",amount=args.amount)
     else:
-        run(args.file, ext=args.ext)
+        run(args.file, ext=args.ext,amount=args.amount)
