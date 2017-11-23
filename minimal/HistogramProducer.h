@@ -153,6 +153,7 @@ class HistogramProducer : public TSelector {
   
   //void Cleaning();
   bool Cleaning();
+  bool CleaningTriggerStudies();
   void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Photon& g,const tree::Particle met ,const particleType particle);
   void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2,const tree::Particle met ,const particleType particle);
   bool CheckParticles();
@@ -162,6 +163,7 @@ class HistogramProducer : public TSelector {
   bool matchGenParticle(const tree::Particle& pa);
   
   bool SelectEvent(selectionType selection);
+  bool SelectEventTriggerStudies(selectionType selection);
 
   bool testSelection(const tree::Electron& pa, selectionType,bool leading);
   bool testSelection(const tree::Muon& pa, selectionType,bool leading);
@@ -169,6 +171,7 @@ class HistogramProducer : public TSelector {
   bool testSelection(const selJet& pa, selectionType);
   
   void InitAllHistos();
+  void InitTriggerStudiesHistos();
   void InitScaleFactors();
   void InitScaleFactorsAlternative();
   float GetScaleFactorAndError(float pt, float eta,bool isFastSim, bool isEle);
@@ -176,9 +179,10 @@ class HistogramProducer : public TSelector {
   map<Histograms1D,TH1F> InitHistograms(const selectionType selection);
   map<Histograms2D,TH2F> Init2DHistograms(const selectionType selection);
   //void InitTriggerStudies();
+  map<Histograms1D,TEfficiency> InitTriggerStudies(const selectionType selection);
   void FillHistograms();
   void FillHistograms2D();
-  //void FillTriggerStudies();
+  void FillTriggerStudies();
 
   bool GenPhotonVeto();
 
@@ -211,15 +215,15 @@ class HistogramProducer : public TSelector {
   TTreeReaderValue<ULong64_t> evtNo;
   TTreeReaderValue<UInt_t> runNo;
   TTreeReaderValue<UInt_t> lumNo;
-  //TTreeReaderValue<Bool_t> hlt_ht200;
-  //TTreeReaderValue<Bool_t> hlt_ht250;
-  //TTreeReaderValue<Bool_t> hlt_ht300;
-  //TTreeReaderValue<Bool_t> hlt_ht350;
-  //TTreeReaderValue<Bool_t> hlt_ht400;
-  //TTreeReaderValue<Bool_t> hlt_ht475;
-  //TTreeReaderValue<Bool_t> hlt_ht600;
-  //TTreeReaderValue<Bool_t> hlt_ht650;
-  //TTreeReaderValue<Bool_t> hlt_ht800;
+  TTreeReaderValue<Bool_t> hlt_ht200;
+  TTreeReaderValue<Bool_t> hlt_ht250;
+  TTreeReaderValue<Bool_t> hlt_ht300;
+  TTreeReaderValue<Bool_t> hlt_ht350;
+  TTreeReaderValue<Bool_t> hlt_ht400;
+  TTreeReaderValue<Bool_t> hlt_ht475;
+  TTreeReaderValue<Bool_t> hlt_ht600;
+  TTreeReaderValue<Bool_t> hlt_ht650;
+  TTreeReaderValue<Bool_t> hlt_ht800;
   TTreeReaderValue<Bool_t> hlt_ele17_ele12_iso;
   TTreeReaderValue<Bool_t> hlt_ele23_ele12_iso;
   TTreeReaderValue<Bool_t> hlt_mu17_mu8_iso;
@@ -264,6 +268,10 @@ class HistogramProducer : public TSelector {
 
   map<string,map<Histograms1D,TH1F>> h1Maps;
   map<string,map<Histograms2D,TH2F>> h2Maps;
+  
+  map<string,map<Histograms1D,TEfficiency>> eff1Maps;
+  map<string,map<Histograms2D,TEfficiency>> eff2Maps;
+  
   TH1F cutFlow;
   string inputName;
 

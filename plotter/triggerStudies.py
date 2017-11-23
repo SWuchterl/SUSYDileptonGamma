@@ -4,6 +4,7 @@ from array import array
 from include import *
 import numpy as np
 
+
 list_of_variables = ['pt1',
                      'pt2',
                      'eta1',
@@ -96,78 +97,13 @@ labels = {
 
 
 
-def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, binningName="", scaleToData=False ):
-    can = ROOT.TCanvas()
-    m = multiplot.Multiplot()
 
-    scale = 1.
-    if scaleToData: scale = divideDatasetIntegrals( [ i for i in additional if "Data" in i.label ], bkg, name )
-
-    for d in bkg[-1::-1]:
-        h = d.getHist( name )
-        if not h: continue
-        if not h.Integral(): continue
-        h.Scale(scale)
-        if (binning.any()): 
-            h = aux.rebin( h, binning )
-
-        aux.appendFlowBin( h )
-        h.SetYTitle( aux.getYAxisTitle( h ) )
-        m.addStack( h, d.label )
-
-    dataHist = None
-    for d in additional:
-        h = d.getHist( name )
-        if not h: continue
-        if not h.Integral(): continue
-        if (binning.any()): 
-            h = aux.rebin( h, binning )
-        aux.appendFlowBin( h )
-
-        if h.GetLineColor() == ROOT.kBlack: # data
-            h.drawOption_ = "ep"
-            h.SetMarkerStyle(20)
-            # disable errors for data, so that ErrorOption is working
-            # TODO: kPoisson also for rebinned and scaled histograms
-            if not(binning.any()): h.Sumw2(False)
-            h.SetBinErrorOption( ROOT.TH1.kPoisson )
-            dataHist = h
-        else:
-            h.drawOption_ = "hist"
-            h.SetLineWidth(3)
-
-        m.add( h, d.label )
-
-    m.sortStackByIntegral()
-    if m.Draw():
-
-        # ratio
-        hsm = m.hists[0].GetStack().Last()
-        if dataHist:
-            r = ratio.Ratio( "Data/MC", dataHist, hsm )
-            r.draw(0.5,1.5)
-
-        info = ""
-        l = aux.Label(info="#scale[0.7]{%s}"%info, sim=((dataDoubleMuon not in additional)or(dataDoubleEG not in additional)))
-
-        if binningName: binningName = "_"+binningName
-        name = name.replace("/","__")
-        saveName = "sameHistograms_{}_{}{}".format(sampleNames, name, binningName )
-        aux.save( saveName )
-
-        
 def main():
     bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    #variables=["eta1","pt1","n_jets","n_vtx","phi1","eta2","phi2","m_ll","ht","n_photons","pt2"]
-    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
-    groups=["dilep","sel","onZ"]
+    #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
+    #groups=["dilep","sel","onZ"]
     for group in groups:
         for variable in variables:
-            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable])
-            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable])
-            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
-            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
-            #drawSameHistogram("SF",group+"/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable])
-            #drawSameHistogram("HT",group+"/"+variable, bkgs, additional=[dataHt],binning=binnings[variable])
+
 
 main()

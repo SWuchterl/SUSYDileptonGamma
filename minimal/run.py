@@ -37,7 +37,7 @@ if __name__ == "__main__":
     parser.add_argument('file', default="", nargs="?")
     parser.add_argument('--ext', action='store_true')
     parser.add_argument('--signal', action='store_true')
-    parser.add_argument('--amount',action='store',default=100.)
+    parser.add_argument('--amount',action='store',default=100.,help="not working yet")
 
     args = parser.parse_args()
     #signalScans = ["SMS-T5Wg_nTuple.root", "SMS-T6Wg_nTuple.root", "SMS-T5Wg_mGo2150To2500_nTuple.root", "SMS-T6Wg_mSq1850To2150_nTuple.root", "SMS-TChiWG_nTuple.root", "SMS-TChiNG_nTuple.root"]

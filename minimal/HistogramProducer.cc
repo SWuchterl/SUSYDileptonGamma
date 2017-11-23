@@ -26,15 +26,15 @@ HistogramProducer::HistogramProducer():
    runNo(fReader, "runNo"),
    lumNo(fReader, "lumNo"),
    evtNo(fReader, "evtNo"),
-   //hlt_ht200(fReader, "HLT_PFHT200_v"),
-   //hlt_ht250(fReader, "HLT_PFHT250_v"),
-   //hlt_ht300(fReader, "HLT_PFHT300_v"),
-   //hlt_ht350(fReader, "HLT_PFHT350_v"),
-   //hlt_ht400(fReader, "HLT_PFHT400_v"),
-   //hlt_ht475(fReader, "HLT_PFHT475_v"),
-   //hlt_ht600(fReader, "HLT_PFHT600_v"),
-   //hlt_ht650(fReader, "HLT_PFHT650_v"),
-   //hlt_ht800(fReader, "HLT_PFHT800_v"),
+   hlt_ht200(fReader, "HLT_PFHT200_v"),
+   hlt_ht250(fReader, "HLT_PFHT250_v"),
+   hlt_ht300(fReader, "HLT_PFHT300_v"),
+   hlt_ht350(fReader, "HLT_PFHT350_v"),
+   hlt_ht400(fReader, "HLT_PFHT400_v"),
+   hlt_ht475(fReader, "HLT_PFHT475_v"),
+   hlt_ht600(fReader, "HLT_PFHT600_v"),
+   hlt_ht650(fReader, "HLT_PFHT650_v"),
+   hlt_ht800(fReader, "HLT_PFHT800_v"),
    hlt_ele17_ele12_iso(fReader, "HLT_Ele17_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"),
    hlt_ele23_ele12_iso(fReader, "HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ_v"),
    hlt_mu17_mu8_iso(fReader, "HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_v"),
@@ -132,6 +132,7 @@ bool HistogramProducer::Check2Mu(){
 
 bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
 {
+   //cout<<"signal?"<<isSignal<<endl;
    if(!isSignal){
       trigDiEle = *hlt_ele17_ele12_iso || *hlt_ele23_ele12_iso || *hlt_doubleEle33 || *hlt_doubleEle33_mw;
       trigDiMu  = *hlt_mu17_mu8_iso || *hlt_mu17_tkMu8_iso || *hlt_mu17_mu8_iso_dz || *hlt_mu17_tkMu8_iso_dz
@@ -141,9 +142,9 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
                   //|| *hlt_mu8_ele23_iso_dz || *hlt_mu12_ele23_iso || *hlt_mu12_ele23_iso_dz
                   //|| *hlt_mu30_ele30 || *hlt_mu33_ele33;
       trigMuEle = false;
-      //trigHt    = *hlt_ht200 || *hlt_ht250 || *hlt_ht300 || *hlt_ht350 || *hlt_ht400
-                  //|| *hlt_ht475 || *hlt_ht600 || *hlt_ht650 || *hlt_ht800;
-      trigHt    = true;
+      trigHt    = *hlt_ht200 || *hlt_ht250 || *hlt_ht300 || *hlt_ht350 || *hlt_ht400
+                  || *hlt_ht475 || *hlt_ht600 || *hlt_ht650 || *hlt_ht800;
+      //trigHt    = true;
    }else{
       trigDiEle = true;
       trigDiMu = true;
@@ -157,6 +158,7 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
       bool isEESelection = inputName.find("DoubleEG") != string::npos;
       bool isMuMuSelection = inputName.find("DoubleMuon") != string::npos;
       bool isEMuSelection = inputName.find("MuonEG") != string::npos;
+      bool isHTSelection = inputName.find("JetHT")!= string::npos;
       auto missingET = *met;
         
       if (isEESelection && trigDiEle && Check2Ele()) {
@@ -228,6 +230,108 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
    return false;
 }
 
+bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 Leptons exist)
+{
+   //cout<<"signal?"<<isSignal<<endl;
+   if(!isSignal){
+      trigDiEle = *hlt_ele17_ele12_iso || *hlt_ele23_ele12_iso || *hlt_doubleEle33 || *hlt_doubleEle33_mw;
+      trigDiMu  = *hlt_mu17_mu8_iso || *hlt_mu17_tkMu8_iso || *hlt_mu17_mu8_iso_dz || *hlt_mu17_tkMu8_iso_dz
+                  || *hlt_tkMu17_tkMu8_iso_dz || *hlt_mu27_tkMu8 || *hlt_mu30_tkMu11;
+      //trigMuEle = *hlt_mu17_ele12_iso || *hlt_mu23_ele8_iso || *hlt_mu23_ele8_iso_dz || *hlt_mu23_ele12_iso
+                  //|| *hlt_mu23_ele12_iso_dz || *hlt_mu8_ele17_iso || *hlt_mu8_ele23_iso
+                  //|| *hlt_mu8_ele23_iso_dz || *hlt_mu12_ele23_iso || *hlt_mu12_ele23_iso_dz
+                  //|| *hlt_mu30_ele30 || *hlt_mu33_ele33;
+      trigMuEle = false;
+      trigHt    = *hlt_ht200 || *hlt_ht250 || *hlt_ht300 || *hlt_ht350 || *hlt_ht400
+                  || *hlt_ht475 || *hlt_ht600 || *hlt_ht650 || *hlt_ht800;
+      //trigHt    = true;
+   }else{
+      trigDiEle = true;
+      trigDiMu = true;
+      trigMuEle = false;
+      trigHt = true;
+   }
+   
+
+   if (isData){           
+      //find Selection (Dataset)
+      bool isEESelection = inputName.find("DoubleEG") != string::npos;
+      bool isMuMuSelection = inputName.find("DoubleMuon") != string::npos;
+      bool isEMuSelection = inputName.find("MuonEG") != string::npos;
+      bool isHTSelection = inputName.find("JetHT")!= string::npos;
+      auto missingET = *met;
+        
+      if (isHTSelection && Check2Ele()) {
+         auto e1 = electrons->at(0);
+         auto e2 = electrons->at(1);
+         if (Check2Mu()) {
+            auto m1 = muons->at(0);
+            auto m2 = muons->at(1);
+            if (min(e1.p.Pt(), e2.p.Pt()) > min(m1.p.Pt(), m2.p.Pt())){
+               CalculateVariables(e1, e2, missingET,E);
+               return true;
+            }else{return false;}
+         }else{
+            CalculateVariables(e1, e2, missingET,E);
+            return true;
+         }
+      }
+      if (isMuMuSelection && Check2Mu()) {
+         auto m1 = muons->at(0);
+         auto m2 = muons->at(1);
+         if (Check2Ele()) {
+            auto e1 = electrons->at(0);
+            auto e2 = electrons->at(1);
+            if (min(m1.p.Pt(), m2.p.Pt()) > min(e1.p.Pt(), e2.p.Pt())){
+               CalculateVariables(m1, m2, missingET,M);
+               return true;
+            }else{return false;}
+         }else{
+            CalculateVariables(m1, m2, missingET,M);
+            return true;
+         }
+      }
+      return false;
+   }else{
+      auto missingET = *met;
+   
+      if (trigHt && Check2Ele()) {
+         auto e1 = electrons->at(0);
+         auto e2 = electrons->at(1);
+         if (Check2Mu()) {
+            auto m1 = muons->at(0);
+            auto m2 = muons->at(1);
+            if (min(e1.p.Pt(), e2.p.Pt()) > min(m1.p.Pt(), m2.p.Pt())){
+               CalculateVariables(e1, e2, missingET,E);
+               return true;
+            }else{return false;}
+         }else{
+         CalculateVariables(e1, e2, missingET,E);
+         return true;
+         }
+      }
+      if (trigHt && Check2Mu()) {
+         auto m1 = muons->at(0);
+         auto m2 = muons->at(1);
+         if (Check2Ele()) {
+            auto e1 = electrons->at(0);
+            auto e2 = electrons->at(1);
+            if (min(m1.p.Pt(), m2.p.Pt()) > min(e1.p.Pt(), e2.p.Pt())){
+               CalculateVariables(m1, m2, missingET,M);
+               return true;
+            }else{return false;}
+         }else{
+         CalculateVariables(m1, m2, missingET,M);
+         return true;
+         }
+      }
+   return false;
+   }
+   return false;
+}
+
+
+
 
 bool HistogramProducer::testSelection(const tree::Electron& pa,selectionType selection ,bool leading){
    bool decision=false;
@@ -235,7 +339,7 @@ bool HistogramProducer::testSelection(const tree::Electron& pa,selectionType sel
       //decision = pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
       decision = pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && pa.isTightMVA;
    }
-   if(selection==SEL){
+   if(selection==SEL || selection==ONZ){
       //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
       decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
       //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
@@ -244,6 +348,9 @@ bool HistogramProducer::testSelection(const tree::Electron& pa,selectionType sel
       decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA ;
       //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue) ;
    }
+   if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
+      decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
+   }
    return decision;
 }
 bool HistogramProducer::testSelection(const tree::Muon& pa, selectionType selection, bool leading){
@@ -251,11 +358,14 @@ bool HistogramProducer::testSelection(const tree::Muon& pa, selectionType select
    if ((selection==UNCUT)||(selection==PHOTON)){
       decision = pa.passImpactParameter  && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && (pa.isTight);
    }
-   if (selection==SEL){
+   if (selection==SEL || selection == ONZ){
       decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
    }
    if(selection==DILEP){
       decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
+   }
+   if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
+      decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
    }
    return decision;
 }
@@ -264,7 +374,7 @@ bool HistogramProducer::testSelection(const selPhoton& pa, selectionType selecti
    if ((selection==UNCUT)||(selection==PHOTON)){
       decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
    }
-   if(selection==SEL || selection==DILEP){
+   if(selection==SEL || selection==DILEP ||selection==ONZ || selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
       decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
    }
    return decision;
@@ -274,7 +384,7 @@ bool HistogramProducer::testSelection(const selJet& pa, selectionType selection)
    if ((selection==UNCUT)||(selection==PHOTON)){
       decision = (fabs(pa.p.Eta())<2.4) && (pa.isLoose) && !(pa.hasElectronMatch) && !(pa.hasPhotonMatch) && !(pa.hasMuonMatch);
    }
-   if(selection==SEL||selection==DILEP){
+   if(selection==SEL||selection==DILEP || selection==ONZ || selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
       decision = (pa.p.Pt()>30.) && (fabs(pa.p.Eta())<2.4) && (pa.isLoose) && !(pa.hasElectronMatch) && !(pa.hasPhotonMatch) && !(pa.hasMuonMatch); //&& (pa.deltaR1>0.3) && (pa.deltaR2>0.3) //study Delta R cut ;
    }
    return decision;
@@ -314,6 +424,8 @@ void HistogramProducer::Init(TTree *tree)
 
 
    InitAllHistos();
+   InitTriggerStudiesHistos();
+   
    //InitScaleFactors();
    InitScaleFactorsAlternative();
 
@@ -497,9 +609,9 @@ float HistogramProducer::GetScaleFactorAndErrorAlternative(float pt, float eta,b
 
 map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType selection_){
     
-   //map<string,TH1F> hMap;
    map<Histograms1D,TH1F> hMap;
-    
+//enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,};
+
    hMap[ETMISS] = TH1F("", ";#it{p}_{T}^{miss} (GeV)", 200, 0, 1000);
    hMap[PT1] = TH1F("", ";#it{p}_{T}^{leading} (GeV)", 200, 0, 1000);
    hMap[PT2] = TH1F("", ";#it{p}_{T}^{trailing} (GeV)", 200, 0, 1000);
@@ -513,14 +625,19 @@ map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType sel
    hMap[ETA2] = TH1F("", ";|#eta_{leading}|", 260, 0, 2.6);
    hMap[PHI1] = TH1F("", ";|#phi_{trailing}|", 350, 0, 3.5);
    hMap[PHI2] = TH1F("", ";|#phi_{leading}|", 350, 0, 3.5);
+   hMap[DeltaEtaLL] = TH1F("", ";#Delta#Eta_{ll}", 600, 0, 6.);
+   hMap[DeltaPhiLL] = TH1F("", ";#Delta#Phi_{ll}", 600, 0, 6.);
+   hMap[DeltaRLL] = TH1F("", ";#DeltaR_{ll}", 5000, 0, 6.);
+
    
-   if ((selection_==PHOTON)||(selection_==SEL)){
+   if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)){
       hMap[PTG1] = TH1F("", ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
       hMap[ETAG1] = TH1F("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
       hMap[PHIG1] = TH1F("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
       hMap[SIGMAIETAIETAG1] = TH1F("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
-      //hMap["m_llg_g2Z"] = TH1F("", ";#it{m}_{ll} (GeV)", 200, 0, 1000);
-      //hMap["m_llg_l2Z"] = TH1F("", ";#it{m}_{ll} (GeV)", 200, 0, 1000);
+      hMap[DeltaRLLG] = TH1F("", ";#DeltaR_{ll,#gamma}", 6000, 0, 6.);
+      hMap[DeltaEtaLLG] = TH1F("", ";#Delta#Eta_{ll,#gamma}", 600, 0, 6.);
+      hMap[DeltaPhiLLG] = TH1F("", ";#Delta#Phi_{ll,#gamma}", 600, 0, 6.);
    }
 
    return hMap;
@@ -539,6 +656,37 @@ map<Histograms2D,TH2F> HistogramProducer::Init2DHistograms(const selectionType s
 
 }
 
+map<Histograms1D,TEfficiency> HistogramProducer::InitTriggerStudies(const selectionType selection_){
+    
+   map<Histograms1D,TEfficiency> hMap;
+    
+   hMap[ETMISS] = TEfficiency("", ";#it{p}_{T}^{miss} (GeV)", 200, 0, 1000);
+   hMap[PT1] = TEfficiency("", ";#it{p}_{T}^{leading} (GeV)", 1000, 0, 1000);
+   hMap[PT2] = TEfficiency("", ";#it{p}_{T}^{trailing} (GeV)", 1000, 0, 1000);
+   hMap[MLL] = TEfficiency("", ";#it{m}_{ll} (GeV)", 200, 0, 1000);
+   hMap[NPHOTONS] = TEfficiency("","n_#gamma",10,0,10);
+   hMap[NVTX] = TEfficiency("","n_{Vtx}",60,0,60);
+   hMap[HT] = TEfficiency("","#it{H}_{T} (GeV)",200,0,1000);
+   hMap[GENHT] = TEfficiency("","#it{H}_{T}^{gen} (GeV)",200,0,1000);
+   hMap[NJETS] = TEfficiency("","n_{Jets}",20,0,20);
+   hMap[ETA1] = TEfficiency("", ";|#eta_{trailing}|", 260, 0, 2.6);
+   hMap[ETA2] = TEfficiency("", ";|#eta_{leading}|", 260, 0, 2.6);
+   hMap[PHI1] = TEfficiency("", ";|#phi_{trailing}|", 350, 0, 3.5);
+   hMap[PHI2] = TEfficiency("", ";|#phi_{leading}|", 350, 0, 3.5);
+   
+   if ((selection_==TRIGONZ)||(selection_==TRIGSEL)){
+      hMap[PTG1] = TEfficiency("", ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
+      hMap[ETAG1] = TEfficiency("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
+      hMap[PHIG1] = TEfficiency("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
+      hMap[SIGMAIETAIETAG1] = TEfficiency("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
+   }
+
+   return hMap;
+
+}
+
+
+
 
 void HistogramProducer::SlaveBegin(TTree *tree)
 {
@@ -553,6 +701,9 @@ bool HistogramProducer::SelectEvent(selectionType selection){
          L.trigDiMu=trigDiMu;
          L.trigMuEle=trigMuEle;
          L.trigHt=trigHt;
+         //if(trigHt&&isDiElectron){
+            //cout<<"  "<<trigDiEle<<endl;
+         //}
          L.l1=lep1;
          L.l2=lep2;
          L.pt1=pt1;
@@ -649,6 +800,115 @@ bool HistogramProducer::SelectEvent(selectionType selection){
   return false;
 }
 
+bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
+   if (CheckParticles()){//only Fill Histograms if nMu>=2, nEle>=2, nGamma>=0
+      if (CleaningTriggerStudies()){//decide in events with DiEle and DiMu where to contribute
+         selEvent L;
+         L.isDiElectron=isDiElectron;
+         L.trigDiEle=trigDiEle;
+         L.trigDiMu=trigDiMu;
+         L.trigMuEle=trigMuEle;
+         L.trigHt=trigHt;
+         //if(trigHt&&isDiElectron){
+            //cout<<"  "<<trigDiEle<<endl;
+         //}
+         L.l1=lep1;
+         L.l2=lep2;
+         L.pt1=pt1;
+         L.pt2=pt2;
+         L.phi1=phi1;
+         L.phi2=phi2;
+         L.eta1=eta1;
+         L.eta2=eta2;
+         L.chargeProduct=chargeProduct;
+         L.deltaRll=deltaRll;
+         L.mll=mll;
+         L.miniIso1=miniIso1;
+         L.miniIso2=miniIso2;
+         L.ETmiss=ETmiss;
+         if(!isData){
+            //L.totalWeight = totalWeight * GetScaleFactorAndError(pt1,eta1,isSignal,isDiElectron)*GetScaleFactorAndError(pt2,eta2,isSignal,isDiElectron);
+            L.totalWeight = totalWeight * GetScaleFactorAndErrorAlternative(pt1,eta1,isSignal,isDiElectron,*runNo)*GetScaleFactorAndErrorAlternative(pt2,eta2,isSignal,isDiElectron,*runNo);
+         }else{
+            L.totalWeight=totalWeight;
+         }
+         if (L.isDiElectron){
+            auto e1 = electrons->at(0);
+            auto e2 = electrons->at(1);
+            if(testSelection(e1,selection,true) && testSelection(e2,selection,false) && ((selection==UNCUT)? true : (mll>50.)) ){
+
+               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+                  auto g = *it;
+                  selPhoton gamma;
+                  gamma.setAll(g);
+                  gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
+                  gamma.deltaR1=gamma.vec.DeltaR(L.l1);
+                  gamma.deltaR2=gamma.vec.DeltaR(L.l2);
+                  if (testSelection(gamma,selection)){
+                     L.selPhotons.push_back(gamma);
+                  }
+               }
+               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+                  auto j = *it;
+                  selJet jet;
+                  jet.setAll(j);
+                  jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
+                  jet.deltaR1=jet.vec.DeltaR(L.l1);
+                  jet.deltaR2=jet.vec.DeltaR(L.l2);
+                  if (testSelection(jet,selection)){
+                     L.selJets.push_back(jet);
+                  }
+               }
+               selectedEvent=L;
+               if(!GenPhotonVeto()){
+                  return true;
+               }else{
+                  return false;
+               }
+            }
+         }
+         else{
+            auto m1 = muons->at(0); 
+            auto m2 = muons->at(1);
+            if(testSelection(m1,selection,true) && testSelection(m2,selection,false) && ((selection==UNCUT)? true : (mll>50.))){
+               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+                  auto g = *it;
+                  selPhoton gamma;
+                  gamma.setAll(g);
+                  gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
+                  gamma.deltaR1=gamma.vec.DeltaR(L.l1);
+                  gamma.deltaR2=gamma.vec.DeltaR(L.l2);
+                  if (testSelection(gamma,selection)){
+                     L.selPhotons.push_back(gamma);
+                  }
+               }
+               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+                  auto j = *it;
+                  selJet jet;
+                  jet.setAll(j);
+                  jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
+                  jet.deltaR1=jet.vec.DeltaR(L.l1);
+                  jet.deltaR2=jet.vec.DeltaR(L.l2);
+                  if (testSelection(jet,selection)){
+                     L.selJets.push_back(jet);
+                  }
+               }
+               selectedEvent=L;
+               if(!GenPhotonVeto()){
+                  return true;
+               }else{
+                  return false;
+               }
+            }
+         }
+      }else{return false;}
+   }else{return false;}
+  
+  
+  return false;
+}
+
+
 void HistogramProducer::InitAllHistos(){
    //h1Maps["uncutEE"]=InitHistograms("uncut"); 
    //h1Maps["uncutMM"]=InitHistograms("uncut");
@@ -662,15 +922,28 @@ void HistogramProducer::InitAllHistos(){
    h1Maps["selEE"]=InitHistograms(SEL);
    h1Maps["selMM"]=InitHistograms(SEL); 
    h1Maps["sel"]=InitHistograms(SEL); 
+   h1Maps["onZEE"]=InitHistograms(ONZ);
+   h1Maps["onZMM"]=InitHistograms(ONZ); 
+   h1Maps["onZ"]=InitHistograms(ONZ); 
    //h2Maps["selEE"]=Init2DHistograms("sel");
    //h2Maps["selMM"]=Init2DHistograms("sel"); 
    //h2Maps["sel"]=Init2DHistograms("sel"); 
+}
    
+void HistogramProducer::InitTriggerStudiesHistos(){
+   eff1Maps["trigDilep"]=InitTriggerStudies(TRIGDILEP);
+   eff1Maps["trigDilepEE"]=InitTriggerStudies(TRIGDILEP);
+   eff1Maps["trigDilepMM"]=InitTriggerStudies(TRIGDILEP);
+   eff1Maps["trigSelEE"]=InitTriggerStudies(TRIGSEL);
+   eff1Maps["trigSelMM"]=InitTriggerStudies(TRIGSEL);
+   eff1Maps["trigOnZEE"]=InitTriggerStudies(TRIGONZ);
+   eff1Maps["trigOnZMM"]=InitTriggerStudies(TRIGONZ);
 
-   }
+}
 
 void HistogramProducer::FillHistograms2D(){
-   if(SelectEvent(SEL)){
+   //if(SelectEvent(SEL)){
+   if(SelectEvent(SEL)||SelectEvent(ONZ)){
       if (selectedEvent.selPhotons.size()!=0){
          auto m1 = &h2Maps["selEE"];
          auto m2 = &h2Maps["selMM"];
@@ -686,6 +959,8 @@ void HistogramProducer::FillHistograms2D(){
    }
 }
 void HistogramProducer::FillHistograms(){
+//enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,};
+
    /*if(SelectEvent(UNCUT)){
       auto m1 = &h1Maps["uncutEE"];
       auto m2 = &h1Maps["uncutMM"];
@@ -749,7 +1024,10 @@ void HistogramProducer::FillHistograms(){
       m3->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
       m3->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
       m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-      m3->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight); 
+      m3->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+      m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+      m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+      m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
       if (selectedEvent.isDiElectron){ 
         m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
         m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
@@ -764,6 +1042,9 @@ void HistogramProducer::FillHistograms(){
         m1->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
         m1->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
         m1->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+        m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+        m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+        m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
       }else{
         m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
         m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
@@ -777,7 +1058,10 @@ void HistogramProducer::FillHistograms(){
         m2->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
         m2->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
         m2->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-        m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);      
+        m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+        m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+        m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+        m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
       }
    }
    /*if(SelectEvent(PHOTON)){
@@ -863,8 +1147,12 @@ void HistogramProducer::FillHistograms(){
          m3->at(PHIG1).Fill(selectedEvent.selPhotons.at(0).p.Phi(),selectedEvent.totalWeight);
          m3->at(ETAG1).Fill(selectedEvent.selPhotons.at(0).p.Eta(),selectedEvent.totalWeight);
          m3->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-         //m3->at("m_llg_g2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()>(2.*91.197-selectedEvent.mll)));
-         //m3->at("m_llg_l2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()<(2.*91.197-selectedEvent.mll)));
+         m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+         m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+         m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+         m3->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+         m3->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+         m3->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
          if (selectedEvent.isDiElectron){ 
             m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
             m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
@@ -883,8 +1171,12 @@ void HistogramProducer::FillHistograms(){
             m1->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
             m1->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
             m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            //m1->at("m_llg_g2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()>(2.*91.197-selectedEvent.mll)));
-            //m1->at("m_llg_l2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()<(2.*91.197-selectedEvent.mll)));
+            m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+            m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+            m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+            m1->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+            m1->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+            m1->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
          }else{
             m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
             m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
@@ -903,8 +1195,221 @@ void HistogramProducer::FillHistograms(){
             m2->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
             m2->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
             m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            //m2->at("m_llg_g2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()>(2.*91.197-selectedEvent.mll)));
-            //m2->at("m_llg_l2Z").Fill((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M(),selectedEvent.totalWeight*((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()<(2.*91.197-selectedEvent.mll)));
+            m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+            m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+            m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+            m2->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+            m2->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+            m2->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         }
+      }
+   }
+  
+   if(SelectEvent(ONZ)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
+         auto m1 = &h1Maps["onZEE"];
+         auto m2 = &h1Maps["onZMM"];
+         auto m3 = &h1Maps["onZ"];
+         m3->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
+         m3->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
+         m3->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
+         m3->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
+         m3->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
+         m3->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
+         m3->at(HT).Fill(*ht,selectedEvent.totalWeight);
+         m3->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
+         m3->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
+         m3->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
+         m3->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
+         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+         m3->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
+         m3->at(PHIG1).Fill(selectedEvent.selPhotons.at(0).p.Phi(),selectedEvent.totalWeight);
+         m3->at(ETAG1).Fill(selectedEvent.selPhotons.at(0).p.Eta(),selectedEvent.totalWeight);
+         m3->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
+         m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+         m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+         m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+         m3->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+         m3->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+         m3->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         if (selectedEvent.isDiElectron){ 
+            m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
+            m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
+            m1->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
+            m1->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
+            m1->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
+            m1->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
+            m1->at(HT).Fill(*ht,selectedEvent.totalWeight);
+            m1->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
+            m1->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
+            m1->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
+            m1->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
+            m1->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+            m1->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+            m1->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
+            m1->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
+            m1->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
+            m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
+            m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+            m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+            m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+            m1->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+            m1->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+            m1->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         }else{
+            m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
+            m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
+            m2->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
+            m2->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
+            m2->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
+            m2->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
+            m2->at(HT).Fill(*ht,selectedEvent.totalWeight);
+            m2->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
+            m2->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
+            m2->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
+            m2->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
+            m2->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+            m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+            m2->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
+            m2->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
+            m2->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
+            m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
+            m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
+            m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
+            m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+            m2->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
+            m2->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
+            m2->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         }
+      }
+   }
+}
+
+
+void HistogramProducer::FillTriggerStudies(){
+   if(SelectEventTriggerStudies(TRIGDILEP)){
+      auto m1 = &eff1Maps["trigDilepEE"];
+      auto m2 = &eff1Maps["trigDilepMM"];
+      if (selectedEvent.trigHt){//baselineTrigger
+         if (selectedEvent.isDiElectron){ 
+           m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
+           m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
+           m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
+           m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
+           m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
+           m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
+           m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
+           m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
+           m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
+           m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
+           m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
+           m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+           m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+         }else{
+           m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
+           m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
+           m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
+           m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
+           m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
+           m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
+           m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
+           m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
+           m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
+           m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
+           m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
+           m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
+           m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));      
+         }
+      }
+   }
+   if(SelectEvent(TRIGSEL)){
+      if (selectedEvent.selPhotons.size()!=0){
+         auto m1 = &eff1Maps["trigSelEE"];
+         auto m2 = &eff1Maps["trigSelMM"];
+         if (selectedEvent.trigHt){//baselineTrigger
+            if (selectedEvent.isDiElectron){ 
+               m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
+               m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
+               m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
+               m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
+               m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
+               m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
+               m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
+               m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
+               m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
+               m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
+               m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
+               m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+               m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+               m1->at(PTG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).p.Pt());
+               m1->at(PHIG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
+               m1->at(ETAG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
+               m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            }else{
+               m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
+               m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
+               m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
+               m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
+               m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
+               m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
+               m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
+               m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
+               m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
+               m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
+               m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
+               m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
+               m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
+               m2->at(PTG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).p.Pt());
+               m2->at(PHIG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
+               m2->at(ETAG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
+               m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            }
+         }
+      }
+   }
+   if(SelectEvent(TRIGONZ)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
+         auto m1 = &eff1Maps["trigOnZEE"];
+         auto m2 = &eff1Maps["trigOnZMM"];
+         if (selectedEvent.trigHt){//baselineTrigger
+            if (selectedEvent.isDiElectron){ 
+               m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
+               m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
+               m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
+               m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
+               m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
+               m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
+               m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
+               m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
+               m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
+               m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
+               m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
+               m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+               m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+               m1->at(PTG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).p.Pt());
+               m1->at(PHIG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
+               m1->at(ETAG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
+               m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            }else{
+               m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
+               m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
+               m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
+               m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
+               m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
+               m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
+               m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
+               m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
+               m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
+               m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
+               m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
+               m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
+               m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
+               m2->at(PTG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).p.Pt());
+               m2->at(PHIG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
+               m2->at(ETAG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
+               m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            }
          }
       }
    }
@@ -913,12 +1418,11 @@ void HistogramProducer::FillHistograms(){
 
 Bool_t HistogramProducer::Process(Long64_t entry){
    //float tempPercentage = (float) entry/ (float)nEntries;
-   //if (tempPercentage>0.1){
+   //if (tempPercentage>0.05){
       //return kTRUE;
    //}
    fReader.SetLocalEntry(entry);
-   //totalWeight = *mc_weight * *pu_weight;
-   totalWeight = *mc_weight;
+   totalWeight = *mc_weight * *pu_weight;
    
    //print out progression
    //double currentEventNo = (double) entry;
@@ -931,6 +1435,8 @@ Bool_t HistogramProducer::Process(Long64_t entry){
 
    FillHistograms();
    //FillHistograms2D();
+   
+   FillTriggerStudies();
    
    return kTRUE;
 }
@@ -976,6 +1482,7 @@ void HistogramProducer::Terminate()
    TFile file(outputName.c_str(), "RECREATE");
    //save2File(h1Map, file);
    save2File(h1Maps, file);
+   save2File(eff1Maps, file);
    //save2File(h2Maps, file);
    cutFlow.Write("hCutFlow");
    file.Close();

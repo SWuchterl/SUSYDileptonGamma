@@ -33,16 +33,16 @@ ds={
         "DoubleMuon_Run2016H-03Feb2017_ver2-v1_nTuple.root",
         "DoubleMuon_Run2016H-03Feb2017_ver3-v1_nTuple.root"
         ],
-    #"ht": [
-        #"JetHT_Run2016B-03Feb2017_ver2-v2_nTuple.root",
-        #"JetHT_Run2016C-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016D-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016E-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016F-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016G-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016H-03Feb2017_ver2-v1_nTuple.root",
-        #"JetHT_Run2016H-03Feb2017_ver3-v1_nTuple.root"
-        #],
+    "ht": [
+        "JetHT_Run2016B-03Feb2017_ver2-v2_nTuple.root",
+        "JetHT_Run2016C-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016D-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016E-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016F-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016G-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016H-03Feb2017_ver2-v1_nTuple.root",
+        "JetHT_Run2016H-03Feb2017_ver3-v1_nTuple.root"
+        ],
     "dy": [
         "DYJetsToLL_M-50_ext_nTuple.root"
         ],
@@ -56,27 +56,31 @@ ds={
         "WZG-amcatnlo_nTuple.root"
         ],
     "zg": [
-        "ZGTo2LG_ext_nTuple.root",
-        "ZGTo2LG_nTuple.root"
+        "ZGTo2LG_ext_nTuple.root"#,
+        #"ZGTo2LG_PtG-130_nTuple.root"
+        #"ZGTo2LG_nTuple.root"
         ],
     "zz": [
-        "ZZTo2L2Nu_powheg_ext1_nTuple.root",
-        "ZZTo2L2Nu_powheg_nTuple.root",
-        "ZGTo2LG_PtG-130_nTuple.root"
+        "ZZTo2L2Nu_powheg_ext1_nTuple.root"#,
+        #"ZZTo2L2Nu_powheg_nTuple.root"
         ],
     "tt":[
         "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_nTuple.root"
         ],
-#"signal":["SMS-T5bbbbZg_nTuple.root",
-        #"SMS-TChiNG_BF50N50G_nTuple.root"
-        #]
-"signal":["SMS-TChiNG_900_nTuple.root"
+    "wjets":[
+        "WJetsToLNu-amcatnloFXFX_ext_nTuple.root",
+        "WJetsToLNu-madgraphMLM_ext_nTuple.root"
+        ],
+"signal":[
+        "SMS-T5bbbbZg_1800_1700_nTuple.root",
+        "SMS-T5bbbbZg_1800_400_nTuple.root"
         ]
 }
     
     
 #dir = "../scratch/v01/"
-dir = "../scratch/v02/"
+#dir = "../scratch/v02/"
+dir = "../scratch/v03/"
 
 #############################################
 # Select datasets to process

@@ -151,8 +151,8 @@ wwgamma.label = "WW#gamma"
 
 ###############################################################################
 ## ZZ
-zz = Dataset("ZZTo2L2Nu_powheg", 0.5644, ROOT.kYellow) \
-    +Dataset("ZZTo2L2Nu_powheg_ext1", 0.5644, ROOT.kYellow)
+#zz = Dataset("ZZTo2L2Nu_powheg", 0.5644, ROOT.kYellow) \
+zz =    Dataset("ZZTo2L2Nu_powheg_ext1", 0.5644, ROOT.kYellow)
 zz.label = "ZZ"
 
 ###############################################################################
@@ -160,8 +160,8 @@ zz.label = "ZZ"
 #zgamma = Dataset("ZGTo2LG", 117.864 , ROOT.kGreen)\
     #+Dataset("ZGTo2LG_ext", 117.864 , ROOT.kGreen) \
     #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen)
-zgamma = Dataset("ZGTo2LG_ext", 117.864 , ROOT.kGreen-3) \
-    +Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
+zgamma = Dataset("ZGTo2LG_ext", 117.864 , ROOT.kGreen-3) #\
+    #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
 #zgamma = Dataset("ZGTo2LG", 117.864 , ROOT.kGreen) #\
 zgamma.label = "Z#gamma"
 
@@ -185,8 +185,11 @@ DYjets.label = "DY+jets"
 ## ttbar
 tt = Dataset("TTTo2L2Nu_TuneCUETP8M2_ttHtranche3", 87.31  , ROOT.kOrange+8)
 tt.label = "t#bar{t}"
-
-
+###############################################################################
+## WJets
+wjets = Dataset("WJetsToLNu-madgraphMLM_ext", 61526.7  , ROOT.kGreen+3)#LO
+#wjets = Dataset("WJetsToLNu-madgraphMLM_ext_hists", 61526.7  , ROOT.kGreen+3)#NLO
+wjets.label = "W+jets"
 
 
 ###############################################################################
@@ -210,6 +213,10 @@ tchiwg_700 = Dataset("SMS-TChiWG_700", 9.51032/1000, ROOT.kRed+4, "")
 
 
 tching_900 = Dataset("SMS-TChiNG_900",)
+
+t5bbbbzg_1800_1700 = Dataset("SMS-T5bbbbZg_1800_1700",0.00276133,ROOT.kRed+4,"")
+t5bbbbzg_1800_400 = Dataset("SMS-T5bbbbZg_1800_400",0.00276133,ROOT.kBlue+2,"")
+
 
 import collections
 class SampleCollection(collections.MutableMapping):
