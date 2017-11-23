@@ -192,6 +192,15 @@ wjets = Dataset("WJetsToLNu-madgraphMLM_ext", 61526.7  , ROOT.kGreen+3)#LO
 wjets.label = "W+jets"
 
 
+totalMC= Dataset("WWG-amcatnlo_ext", 0.2147, ROOT.kBlack)\
+        +Dataset("ZZTo2L2Nu_powheg_ext1", 0.5644, ROOT.kBlack)\
+        +Dataset("ZGTo2LG_ext", 117.864 , ROOT.kBlack)\
+        +Dataset("WZG-amcatnlo", 0.04123 , ROOT.kBlack)\
+        +Dataset("TTGamma_Dilept-amcatnlo", 0.6352 , ROOT.kBlack)\
+        +Dataset("DYJetsToLL_M-50_ext", 1921.8*3.  , ROOT.kBlack)\
+        +Dataset("TTTo2L2Nu_TuneCUETP8M2_ttHtranche3", 87.31  , ROOT.kBlack)\
+
+
 ###############################################################################
 # ##Signal samples
 t5wg_1600_100 = Dataset("SMS-T5Wg_1600_100", 0.00810078, ROOT.kRed, "")

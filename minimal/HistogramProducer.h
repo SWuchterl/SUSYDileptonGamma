@@ -170,6 +170,10 @@ class HistogramProducer : public TSelector {
   bool testSelection(const selPhoton& pa, selectionType);
   bool testSelection(const selJet& pa, selectionType);
   
+  
+  void Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
+  void FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool);
+  
   void InitAllHistos();
   void InitTriggerStudiesHistos();
   void InitScaleFactors();

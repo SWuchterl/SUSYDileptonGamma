@@ -35,16 +35,19 @@ list_of_variables = ['pt1',
 
 
 binnings = {
-    'pt1':              np.arange(0., 300., 10.),
+    #'pt1':              np.arange(0., 500., 10.),
+    'pt1':              np.concatenate((np.arange(0,200,10),np.arange(200,550,50)),axis=0),
     'pt2':              np.arange(0., 300, 10),
     'eta1':             np.arange(0., 2.6, 0.1),
     'eta2':             np.arange(0., 2.60, 0.1),
     'phi1':             np.arange(0., 3.50, 0.10),
     'phi2':             np.arange(0., 3.50, 0.10),
     'ht':               np.arange(0., 1000.,10.),
-    'met':              np.arange(0., 1000.,10.),
+    #'met':              np.arange(0., 1000.,100.),
+    'met':              np.concatenate((np.arange(0,200,10),np.arange(200,550,50)),axis=0),
     'gen_ht':           np.arange(0., 1000.,10.),
     'm_ll':             np.arange(0., 650.,10.),
+    #'m_ll':             np.concatenate((np.arange(0,300,10),np.arange(300,550,50)),axis=0),
     'm_ll_e':           np.arange(0., 650.,10.),
     'm_ll_m':           np.arange(0., 650.,10.),
     'n_jets':           np.arange(0.,10.,1.),
@@ -148,7 +151,7 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
             r.draw(0.5,1.5)
 
         info = ""
-        l = aux.Label(info="#scale[0.7]{%s}"%info, sim=((dataDoubleMuon not in additional)or(dataDoubleEG not in additional)))
+        l = aux.Label(info="#scale[0.7]{%s}"%info, sim=((dataDoubleMuon not in additional)or(dataDoubleEG not in additional)or(dataHt not in additional)or(dataSF not in additional)))
 
         if binningName: binningName = "_"+binningName
         name = name.replace("/","__")
@@ -157,17 +160,27 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
 
         
 def main():
-    bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    #variables=["eta1","pt1","n_jets","n_vtx","phi1","eta2","phi2","m_ll","ht","n_photons","pt2"]
-    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
+    #bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
+    bkgs=[DYjets,zgamma,wwgamma,ttgamma,zz,tt,wjets]
+    #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
+    variables=["eta1","pt1","n_jets","m_ll"]
     groups=["dilep","sel","onZ"]
     for group in groups:
         for variable in variables:
             drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable])
             drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable])
+            #drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
+            #drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
+def main2():
+    #bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
+    bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
+    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","met","DeltaEtaLL","DeltaEtaLLG","DeltaPhiLL","DeltaPhiLLG","DeltaRLL","DeltaRLLG"]
+    groups=["sel","onZ"]
+    for group in groups:
+        for variable in variables:
             drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
             drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
-            #drawSameHistogram("SF",group+"/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable])
-            #drawSameHistogram("HT",group+"/"+variable, bkgs, additional=[dataHt],binning=binnings[variable])
+
 
 main()
+#main2()

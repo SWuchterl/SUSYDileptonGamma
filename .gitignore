@@ -8,3 +8,7 @@ scratch
 *.pdf
 *.png
 *.jpg
+*.so
+minimal/submitCondor.txt
+minimal/logs/
+minimal/HistogramProducer_cc.so

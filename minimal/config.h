@@ -1,15 +1,15 @@
 #include <iostream>
-
-
 using namespace std;
 
 
 
-
-enum selectionType{UNCUT,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ};
-enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG};
+enum selectionType{UNCUT,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ,TRIGDILEP_ptcuts,TRIGONZ_ptcuts,TRIGSEL_ptcuts};
+enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,ST,STG,STMET,ZPT,MTLL,MTLLG};
 enum Histograms2D{ISRVFSR};
 enum particleType{E,M};
+
+
+
 
 map<Histograms1D,string> histoNames;
 map<Histograms2D,string> histoNames2D;
@@ -37,6 +37,12 @@ histoNames[DeltaEtaLLG] = "deltaEtaLLG";
 histoNames[DeltaPhiLLG] = "deltaPhiLLG";
 histoNames[DeltaRLL] = "deltaRLL";
 histoNames[DeltaRLLG] = "deltaRLLG";
+histoNames[ST] = "st";
+histoNames[STG] = "stg";
+histoNames[STMET] = "stmet";
+histoNames[ZPT] = "zpt";
+histoNames[MTLL] = "mtll";
+histoNames[MTLLG] = "mtllg";
 };
 
 

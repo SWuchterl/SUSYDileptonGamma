@@ -232,7 +232,6 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
 
 bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 Leptons exist)
 {
-   //cout<<"signal?"<<isSignal<<endl;
    if(!isSignal){
       trigDiEle = *hlt_ele17_ele12_iso || *hlt_ele23_ele12_iso || *hlt_doubleEle33 || *hlt_doubleEle33_mw;
       trigDiMu  = *hlt_mu17_mu8_iso || *hlt_mu17_tkMu8_iso || *hlt_mu17_mu8_iso_dz || *hlt_mu17_tkMu8_iso_dz
@@ -244,7 +243,6 @@ bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 L
       trigMuEle = false;
       trigHt    = *hlt_ht200 || *hlt_ht250 || *hlt_ht300 || *hlt_ht350 || *hlt_ht400
                   || *hlt_ht475 || *hlt_ht600 || *hlt_ht650 || *hlt_ht800;
-      //trigHt    = true;
    }else{
       trigDiEle = true;
       trigDiMu = true;
@@ -261,7 +259,7 @@ bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 L
       bool isHTSelection = inputName.find("JetHT")!= string::npos;
       auto missingET = *met;
         
-      if (isHTSelection && Check2Ele()) {
+      if (isHTSelection && trigHt && Check2Ele()) {
          auto e1 = electrons->at(0);
          auto e2 = electrons->at(1);
          if (Check2Mu()) {
@@ -276,7 +274,7 @@ bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 L
             return true;
          }
       }
-      if (isMuMuSelection && Check2Mu()) {
+      if (isHTSelection && trigHt && Check2Mu()) {
          auto m1 = muons->at(0);
          auto m2 = muons->at(1);
          if (Check2Ele()) {
@@ -349,7 +347,10 @@ bool HistogramProducer::testSelection(const tree::Electron& pa,selectionType sel
       //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue) ;
    }
    if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
-      decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
+      decision =(*ht>200.) && pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
+   }
+   if(selection==TRIGSEL_ptcuts || selection==TRIGDILEP_ptcuts || selection==TRIGONZ_ptcuts){
+      decision =(*ht>200.) && pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
    }
    return decision;
 }
@@ -365,7 +366,10 @@ bool HistogramProducer::testSelection(const tree::Muon& pa, selectionType select
       decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
    }
    if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
-      decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
+      decision = (*ht>200.) && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
+   }
+   if(selection==TRIGSEL_ptcuts || selection==TRIGDILEP_ptcuts || selection==TRIGONZ_ptcuts){
+      decision = (*ht>200.)&& pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
    }
    return decision;
 }
@@ -374,7 +378,10 @@ bool HistogramProducer::testSelection(const selPhoton& pa, selectionType selecti
    if ((selection==UNCUT)||(selection==PHOTON)){
       decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
    }
-   if(selection==SEL || selection==DILEP ||selection==ONZ || selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
+   if(selection==SEL || selection==DILEP ||selection==ONZ){
+      decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+   }
+   if(selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
       decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
    }
    return decision;
@@ -390,11 +397,6 @@ bool HistogramProducer::testSelection(const selJet& pa, selectionType selection)
    return decision;
 }
 
-//bool matchGenParticle(const tree::Particle& pa){
-   //float deltaR_temp,pt_temp;
-   //for{genParticles::iterator = genParticles.begin(), iterator}
-   //
-//}
 
 
 void HistogramProducer::Init(TTree *tree)
@@ -608,9 +610,7 @@ float HistogramProducer::GetScaleFactorAndErrorAlternative(float pt, float eta,b
 
 
 map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType selection_){
-    
    map<Histograms1D,TH1F> hMap;
-//enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,};
 
    hMap[ETMISS] = TH1F("", ";#it{p}_{T}^{miss} (GeV)", 200, 0, 1000);
    hMap[PT1] = TH1F("", ";#it{p}_{T}^{leading} (GeV)", 200, 0, 1000);
@@ -628,7 +628,9 @@ map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType sel
    hMap[DeltaEtaLL] = TH1F("", ";#Delta#Eta_{ll}", 600, 0, 6.);
    hMap[DeltaPhiLL] = TH1F("", ";#Delta#Phi_{ll}", 600, 0, 6.);
    hMap[DeltaRLL] = TH1F("", ";#DeltaR_{ll}", 5000, 0, 6.);
-
+   hMap[ZPT] = TH1F("", ";Z_{p_T}", 1000, 0, 1000);
+   hMap[MTLL] = TH1F("", ";m_{T}^{ll}", 1000, 0, 1000);
+   hMap[ST] = TH1F("", ";S_T", 5000, 0, 5000.);
    
    if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)){
       hMap[PTG1] = TH1F("", ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
@@ -638,6 +640,9 @@ map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType sel
       hMap[DeltaRLLG] = TH1F("", ";#DeltaR_{ll,#gamma}", 6000, 0, 6.);
       hMap[DeltaEtaLLG] = TH1F("", ";#Delta#Eta_{ll,#gamma}", 600, 0, 6.);
       hMap[DeltaPhiLLG] = TH1F("", ";#Delta#Phi_{ll,#gamma}", 600, 0, 6.);
+      hMap[STG] = TH1F("", ";S_T", 5000, 0, 5000.);
+      hMap[STMET] = TH1F("", ";S_T + #it{p}_{T}^{miss} (GeV)", 5000, 0, 5000.);   
+      hMap[MTLLG] = TH1F("", ";m_{T}^{ll#gamma}", 1000, 0, 1000);
    }
 
    return hMap;
@@ -673,7 +678,7 @@ map<Histograms1D,TEfficiency> HistogramProducer::InitTriggerStudies(const select
    hMap[ETA2] = TEfficiency("", ";|#eta_{leading}|", 260, 0, 2.6);
    hMap[PHI1] = TEfficiency("", ";|#phi_{trailing}|", 350, 0, 3.5);
    hMap[PHI2] = TEfficiency("", ";|#phi_{leading}|", 350, 0, 3.5);
-   
+
    if ((selection_==TRIGONZ)||(selection_==TRIGSEL)){
       hMap[PTG1] = TEfficiency("", ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
       hMap[ETAG1] = TEfficiency("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
@@ -701,9 +706,6 @@ bool HistogramProducer::SelectEvent(selectionType selection){
          L.trigDiMu=trigDiMu;
          L.trigMuEle=trigMuEle;
          L.trigHt=trigHt;
-         //if(trigHt&&isDiElectron){
-            //cout<<"  "<<trigDiEle<<endl;
-         //}
          L.l1=lep1;
          L.l2=lep2;
          L.pt1=pt1;
@@ -801,7 +803,7 @@ bool HistogramProducer::SelectEvent(selectionType selection){
 }
 
 bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
-   if (CheckParticles()){//only Fill Histograms if nMu>=2, nEle>=2, nGamma>=0
+   if (CheckParticles()){//only Fill Histograms if nMu>=2 or nEle>=2, nGamma>=0
       if (CleaningTriggerStudies()){//decide in events with DiEle and DiMu where to contribute
          selEvent L;
          L.isDiElectron=isDiElectron;
@@ -809,9 +811,6 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
          L.trigDiMu=trigDiMu;
          L.trigMuEle=trigMuEle;
          L.trigHt=trigHt;
-         //if(trigHt&&isDiElectron){
-            //cout<<"  "<<trigDiEle<<endl;
-         //}
          L.l1=lep1;
          L.l2=lep2;
          L.pt1=pt1;
@@ -931,13 +930,18 @@ void HistogramProducer::InitAllHistos(){
 }
    
 void HistogramProducer::InitTriggerStudiesHistos(){
-   eff1Maps["trigDilep"]=InitTriggerStudies(TRIGDILEP);
    eff1Maps["trigDilepEE"]=InitTriggerStudies(TRIGDILEP);
    eff1Maps["trigDilepMM"]=InitTriggerStudies(TRIGDILEP);
    eff1Maps["trigSelEE"]=InitTriggerStudies(TRIGSEL);
    eff1Maps["trigSelMM"]=InitTriggerStudies(TRIGSEL);
    eff1Maps["trigOnZEE"]=InitTriggerStudies(TRIGONZ);
    eff1Maps["trigOnZMM"]=InitTriggerStudies(TRIGONZ);
+   eff1Maps["trigDilepEE_ptcuts"]=InitTriggerStudies(TRIGDILEP);
+   eff1Maps["trigDilepMM_ptcuts"]=InitTriggerStudies(TRIGDILEP);
+   eff1Maps["trigSelEE_ptcuts"]=InitTriggerStudies(TRIGSEL);
+   eff1Maps["trigSelMM_ptcuts"]=InitTriggerStudies(TRIGSEL);
+   eff1Maps["trigOnZEE_ptcuts"]=InitTriggerStudies(TRIGONZ);
+   eff1Maps["trigOnZMM_ptcuts"]=InitTriggerStudies(TRIGONZ);
 
 }
 
@@ -958,457 +962,187 @@ void HistogramProducer::FillHistograms2D(){
    
    }
 }
+
+
+void HistogramProducer::Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton){
+   m.at(ETMISS).Fill(ev.ETmiss, ev.totalWeight);
+   m.at(PT1).Fill(ev.pt1, ev.totalWeight);
+   m.at(PT2).Fill(ev.pt2, ev.totalWeight);
+   m.at(MLL).Fill(ev.mll,ev.totalWeight);   
+   m.at(NPHOTONS).Fill(ev.selPhotons.size(),ev.totalWeight);
+   m.at(NVTX).Fill(*nGoodVertices,ev.totalWeight);
+   m.at(HT).Fill(*ht,ev.totalWeight);
+   m.at(GENHT).Fill(*genHt,ev.totalWeight);
+   m.at(NJETS).Fill(ev.selJets.size(),ev.totalWeight);
+   m.at(ETA1).Fill(fabs(ev.eta1),ev.totalWeight);
+   m.at(ETA2).Fill(fabs(ev.eta2),ev.totalWeight);
+   m.at(PHI1).Fill(fabs(ev.phi2),ev.totalWeight);
+   m.at(PHI2).Fill(fabs(ev.phi2),ev.totalWeight);
+   m.at(DeltaEtaLL).Fill(fabs(ev.eta1-ev.eta2),ev.totalWeight);
+   m.at(DeltaPhiLL).Fill(fabs(ev.phi1-ev.phi2),ev.totalWeight);
+   m.at(DeltaRLL).Fill(fabs(ev.deltaRll),ev.totalWeight);
+   m.at(ZPT).Fill((ev.l1+ev.l2).Pt(),ev.totalWeight);
+   m.at(MTLL).Fill((ev.l1+ev.l2).Mt(),ev.totalWeight);
+   m.at(ST).Fill(ev.pt1+ev.pt2,ev.totalWeight);
+   if(withPhoton){
+      m.at(PTG1).Fill(ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
+      m.at(PHIG1).Fill(ev.selPhotons.at(0).p.Phi(),ev.totalWeight);
+      m.at(ETAG1).Fill(ev.selPhotons.at(0).p.Eta(),ev.totalWeight);
+      m.at(SIGMAIETAIETAG1).Fill(ev.selPhotons.at(0).sigmaIetaIeta,ev.totalWeight);
+      m.at(DeltaEtaLLG).Fill(fabs((ev.l1+ev.l2).Eta()-ev.selPhotons.at(0).vec.Eta()), ev.totalWeight);
+      m.at(DeltaPhiLLG).Fill(fabs((ev.l1+ev.l2).Phi()-ev.selPhotons.at(0).vec.Phi()),ev.totalWeight);
+      m.at(DeltaRLLG).Fill(fabs((ev.l1+ev.l2).DeltaR(ev.selPhotons.at(0).vec)),ev.totalWeight);
+      m.at(MTLLG).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec).Mt(),ev.totalWeight);
+      m.at(STG).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
+      m.at(STMET).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt()+ev.ETmiss,ev.totalWeight);
+   }
+}
+
+void HistogramProducer::FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool){
+   m.at(ETMISS).Fill(TriggerBool,ev.ETmiss);
+   m.at(PT1).Fill(TriggerBool,ev.pt1);
+   m.at(PT2).Fill(TriggerBool,ev.pt2);
+   m.at(MLL).Fill(TriggerBool,ev.mll);   
+   m.at(NPHOTONS).Fill(TriggerBool,ev.selPhotons.size());
+   m.at(NVTX).Fill(TriggerBool,*nGoodVertices);
+   m.at(HT).Fill(TriggerBool,*ht);
+   m.at(GENHT).Fill(TriggerBool,*genHt);
+   m.at(NJETS).Fill(TriggerBool,ev.selJets.size());
+   m.at(ETA1).Fill(TriggerBool,fabs(ev.eta1));
+   m.at(ETA2).Fill(TriggerBool,fabs(ev.eta2));
+   m.at(PHI1).Fill(TriggerBool,fabs(ev.phi2));
+   m.at(PHI2).Fill(TriggerBool,fabs(ev.phi2));
+   if(withPhoton){
+      m.at(PTG1).Fill(TriggerBool,ev.selPhotons.at(0).p.Pt());
+      m.at(PHIG1).Fill(TriggerBool,fabs(ev.selPhotons.at(0).p.Phi()));
+      m.at(ETAG1).Fill(TriggerBool,fabs(ev.selPhotons.at(0).p.Eta()));
+      m.at(SIGMAIETAIETAG1).Fill(TriggerBool,ev.selPhotons.at(0).sigmaIetaIeta);
+   }
+}
+
+
+
 void HistogramProducer::FillHistograms(){
-//enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,};
 
    /*if(SelectEvent(UNCUT)){
       auto m1 = &h1Maps["uncutEE"];
       auto m2 = &h1Maps["uncutMM"];
       auto m3 = &h1Maps["uncut"];
-      m3->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-      m3->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-      m3->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-      m3->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-      m3->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-      m3->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-      m3->at("ht").Fill(*ht,selectedEvent.totalWeight);
-      m3->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-      m3->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-      m3->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-      m3->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-      m3->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-      m3->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight); 
+      Filler(selectedEvent,h1Maps["uncut"],false); 
       if (selectedEvent.isDiElectron){ 
-         m1->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-         m1->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-         m1->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-         m1->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-         m1->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-         m1->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-         m1->at("ht").Fill(*ht,selectedEvent.totalWeight);
-         m1->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-         m1->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-         m1->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-         m1->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-         m1->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m1->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
+         Filler(selectedEvent,h1Maps["uncutEE"],false); 
       }else{
-         m2->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-         m2->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-         m2->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-         m2->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-         m2->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-         m2->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-         m2->at("ht").Fill(*ht,selectedEvent.totalWeight);
-         m2->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-         m2->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-         m2->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-         m2->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-         m2->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m2->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);      
+         Filler(selectedEvent,h1Maps["uncutMM"],false);      
       }
    }*/
    if(SelectEvent(DILEP)){
-      auto m1 = &h1Maps["dilepEE"];
-      auto m2 = &h1Maps["dilepMM"];
-      auto m3 = &h1Maps["dilep"];
-      m3->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-      m3->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-      m3->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-      m3->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-      m3->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-      m3->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-      m3->at(HT).Fill(*ht,selectedEvent.totalWeight);
-      m3->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-      m3->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-      m3->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-      m3->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-      m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-      m3->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-      m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-      m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-      m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+      Filler(selectedEvent,h1Maps["dilep"],false);
       if (selectedEvent.isDiElectron){ 
-        m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-        m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-        m1->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-        m1->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-        m1->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-        m1->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-        m1->at(HT).Fill(*ht,selectedEvent.totalWeight);
-        m1->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-        m1->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-        m1->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-        m1->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-        m1->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-        m1->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-        m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-        m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-        m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+         Filler(selectedEvent,h1Maps["dilepEE"],false);
       }else{
-        m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-        m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-        m2->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-        m2->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-        m2->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-        m2->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-        m2->at(HT).Fill(*ht,selectedEvent.totalWeight);
-        m2->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-        m2->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-        m2->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-        m2->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-        m2->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-        m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-        m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-        m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-        m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
+        Filler(selectedEvent,h1Maps["dilepMM"],false);
       }
    }
    /*if(SelectEvent(PHOTON)){
       if (selectedEvent.selPhotons.size()!=0){
-         auto m1 = &h1Maps["1photonEE"];
-         auto m2 = &h1Maps["1photonMM"];
-         auto m3 = &h1Maps["1photon"];
-         m3->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-         m3->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-         m3->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-         m3->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-         m3->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-         m3->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-         m3->at("ht").Fill(*ht,selectedEvent.totalWeight);
-         m3->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-         m3->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-         m3->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-         m3->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-         m3->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at("pt_g1").Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-         m3->at("phi_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-         m3->at("eta_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-         m3->at("sigmaIetaIeta_g1").Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);         
+         Filler(selectedEvent,h1Maps["1photon"],true);         
          if (selectedEvent.isDiElectron){ 
-            m1->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m1->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m1->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m1->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m1->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m1->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m1->at("ht").Fill(*ht,selectedEvent.totalWeight);
-            m1->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-            m1->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m1->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m1->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m1->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at("pt_g1").Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m1->at("phi_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m1->at("eta_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m1->at("sigmaIetaIeta_g1").Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
+            Filler(selectedEvent,h1Maps["1photonEE"],true);
          }else{
-            m2->at("met").Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m2->at("pt1").Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m2->at("pt2").Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m2->at("m_ll").Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m2->at("n_photons").Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m2->at("n_vtx").Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m2->at("ht").Fill(*ht,selectedEvent.totalWeight);
-            m2->at("gen_ht").Fill(*genHt,selectedEvent.totalWeight);
-            m2->at("n_jets").Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m2->at("eta1").Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m2->at("eta2").Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m2->at("phi1").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at("phi2").Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at("pt_g1").Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m2->at("phi_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m2->at("eta_g1").Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m2->at("sigmaIetaIeta_g1").Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);      
+            Filler(selectedEvent,h1Maps["1photonMM"],true); 
          }
       }
    }*/
    if(SelectEvent(SEL)){
       if (selectedEvent.selPhotons.size()!=0){
-         auto m1 = &h1Maps["selEE"];
-         auto m2 = &h1Maps["selMM"];
-         auto m3 = &h1Maps["sel"];
-         m3->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-         m3->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-         m3->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-         m3->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-         m3->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-         m3->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-         m3->at(HT).Fill(*ht,selectedEvent.totalWeight);
-         m3->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-         m3->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-         m3->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-         m3->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-         m3->at(PHIG1).Fill(selectedEvent.selPhotons.at(0).p.Phi(),selectedEvent.totalWeight);
-         m3->at(ETAG1).Fill(selectedEvent.selPhotons.at(0).p.Eta(),selectedEvent.totalWeight);
-         m3->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-         m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-         m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-         m3->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-         m3->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-         m3->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
-         if (selectedEvent.isDiElectron){ 
-            m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m1->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m1->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m1->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m1->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m1->at(HT).Fill(*ht,selectedEvent.totalWeight);
-            m1->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-            m1->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m1->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m1->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m1->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m1->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m1->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-            m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-            m1->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-            m1->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-            m1->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         Filler(selectedEvent,h1Maps["sel"],true);
+         if (selectedEvent.isDiElectron){
+            Filler(selectedEvent,h1Maps["selEE"],true); 
          }else{
-            m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m2->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m2->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m2->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m2->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m2->at(HT).Fill(*ht,selectedEvent.totalWeight);
-            m2->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-            m2->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m2->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m2->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m2->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m2->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m2->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-            m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-            m2->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-            m2->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-            m2->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+            Filler(selectedEvent,h1Maps["selMM"],true); 
          }
       }
    }
   
    if(SelectEvent(ONZ)){
       if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
-         auto m1 = &h1Maps["onZEE"];
-         auto m2 = &h1Maps["onZMM"];
-         auto m3 = &h1Maps["onZ"];
-         m3->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-         m3->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-         m3->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-         m3->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-         m3->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-         m3->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-         m3->at(HT).Fill(*ht,selectedEvent.totalWeight);
-         m3->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-         m3->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-         m3->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-         m3->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-         m3->at(PHIG1).Fill(selectedEvent.selPhotons.at(0).p.Phi(),selectedEvent.totalWeight);
-         m3->at(ETAG1).Fill(selectedEvent.selPhotons.at(0).p.Eta(),selectedEvent.totalWeight);
-         m3->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-         m3->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-         m3->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-         m3->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-         m3->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-         m3->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-         m3->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+         Filler(selectedEvent,h1Maps["onZ"],true);
          if (selectedEvent.isDiElectron){ 
-            m1->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m1->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m1->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m1->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m1->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m1->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m1->at(HT).Fill(*ht,selectedEvent.totalWeight);
-            m1->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-            m1->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m1->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m1->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m1->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m1->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m1->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            m1->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-            m1->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-            m1->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-            m1->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-            m1->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-            m1->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+            Filler(selectedEvent,h1Maps["onZEE"],true);
          }else{
-            m2->at(ETMISS).Fill(selectedEvent.ETmiss, selectedEvent.totalWeight);
-            m2->at(PT1).Fill(selectedEvent.pt1, selectedEvent.totalWeight);
-            m2->at(PT2).Fill(selectedEvent.pt2, selectedEvent.totalWeight);
-            m2->at(MLL).Fill(selectedEvent.mll,selectedEvent.totalWeight);   
-            m2->at(NPHOTONS).Fill(selectedEvent.selPhotons.size(),selectedEvent.totalWeight);
-            m2->at(NVTX).Fill(*nGoodVertices,selectedEvent.totalWeight);
-            m2->at(HT).Fill(*ht,selectedEvent.totalWeight);
-            m2->at(GENHT).Fill(*genHt,selectedEvent.totalWeight);
-            m2->at(NJETS).Fill(selectedEvent.selJets.size(),selectedEvent.totalWeight);
-            m2->at(ETA1).Fill(fabs(selectedEvent.eta1),selectedEvent.totalWeight);
-            m2->at(ETA2).Fill(fabs(selectedEvent.eta2),selectedEvent.totalWeight);
-            m2->at(PHI1).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(PHI2).Fill(fabs(selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(PTG1).Fill(selectedEvent.selPhotons.at(0).p.Pt(),selectedEvent.totalWeight);
-            m2->at(PHIG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Phi()),selectedEvent.totalWeight);
-            m2->at(ETAG1).Fill(fabs(selectedEvent.selPhotons.at(0).p.Eta()),selectedEvent.totalWeight);
-            m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.selPhotons.at(0).sigmaIetaIeta,selectedEvent.totalWeight);
-            m2->at(DeltaEtaLL).Fill(fabs(selectedEvent.eta1-selectedEvent.eta2),selectedEvent.totalWeight);
-            m2->at(DeltaPhiLL).Fill(fabs(selectedEvent.phi1-selectedEvent.phi2),selectedEvent.totalWeight);
-            m2->at(DeltaRLL).Fill(fabs(selectedEvent.deltaRll),selectedEvent.totalWeight);
-            m2->at(DeltaEtaLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Eta()-selectedEvent.selPhotons.at(0).vec.Eta()), selectedEvent.totalWeight);
-            m2->at(DeltaPhiLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).Phi()-selectedEvent.selPhotons.at(0).vec.Phi()),selectedEvent.totalWeight);
-            m2->at(DeltaRLLG).Fill(fabs((selectedEvent.l1+selectedEvent.l2).DeltaR(selectedEvent.selPhotons.at(0).vec)),selectedEvent.totalWeight);
+            Filler(selectedEvent,h1Maps["onZMM"],true);
          }
       }
    }
 }
 
 
+
+
+
+
+
 void HistogramProducer::FillTriggerStudies(){
    if(SelectEventTriggerStudies(TRIGDILEP)){
-      auto m1 = &eff1Maps["trigDilepEE"];
-      auto m2 = &eff1Maps["trigDilepMM"];
+      //auto m1 = &eff1Maps["trigDilepEE"];
+      //auto m2 = &eff1Maps["trigDilepMM"];
       if (selectedEvent.trigHt){//baselineTrigger
          if (selectedEvent.isDiElectron){ 
-           m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
-           m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
-           m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
-           m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
-           m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
-           m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
-           m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
-           m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
-           m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
-           m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
-           m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
-           m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
-           m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
+           FillerTrigger(selectedEvent,eff1Maps["trigDilepEE"],false,selectedEvent.trigDiEle);
          }else{
-           m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
-           m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
-           m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
-           m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
-           m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
-           m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
-           m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
-           m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
-           m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
-           m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
-           m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
-           m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
-           m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));      
+            FillerTrigger(selectedEvent,eff1Maps["trigDilepMM"],false,selectedEvent.trigDiMu);  
          }
       }
    }
-   if(SelectEvent(TRIGSEL)){
+   if(SelectEventTriggerStudies(TRIGDILEP_ptcuts)){
+      if (selectedEvent.trigHt){//baselineTrigger
+         if (selectedEvent.isDiElectron){ 
+           FillerTrigger(selectedEvent,eff1Maps["trigDilepEE_ptcuts"],false,selectedEvent.trigDiEle);
+         }else{
+            FillerTrigger(selectedEvent,eff1Maps["trigDilepMM_ptcuts"],false,selectedEvent.trigDiMu);  
+         }
+      }
+   }
+   if(SelectEventTriggerStudies(TRIGSEL)){
       if (selectedEvent.selPhotons.size()!=0){
-         auto m1 = &eff1Maps["trigSelEE"];
-         auto m2 = &eff1Maps["trigSelMM"];
          if (selectedEvent.trigHt){//baselineTrigger
-            if (selectedEvent.isDiElectron){ 
-               m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
-               m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
-               m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
-               m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
-               m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
-               m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
-               m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
-               m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
-               m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
-               m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
-               m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
-               m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
-               m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
-               m1->at(PTG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).p.Pt());
-               m1->at(PHIG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
-               m1->at(ETAG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
-               m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            if (selectedEvent.isDiElectron){
+               FillerTrigger(selectedEvent,eff1Maps["trigSelEE"],true,selectedEvent.trigDiEle); 
             }else{
-               m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
-               m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
-               m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
-               m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
-               m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
-               m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
-               m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
-               m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
-               m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
-               m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
-               m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
-               m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
-               m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
-               m2->at(PTG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).p.Pt());
-               m2->at(PHIG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
-               m2->at(ETAG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
-               m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+               FillerTrigger(selectedEvent,eff1Maps["trigSelMM"],true,selectedEvent.trigDiMu); 
             }
          }
       }
    }
-   if(SelectEvent(TRIGONZ)){
-      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
-         auto m1 = &eff1Maps["trigOnZEE"];
-         auto m2 = &eff1Maps["trigOnZMM"];
+   if(SelectEventTriggerStudies(TRIGSEL_ptcuts)){
+      if (selectedEvent.selPhotons.size()!=0){
          if (selectedEvent.trigHt){//baselineTrigger
-            if (selectedEvent.isDiElectron){ 
-               m1->at(ETMISS).Fill(selectedEvent.trigDiEle,selectedEvent.ETmiss);
-               m1->at(PT1).Fill(selectedEvent.trigDiEle,selectedEvent.pt1);
-               m1->at(PT2).Fill(selectedEvent.trigDiEle,selectedEvent.pt2);
-               m1->at(MLL).Fill(selectedEvent.trigDiEle,selectedEvent.mll);   
-               m1->at(NPHOTONS).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.size());
-               m1->at(NVTX).Fill(selectedEvent.trigDiEle,*nGoodVertices);
-               m1->at(HT).Fill(selectedEvent.trigDiEle,*ht);
-               m1->at(GENHT).Fill(selectedEvent.trigDiEle,*genHt);
-               m1->at(NJETS).Fill(selectedEvent.trigDiEle,selectedEvent.selJets.size());
-               m1->at(ETA1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta1));
-               m1->at(ETA2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.eta2));
-               m1->at(PHI1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
-               m1->at(PHI2).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.phi2));
-               m1->at(PTG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).p.Pt());
-               m1->at(PHIG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
-               m1->at(ETAG1).Fill(selectedEvent.trigDiEle,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
-               m1->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiEle,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+            if (selectedEvent.isDiElectron){
+               FillerTrigger(selectedEvent,eff1Maps["trigSelEE_ptcuts"],true,selectedEvent.trigDiEle); 
             }else{
-               m2->at(ETMISS).Fill(selectedEvent.trigDiMu,selectedEvent.ETmiss);
-               m2->at(PT1).Fill(selectedEvent.trigDiMu,selectedEvent.pt1);
-               m2->at(PT2).Fill(selectedEvent.trigDiMu,selectedEvent.pt2);
-               m2->at(MLL).Fill(selectedEvent.trigDiMu,selectedEvent.mll);   
-               m2->at(NPHOTONS).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.size());
-               m2->at(NVTX).Fill(selectedEvent.trigDiMu,*nGoodVertices);
-               m2->at(HT).Fill(selectedEvent.trigDiMu,*ht);
-               m2->at(GENHT).Fill(selectedEvent.trigDiMu,*genHt);
-               m2->at(NJETS).Fill(selectedEvent.trigDiMu,selectedEvent.selJets.size());
-               m2->at(ETA1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta1));
-               m2->at(ETA2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.eta2));
-               m2->at(PHI1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
-               m2->at(PHI2).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.phi2));
-               m2->at(PTG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).p.Pt());
-               m2->at(PHIG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Phi()));
-               m2->at(ETAG1).Fill(selectedEvent.trigDiMu,fabs(selectedEvent.selPhotons.at(0).p.Eta()));
-               m2->at(SIGMAIETAIETAG1).Fill(selectedEvent.trigDiMu,selectedEvent.selPhotons.at(0).sigmaIetaIeta);
+               FillerTrigger(selectedEvent,eff1Maps["trigSelMM_ptcuts"],true,selectedEvent.trigDiMu); 
+            }
+         }
+      }
+   }
+   if(SelectEventTriggerStudies(TRIGONZ)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
+         if (selectedEvent.trigHt){//baselineTrigger
+            if (selectedEvent.isDiElectron){
+               FillerTrigger(selectedEvent,eff1Maps["trigOnZEE"],true,selectedEvent.trigDiEle);  
+            }else{
+               FillerTrigger(selectedEvent,eff1Maps["trigOnZMM"],true,selectedEvent.trigDiMu); 
+            }
+         }
+      }
+   }
+   if(SelectEventTriggerStudies(TRIGONZ_ptcuts)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81 && selectedEvent.mll<101)){
+         if (selectedEvent.trigHt){//baselineTrigger
+            if (selectedEvent.isDiElectron){
+               FillerTrigger(selectedEvent,eff1Maps["trigOnZEE_ptcuts"],true,selectedEvent.trigDiEle);  
+            }else{
+               FillerTrigger(selectedEvent,eff1Maps["trigOnZMM_ptcuts"],true,selectedEvent.trigDiMu); 
             }
          }
       }
