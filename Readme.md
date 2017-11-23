@@ -1,4 +1,4 @@
-nTuples are assumed to be generated using the [TreeWriter]{https://github.com/cms-susy-photon-rwth-1b/TreeWriter/tree/cleaned_for_sebastian}
+nTuples are assumed to be generated using the [TreeWriter](https://github.com/cms-susy-photon-rwth-1b/TreeWriter/tree/cleaned_for_sebastian)
 software.
 
 ## Creating histograms ##
