@@ -5,14 +5,15 @@ from array import array
 from include import *
 import numpy as np
 
-path = "../minimal/output_01/"
+path = "../minimal/output/"
 
 DY = ROOT.TFile(path+"DYJetsToLL_M-50_ext_hists.root")
 DY.ls()
-hDY = DY.Get("selMM/ISRvFSR")
+hDY = DY.Get("selMM/")
 hDY.SetDirectory(0)
-ZG = ROOT.TFile(path+"ZGTo2LG_ext_hists.root")
-hZG = ZG.Get("selMM/ISRvFSR")
+#ZG = ROOT.TFile(path+"ZGTo2LG_ext_hists.root")
+ZG = ROOT.TFile(path+"DYJetsToLL_M-50-amcatnloFXFX_ext_hists.root")
+hZG = ZG.Get("selMM/")
 hZG.SetDirectory(0)
 hDY=aux.rebin2d(hDY,range(0,300,2),range(0,400,2))
 hZG=aux.rebin2d(hZG,range(0,300,2),range(0,400,2))

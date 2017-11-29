@@ -36,43 +36,50 @@ list_of_variables = ['pt1',
 
 binnings = {
     #'pt1':              np.arange(0., 500., 10.),
-    'pt1':              np.concatenate((np.arange(0,200,10),np.arange(200,550,50)),axis=0),
+    'pt1':              np.concatenate((np.arange(0,200,10),np.arange(200,1750,50)),axis=0),
     'pt2':              np.arange(0., 300, 10),
-    'eta1':             np.arange(0., 2.6, 0.1),
+    #'eta1':             np.arange(0., 2.6, 0.1),
+    'eta1':             np.arange(0., 2.6, 0.2),
     'eta2':             np.arange(0., 2.60, 0.1),
-    'phi1':             np.arange(0., 3.50, 0.10),
+    #'phi1':             np.arange(0., 3.50, 0.10),
+    'phi1':             np.arange(0., 3.50, 0.25),
     'phi2':             np.arange(0., 3.50, 0.10),
-    'ht':               np.arange(0., 1000.,10.),
+    'ht':               np.arange(0., 5000.,100.),
     #'met':              np.arange(0., 1000.,100.),
-    'met':              np.concatenate((np.arange(0,200,10),np.arange(200,550,50)),axis=0),
-    'gen_ht':           np.arange(0., 1000.,10.),
-    'm_ll':             np.arange(0., 650.,10.),
-    #'m_ll':             np.concatenate((np.arange(0,300,10),np.arange(300,550,50)),axis=0),
+    #'met':              np.concatenate((np.arange(0,400,50),np.arange(400,3000,1300)),axis=0),
+    'met':              np.concatenate((np.arange(0,200,50),np.arange(200,400,100),np.arange(400,3000,1300)),axis=0),
+    'gen_ht':           np.arange(0., 5000.,100.),
+    #'m_ll':             np.arange(0., 650.,10.),
+    #'m_ll':             np.concatenate((np.arange(0,200,20),np.arange(200,550,50)),axis=0),
+    #'m_ll':             np.concatenate((np.arange(0,200,10),np.arange(200,950,50)),axis=0),
+    'm_ll':             np.arange(50,150,5),
     'm_ll_e':           np.arange(0., 650.,10.),
     'm_ll_m':           np.arange(0., 650.,10.),
     'n_jets':           np.arange(0.,10.,1.),
     'n_photons':           np.arange(0.,10.,1.),
-    'n_vtx':            np.arange(0.,40.,4.),
+    'n_vtx':            np.arange(0.,40.,1.),
     #'pt_g1':            np.array((range(0,100,10)+np.array([100., 150., 200.,300,400.]))),
-    'pt_g1':            np.concatenate((np.arange(0,100,10),np.arange(100,450,50)),axis=0),
+    'pt_g1':            np.concatenate((np.arange(0,100,10),np.arange(100,950,50)),axis=0),
     'eta_g1':           np.arange(0., 2.60, 0.10),
     'phi_g1':           np.arange(0., 3.50, 0.10),
     'sigmaIetaIeta_g1': np.arange(0., 0.04,0.001),
-    'DeltaEtaLL':       np.arange(0.,6.,0.1),
-    'DeltaPhiLL':       np.arange(0.,6.,0.1),
-    'DeltaEtaLLG':      np.arange(0.,6.,0.1),
-    'DeltaPhiLLG':      np.arange(0.,6.,0.1),
-    'DeltaRLL':         np.arange(0.,6.,0.1),
-    'DeltaRLLG':        np.arange(0.,6.,0.1),
-    #'st':        np.arange(0.,2000.,100.),
-    #'stmet':        np.arange(0.,2000.,100.),
-    #'zpt':        np.arange(0.,500.,50.),
+    'deltaEtaLL':       np.arange(0.,6.,0.1),
+    'deltaPhiLL':       np.arange(0.,6.,0.1),
+    'deltaEtaLLG':      np.arange(0.,6.,0.1),
+    'deltaPhiLLG':      np.arange(0.,6.,0.1),
+    'deltaRLL':         np.arange(0.,6.,0.12),
+    'deltaRLLG':        np.arange(0.,6.,0.1),
+    'st':        np.arange(0.,5000.,100.),
+    'stmet':        np.arange(0.,5000.,100.),
+    'zpt':        np.arange(0.,2000.,100.),
+    'mtll':        np.arange(0.,3000.,100.),
+    'mtllg':        np.arange(0.,3000.,100.)
 }
 labels = {
     'pt1': ["p_{T}^{leading}[GeV]","Events / 30 GeV"],
     'pt2': ["p_{T}^{trailing}[GeV]"," Events / 30 GeV"],
-    'eta1': ["|#Eta_{leading}|","Events / 0.1"],
-    'eta2': ["|#Eta_{trailing}|","Events / 0.1"],
+    'eta1': ["|#eta_{leading}|","Events / 0.1"],
+    'eta2': ["|#eta_{trailing}|","Events / 0.1"],
     'phi1': ["|#Phi_{leading}|","Events / 0.1"],
     'phi2': ["|#Phi_{trailing}|","Events / 0.1"],
     'ht': ["H_{T} [GeV]", "Events / 10 GeV"],
@@ -86,20 +93,22 @@ labels = {
     'eta_g1': ["|#Eta| of leading photon","Events / 0.1"],
     'phi_g1': ["|#phi| of leading photon","Events / 0.1"],
     'sigmaIetaIeta_g1': ["#sigma_{I#etaI#eta} of leading photon","Events / 0.001"],
-    'DeltaEtaLL':       ["#Delta#Eta_{ll}","Events / 0.1"],
-    'DeltaPhiLL':       ["#Delta#Phi_{ll}","Events / 0.1"],
-    'DeltaEtaLLG':      ["#Delta#Eta_{ll,#gamma}","Events / 0.1"],
-    'DeltaPhiLLG':      ["#Delta#Phi_{ll,#gamma}","Events / 0.1"],
-    'DeltaRLL':         ["#DeltaR_{ll}","Events / 0.1"],
-    'DeltaRLLG':        ["#DeltaR_{ll,#gamma}","Events / 0.1"],    
-    #'st':        ["#itS_T [GeV]","Events / 100 GeV"],    
-    #'stmet':        ["#it S_T+E_{T}^{miss}" [GeV],"Events / 100 GeV"],    
-    #'zpt':        ["Z_{p_T} [GeV]","Events / 50. GeV"],    
+    'deltaEtaLL':       ["#Delta#Eta_{ll}","Events / 0.1"],
+    'deltaPhiLL':       ["#Delta#Phi_{ll}","Events / 0.1"],
+    'deltaEtaLLG':      ["#Delta#Eta_{ll,#gamma}","Events / 0.1"],
+    'deltaPhiLLG':      ["#Delta#Phi_{ll,#gamma}","Events / 0.1"],
+    'deltaRLL':         ["#DeltaR_{ll}","Events / 0.1"],
+    'deltaRLLG':        ["#DeltaR_{ll,#gamma}","Events / 0.1"],    
+    'st':        ["#itS_T [GeV]","Events / 100 GeV"],    
+    'stmet':        ["#it S_T+E_{T}^{miss} [GeV]","Events / 100 GeV"],    
+    'zpt':        ["#Z_{#p_{T}} [GeV]","Events / 50. GeV"],    
+    'mtll':        ["m_{T}^{ll} [GeV]","Events / 100. GeV"],    
+    'mtllg':        ["m_{T}^{ll#gamma} [GeV]","Events / 100. GeV"]    
 }
 
 
 
-def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, binningName="", scaleToData=False ):
+def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, binningName="", scaleToData=False, xTitle=None, yTitle=None ):
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
 
@@ -115,7 +124,13 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
             h = aux.rebin( h, binning )
 
         aux.appendFlowBin( h )
-        h.SetYTitle( aux.getYAxisTitle( h ) )
+        #h.SetYTitle( aux.getYAxisTitle( h ) )
+        if yTitle:
+            h.SetYTitle( yTitle )
+        else:
+            h.SetYTitle( aux.getYAxisTitle( h ) )
+        if xTitle:
+            h.SetXTitle( xTitle )
         m.addStack( h, d.label )
 
     dataHist = None
@@ -160,27 +175,24 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
 
         
 def main():
-    #bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    bkgs=[DYjets,zgamma,wwgamma,ttgamma,zz,tt,wjets]
-    #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
-    variables=["eta1","pt1","n_jets","m_ll"]
-    groups=["dilep","sel","onZ"]
+    #bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt]
+    bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
+    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","sigmaIetaIeta_g1"]
+    groups=["sel","onZ","dilep"]
     for group in groups:
         for variable in variables:
-            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable])
-            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable])
-            #drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
-            #drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
+            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
+            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
 def main2():
     #bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","met","DeltaEtaLL","DeltaEtaLLG","DeltaPhiLL","DeltaPhiLLG","DeltaRLL","DeltaRLLG"]
-    groups=["sel","onZ"]
+    bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt]
+    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","met","deltaEtaLL","deltaEtaLLG","deltaPhiLL","deltaPhiLLG","deltaRLL","deltaRLLG","st","zpt","stmet","mtll","mtllg"]
+    groups=["onZ"]
     for group in groups:
         for variable in variables:
-            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
-            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400],binning=binnings[variable])
+            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
+            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
 
 
-main()
-#main2()
+#main()
+main2()

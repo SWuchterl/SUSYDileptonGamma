@@ -178,7 +178,10 @@ ttgamma.label = "tt#gamma"
 
 ###############################################################################
 ## DY+jets
-DYjets = Dataset("DYJetsToLL_M-50_ext", 1921.8*3.  , ROOT.kBlue-7)
+#DYjets = Dataset("DYJetsToLL_M-50_ext", 1921.8*3.  , ROOT.kBlue-7)
+#DYjets = Dataset("DYJetsToLL_M-50_ext", 6024.  , ROOT.kBlue-7)
+DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7)
+#DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 6024.  , ROOT.kBlue-7)
 DYjets.label = "DY+jets"
 
 ###############################################################################
@@ -187,8 +190,8 @@ tt = Dataset("TTTo2L2Nu_TuneCUETP8M2_ttHtranche3", 87.31  , ROOT.kOrange+8)
 tt.label = "t#bar{t}"
 ###############################################################################
 ## WJets
-wjets = Dataset("WJetsToLNu-madgraphMLM_ext", 61526.7  , ROOT.kGreen+3)#LO
-#wjets = Dataset("WJetsToLNu-madgraphMLM_ext_hists", 61526.7  , ROOT.kGreen+3)#NLO
+#wjets = Dataset("WJetsToLNu-madgraphMLM_ext", 61526.7  , ROOT.kGreen+3)#LO
+wjets = Dataset("WJetsToLNu-amcatnloFXFX_ext", 61526.7  , ROOT.kGreen+3)#NLO
 wjets.label = "W+jets"
 
 
@@ -198,7 +201,7 @@ totalMC= Dataset("WWG-amcatnlo_ext", 0.2147, ROOT.kBlack)\
         +Dataset("WZG-amcatnlo", 0.04123 , ROOT.kBlack)\
         +Dataset("TTGamma_Dilept-amcatnlo", 0.6352 , ROOT.kBlack)\
         +Dataset("DYJetsToLL_M-50_ext", 1921.8*3.  , ROOT.kBlack)\
-        +Dataset("TTTo2L2Nu_TuneCUETP8M2_ttHtranche3", 87.31  , ROOT.kBlack)\
+        +Dataset("TTTo2L2Nu_TuneCUETP8M2_ttHtranche3", 87.31  , ROOT.kOrange+8)\
 
 
 ###############################################################################
@@ -221,10 +224,12 @@ t6gg_1100_600 = Dataset("SMS-T6gg_1100_600", 0.0313372, ROOT.kRed+4, "")
 tchiwg_700 = Dataset("SMS-TChiWG_700", 9.51032/1000, ROOT.kRed+4, "")
 
 
-tching_900 = Dataset("SMS-TChiNG_900",)
+tching_1200 = Dataset("SMS-TChiNG_1200",58.6311/1000.,ROOT.kRed-2,"")
+tching_400 = Dataset("SMS-TChiNG_400",0.196044/1000. ,ROOT.kRed-3,"")
 
-t5bbbbzg_1800_1700 = Dataset("SMS-T5bbbbZg_1800_1700",0.00276133,ROOT.kRed+4,"")
-t5bbbbzg_1800_400 = Dataset("SMS-T5bbbbZg_1800_400",0.00276133,ROOT.kBlue+2,"")
+t5bbbbzg_1800_1700 = Dataset("SMS-T5bbbbZg_1800_1700",0.00276133,ROOT.kBlue-4,"")
+t5bbbbzg_1800_400 = Dataset("SMS-T5bbbbZg_1800_400",0.00276133,ROOT.kBlue+3,"")
+t5bbbbzg_1800_600 = Dataset("SMS-T5bbbbZg_1800_600",0.00276133,ROOT.kGreen+1,"")
 
 
 import collections

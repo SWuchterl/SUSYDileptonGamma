@@ -23,6 +23,12 @@
 
 #include "config.h"
 
+#include <chrono> //for sleeping
+#include <thread> // --do--
+#include <cstdlib>//for random increments 
+#include <ctime>// --do--
+
+
 
 using namespace std;
 
@@ -180,6 +186,7 @@ class HistogramProducer : public TSelector {
   void InitScaleFactorsAlternative();
   float GetScaleFactorAndError(float pt, float eta,bool isFastSim, bool isEle);
   float GetScaleFactorAndErrorAlternative(float pt, float eta,bool isFastSim, bool isEle, int runNr);
+  float GetScaleFactorAndErrorPhotons(vector<selPhoton>& vecGamma);
   map<Histograms1D,TH1F> InitHistograms(const selectionType selection);
   map<Histograms2D,TH2F> Init2DHistograms(const selectionType selection);
   //void InitTriggerStudies();
@@ -346,6 +353,8 @@ class HistogramProducer : public TSelector {
   Weighter FastSimDiMuWeighterIso;
   Weighter FastSimDiMuWeighterIP2D;
   Weighter FastSimDiMuWeighterSIP3D;
+
+  Weighter PhotonIDWeighter;
 
   bool isData;
   bool isSignal;

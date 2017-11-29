@@ -233,14 +233,13 @@ def main():
     #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons"]
     variables=["pt1","pt2"]
     groups=["trigDilep","trigSel","trigOnZ"]
+    #groups=["trigDilep_ptcuts","trigSel_ptcuts","trigOnZ_ptcuts"]
     for group in groups:
         for variable in variables:
-            efficiency(dataHt,group+"EE/"+variable,"dataHT"+group+"EE",binning=binnings[variable])
-            efficiency(dataHt,group+"MM/"+variable,"dataHT"+group+"MM",binning=binnings[variable])
-            #efficiency(DYjets,group+"EE/"+variable,group+"EE",binning=binnings[variable])
-            #efficiency(zgamma,group+"EE/"+variable,"zgamma"+group+"EE",binning=binnings[variable])
-            #efficiency(totalMC,group+"EE/"+variable,"MC"+group+"EE",binning=binnings[variable])
-            #efficiency(totalMC,group+"MM/"+variable,"MC"+group+"MM",binning=binnings[variable])
-            #efficiency(dataHt,group+"MM/"+variable,"MM",binning=binnings[variable])
+            efficiency(dataHt,group+"EE/"+variable,"dataHT_"+group+"_EE",binning=binnings[variable])
+            efficiency(dataHt,group+"MM/"+variable,"dataHT_"+group+"_MM",binning=binnings[variable])
+            efficiency(dataHt,group+"MM_ptcuts/"+variable,"dataHT_"+group+"_ptcuts"+"_MM",binning=binnings[variable])
+            efficiency(dataHt,group+"EE_ptcuts/"+variable,"dataHT_"+group+"_ptcuts_"+"_EE",binning=binnings[variable])
+  
 
 main()

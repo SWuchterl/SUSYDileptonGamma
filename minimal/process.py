@@ -44,7 +44,8 @@ ds={
         "JetHT_Run2016H-03Feb2017_ver3-v1_nTuple.root"
         ],
     "dy": [
-        "DYJetsToLL_M-50_ext_nTuple.root"
+        "DYJetsToLL_M-50_ext_nTuple.root",
+        "DYJetsToLL_M-50-amcatnloFXFX_ext_nTuple.root"
         ],
     "ttg": [
         "TTGamma_Dilept-amcatnlo_nTuple.root"
@@ -73,7 +74,10 @@ ds={
         ],
 "signal":[
         "SMS-T5bbbbZg_1800_1700_nTuple.root",
-        "SMS-T5bbbbZg_1800_400_nTuple.root"
+        "SMS-T5bbbbZg_1800_400_nTuple.root",
+        "SMS-T5bbbbZg_1800_600_nTuple.root",
+        "SMS-TChiNG_400_nTuple.root",
+        "SMS-TChiNG_1200_nTuple.root"
         ]
 }
     
