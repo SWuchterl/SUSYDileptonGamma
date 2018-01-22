@@ -58,6 +58,9 @@ HistogramProducer::HistogramProducer():
    hlt_mu30_tkMu11(fReader, "HLT_Mu30_TkMu11_v"),
    //hlt_mu30_ele30(fReader, "HLT_Mu30_Ele30_CaloIdL_GsfTrkIdVL_v"),
    //hlt_mu33_ele33(fReader, "HLT_Mu33_Ele33_CaloIdL_GsfTrkIdVL_v"),
+   signal_m1(fReader,"signal_m1"),
+   signal_m2(fReader,"signal_m2"),
+   nBinos(fReader,"signal_nBinos"),
    startTime(time(NULL))//,
    //rand()
 {
@@ -65,22 +68,49 @@ HistogramProducer::HistogramProducer():
 
 
 
-bool HistogramProducer::GenPhotonVeto(){
+bool HistogramProducer::GenPhotonVeto(const int a){
    bool isGenPhoton=false;
    if(!isData){
-      for (vector<tree::GenParticle>::iterator it = genParticles->begin(); it != genParticles->end(); ++it){
+      //for (vector<tree::GenParticle>::iterator it = genParticles->begin(); it != genParticles->end(); ++it){
+      for (vector<tree::GenParticle>::iterator it = genParticles->begin(); it != genParticles->end(); it++){
          if(it->pdgId==22){
-            //isGenPhoton=isGenPhoton || it->fromHardProcess;
-            isGenPhoton=isGenPhoton || true;
-            //isGenPhoton=isGenPhoton || it->promptStatus==DIRECTPROMPT;
+            switch (a)
+            {
+            case 0: 
+               isGenPhoton=isGenPhoton || true; //veto all genPhotons
+               break;
+            
+            case 1:
+               isGenPhoton=isGenPhoton || (abs(it->motherId)<16 && abs(it->motherId)>10); //veto genPhotons from leptons (FSR)
+               break;
+            case 2:
+               isGenPhoton=isGenPhoton || it->fromHardProcess || (abs(it->motherId)<16 && abs(it->motherId)>10);
+               break;
+            case 3:
+               isGenPhoton=isGenPhoton || it->isPrompt ;
+               break;
+            case 4:
+               isGenPhoton=isGenPhoton || !(it->promptStatus==DIRECTPROMPT) ;
+               break;
+            case 5:
+               isGenPhoton=isGenPhoton || ((it->statusID==1) && (it->isPrompt)) ;
+               break;
+            default:
+               isGenPhoton=false;
+               break;
+            }
+            //isGenPhoton=isGenPhoton || true;
+            //isGenPhoton=isGenPhoton || (abs(it->motherId)<7);
+            //isGenPhoton = isGenPhoton || (abs(it->motherId)<7) || (abs(it->motherId)>16);
          }
       }
    }
-   //bool cutPrompt = noPromptPhotons && count_if(genParticles->begin(), genParticles->end(), [] (const tree::GenParticle& p) { return p.pdgId==22 && p.promptStatus == DIRECTPROMPT;});
-   //return cutPrompt;
+   return (isGenPhoton && noPromptPhotons);
    //return false;
-   return isGenPhoton && noPromptPhotons;
 }
+
+
+
 
 
 void HistogramProducer::CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Particle mett ,const particleType particle)
@@ -93,29 +123,94 @@ void HistogramProducer::CalculateVariables(const tree::Lepton& l1, const tree::L
       isEle=false;
    }
    isDiElectron=isEle;
+   bool isMuon;
+   if (particle==M){
+      isMuon=true;
+   }else{
+      isMuon=false;
+   }
+   isDiMuon=isMuon;
    float leptonMass = (isEle)?  0.51099895e-3 : 0.1056584;
-   pt1 = l1.p.Pt();  
-   pt2 = l2.p.Pt();  
-   phi1 = l1.p.Phi();  
-   phi2 = l2.p.Phi();  
-   eta1 = l1.p.Eta();  
-   eta2 = l2.p.Eta();
+   float qter = 1.0;
+   
    int charge1 = (int) l1.charge;
    int charge2 = (int) l2.charge;
-   chargeProduct = charge1*charge2;
+   
    TLorentzVector lepton1 (0.,0.,0.,0.);
    TLorentzVector lepton2 (0.,0.,0.,0.);
-   lepton1.SetPtEtaPhiM(pt1,eta1,phi1,leptonMass);
-   lepton2.SetPtEtaPhiM(pt2,eta2,phi2,leptonMass);
+   lepton1.SetPtEtaPhiM(l1.p.Pt(),l1.p.Eta(),l1.p.Phi(),leptonMass);
+   lepton2.SetPtEtaPhiM(l2.p.Pt(),l2.p.Eta(),l2.p.Phi(),leptonMass);
+   
+   float pt1_old= l1.p.Pt();
+   float pt2_old= l2.p.Pt();
+   
+   
+   //if(isData && !isEle){
+   if(isData && isMuon){
+      rmcor.momcor_data(lepton1, charge1, 0, qter);
+      rmcor.momcor_data(lepton2, charge2, 0, qter);
+      miniIso1 = l1.miniIso*pt1_old/lepton1.Pt();
+      miniIso2 = l2.miniIso*pt2_old/lepton2.Pt();
+   }else{
+      //if(!isEle && !isData){
+      if(!isEle && isMuon){
+         //rmcor.momcor_mc(lepton1, charge1, l1.nTrkLayers, qter);
+         //rmcor.momcor_mc(lepton2, charge2, l2.nTrkLayers, qter);
+         rmcor.momcor_mc(lepton1, charge1, muons->at(0).nTrkLayers, qter);
+         rmcor.momcor_mc(lepton2, charge2, muons->at(0).nTrkLayers, qter);
+      }
+   }
+   
+   //pt1 = l1.p.Pt();  
+   //pt2 = l2.p.Pt();  
+   //phi1 = l1.p.Phi();  
+   //phi2 = l2.p.Phi();  
+   //eta1 = l1.p.Eta();  
+   //eta2 = l2.p.Eta();
+   pt1 = lepton1.Pt();  
+   pt2 = lepton2.Pt();  
+   phi1 = lepton1.Phi();  
+   phi2 = lepton2.Phi();  
+   eta1 = lepton1.Eta();  
+   eta2 = lepton2.Eta();
+   
+   //cout<<pt1_old<<" | "<<pt1<<endl;
+   
+   //int charge1 = (int) l1.charge;
+   //int charge2 = (int) l2.charge;
+   chargeProduct = charge1*charge2;
+   //TLorentzVector lepton1 (0.,0.,0.,0.);
+   //TLorentzVector lepton2 (0.,0.,0.,0.);
+   //lepton1.SetPtEtaPhiM(pt1,eta1,phi1,leptonMass);
+   //lepton2.SetPtEtaPhiM(pt2,eta2,phi2,leptonMass);
    lep1=lepton1;
    lep2=lepton2;
    mll = (lepton1+lepton2).M();
-   miniIso1 = l1.miniIso;
-   miniIso2 = l2.miniIso;
+   //miniIso1 = l1.miniIso;
+   //miniIso2 = l2.miniIso;
    //Delta R between all three partciles
    deltaRll=lepton1.DeltaR(lepton2);
    //MET
    ETmiss = mett.p.Pt();
+   
+   TLorentzVector missing (0.,0.,0.,0.);
+   missing.SetPtEtaPhiM(mett.p.Pt(),mett.p.Eta(),mett.p.Phi(),0.);
+   ETmiss_vec = missing;
+   
+   //double pa[3] = {aVec.M(),aVec.Px(),aVec.Py()};
+   //double pb[3] = {bVec.M(),bVec.Px(),bVec.Py()};
+   double pa[3] = {lep1.M(),lep1.Px(),lep1.Py()};
+   double pb[3] = {lep2.M(),lep2.Px(),lep2.Py()};
+  
+   //double pmiss[3] = {0.,met.Px(),met.Py()};
+   double pmiss[3] = {0.,missing.Px(),missing.Py()};
+   fctMT2_.set_mn(0.);
+   //fctMT2_.set_momenta(pa,pb,pmiss,*(longIntBranches_[treeName]["eventNr"]));
+   fctMT2_.set_momenta(pa,pb,pmiss,*evtNo);
+   //*(floatBranches_[treeName]["MT2"]) = static_cast<float>(fctMT2_.get_mt2()); 
+   MT2_val = static_cast<float>(fctMT2_.get_mt2()); 
+   
+   
 }
 
 
@@ -133,7 +228,6 @@ bool HistogramProducer::Check2Mu(){
 
 bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
 {
-   //cout<<"signal?"<<isSignal<<endl;
    if(!isSignal){
       trigDiEle = *hlt_ele17_ele12_iso || *hlt_ele23_ele12_iso || *hlt_doubleEle33 || *hlt_doubleEle33_mw;
       trigDiMu  = *hlt_mu17_mu8_iso || *hlt_mu17_tkMu8_iso || *hlt_mu17_mu8_iso_dz || *hlt_mu17_tkMu8_iso_dz
@@ -145,7 +239,6 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
       trigMuEle = false;
       trigHt    = *hlt_ht200 || *hlt_ht250 || *hlt_ht300 || *hlt_ht350 || *hlt_ht400
                   || *hlt_ht475 || *hlt_ht600 || *hlt_ht650 || *hlt_ht800;
-      //trigHt    = true;
    }else{
       trigDiEle = true;
       trigDiMu = true;
@@ -155,7 +248,6 @@ bool HistogramProducer::Cleaning() //return if event is valid (2 Leptons exist)
    
 
    if (isData){           
-      //find Selection (Dataset)
       bool isEESelection = inputName.find("DoubleEG") != string::npos;
       bool isMuMuSelection = inputName.find("DoubleMuon") != string::npos;
       bool isEMuSelection = inputName.find("MuonEG") != string::npos;
@@ -330,28 +422,64 @@ bool HistogramProducer::CleaningTriggerStudies() //return if event is valid (2 L
 }
 
 
+void HistogramProducer::clearCutFlowMap(){
+   decisionMapCutFlowFine[TRIGGERED]=false;
+   decisionMapCutFlowFine[LEPTONID_leading]=false;
+   decisionMapCutFlowFine[LEPTONID_trailing]=false;
+   decisionMapCutFlowFine[LEPTONPT_leading]=false;
+   decisionMapCutFlowFine[LEPTONPT_trailing]=false;
+   decisionMapCutFlowFine[PHOTON1]=false;
+   decisionMapCutFlowFine[PHOTON1ID]=false;
+   decisionMapCutFlowFine[PHOTON1PT]=false;
+   decisionMapCutFlowFine[PHOTON1DR]=false;
+   decisionMapCutFlowFine[M50]=false;
+   decisionMapCutFlowFine[DIELECTRON]=false;
+   decisionMapCutFlowFine[DIMUON]=false;
+   decisionMapCutFlowFine[ZMASS]=false;
+   decisionMapCutFlowFine[GENVETO]=false;
+}
+
+
 
 //ELECTRON
 bool HistogramProducer::testSelection(const tree::Electron& pa,selectionType selection ,bool leading){
    bool decision=false;
    if ((selection==UNCUT)||(selection==PHOTON)){
-      //decision = pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
       decision = pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && pa.isTightMVA;
+      //if (pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && pa.isTightMVA){
+         //decisionMapCutFlowFine[LEPTON2ID]=true;
+      //}
    }
    if(selection==SEL || selection==ONZ){
-      //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
       decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
-      //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue);
+      if (pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA){
+         if(selection==ONZ) leading? decisionMapCutFlowFine[LEPTONID_leading]=true : decisionMapCutFlowFine[LEPTONID_trailing]=true;
+         if((leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.))){
+            if(selection==ONZ) leading? decisionMapCutFlowFine[LEPTONPT_leading]=true : decisionMapCutFlowFine[LEPTONPT_trailing]=true;
+         }
+      }
+   
    }
    if(selection==DILEP){
       decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA ;
-      //decision = pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && ElectronTightMVA(pa.p.Eta(),pa.p.Pt(),pa.mvaValue) ;
+      //if(pa.isPassConvVeto && pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA){
+         //leading? decisionMapCutFlowFine[LEPTONID_leading]=true : decisionMapCutFlowFine[LEPTONID_trailing]=true;
+         //if((leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.))){
+            //leading? decisionMapCutFlowFine[LEPTONPT_leading]=true : decisionMapCutFlowFine[LEPTONPT_trailing]=true;
+         //}
+      //}
    }
    if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
       decision =(*ht>200.) && pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
    }
    if(selection==TRIGSEL_ptcuts || selection==TRIGDILEP_ptcuts || selection==TRIGONZ_ptcuts){
       decision =(*ht>200.) && pa.isPassConvVeto && pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.1) && (deltaRll>0.1) && pa.isTightMVA;
+   }
+   if(selection==EXO){
+      decision = pa.isPassConvVeto && pa.passImpactParameter && (leading? (fabs(pa.p.Eta())<1.4442 ? (pa.p.Pt()>65.) : (pa.p.Pt()>70.)) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.5) && (pa.miniIso<0.1) && pa.isTightMVA;
+   }
+   if(selection==EGRegression){
+      decision = pa.isPassConvVeto && pa.passImpactParameter && (leading? (pa.p.Pt()>32.) : (pa.p.Pt()>25.)) && (fabs(pa.p.Eta())<2.5) && (pa.miniIso<0.1) && pa.isLoose;
    }
    return decision;
 }
@@ -363,9 +491,21 @@ bool HistogramProducer::testSelection(const tree::Muon& pa, selectionType select
    }
    if (selection==SEL || selection == ONZ){
       decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
+      if(pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1)){
+         if(selection==ONZ) leading? decisionMapCutFlowFine[LEPTONID_leading]=true : decisionMapCutFlowFine[LEPTONID_trailing]=true;
+         if((leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.))){
+            if(selection==ONZ) leading? decisionMapCutFlowFine[LEPTONPT_leading]=true : decisionMapCutFlowFine[LEPTONPT_trailing]=true;
+         }
+      }
    }
-   if(selection==DILEP){
+   if(selection==DILEP || selection==EGRegression){
       decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
+      //if (pa.passImpactParameter && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1)){
+         //leading? decisionMapCutFlowFine[LEPTONID_leading]=true : decisionMapCutFlowFine[LEPTONID_trailing]=true;
+         //if((leading ? (pa.p.Pt()>25.) : (pa.p.Pt()>20.))){
+            //leading? decisionMapCutFlowFine[LEPTONPT_leading]=true : decisionMapCutFlowFine[LEPTONPT_trailing]=true;
+         //}
+      //}
    }
    if(selection==TRIGSEL || selection==TRIGDILEP || selection==TRIGONZ){
       decision = (*ht>200.) && pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>0.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
@@ -379,23 +519,44 @@ bool HistogramProducer::testSelection(const tree::Muon& pa, selectionType select
    if(selection==TRIGDILEP_pt2cut){
       decision = (*ht>200.)&& pa.passImpactParameter && (leading ? (pa.p.Pt()>0.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && ((fabs(pa.p.Eta())<1.4)|| (fabs(pa.p.Eta()))>1.6) && (pa.miniIso<0.2) && (pa.isMedium) && (deltaRll>0.1);
    }
+   if(selection==EXO){
+      decision = pa.passImpactParameter && (leading ? (pa.p.Pt()>52.) : (pa.p.Pt()>20.)) && (fabs(pa.p.Eta())<2.4) && (pa.miniIso<0.1) && (pa.isMedium);
+   }
    return decision;
 }
 //PHOTON
 bool HistogramProducer::testSelection(const selPhoton& pa, selectionType selection){
    bool decision=false;
    if ((selection==UNCUT)||(selection==PHOTON)){
-      //decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
-      decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
+      //decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
+      //decision = (pa.passElectronVeto) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
+      //decision = !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
+      decision = !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3);
    }
-   if(selection==SEL || selection==DILEP ||selection==ONZ){
-      //decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
-      decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
-      //decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMedium) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+   if(selection==SEL || selection==DILEP ||selection==ONZ || selection==EGRegression){
+      //decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      //decision = (pa.passElectronVeto) && (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      //decision = (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      decision = (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      if(!(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose)){
+         if(selection==ONZ) decisionMapCutFlowFine[PHOTON1ID]=true;
+         if((pa.p.Pt()>25.)){
+            if(selection==ONZ) decisionMapCutFlowFine[PHOTON1PT]=true;
+            if((pa.deltaR1>0.3) && (pa.deltaR2>0.3)){
+               if(selection==ONZ) decisionMapCutFlowFine[PHOTON1DR]=true;
+            }
+         }
+      }
+   }
+   if(selection==EXO){
+      //decision = (isDiElectron? (pa.p.Pt()>(65. + 5.* ((1.566 < fabs(pa.p.Eta())) && (fabs(pa.p.Eta()) < 2.5))  )) : (pa.p.Pt()>40.)) && (pa.passElectronVeto) && (fabs(pa.p.Eta())<2.5) && (pa.isMediumMVA) && (pa.deltaR1>0.4) && (pa.deltaR2>0.4); //study Delta R cut ;
+      decision = (isDiElectron? (pa.p.Pt()>(65. + 5.* ((1.566 < fabs(pa.p.Eta())) && (fabs(pa.p.Eta()) < 2.5))  )) : (pa.p.Pt()>40.)) && (pa.passElectronVeto) && (fabs(pa.p.Eta())<2.5) && (pa.isLoose) && (pa.deltaR1>0.4) && (pa.deltaR2>0.4); //study Delta R cut ;
    }
    if(selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
-      //decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
-      decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      //decision = (pa.passElectronVeto) && (pa.p.Pt()>20.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      //decision = (pa.passElectronVeto) && (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      //decision = (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isMediumMVA) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
+      decision = (pa.p.Pt()>25.) && !(pa.hasPixelSeed) && (fabs(pa.p.Eta())<1.4442) && (pa.isLoose) && (pa.deltaR1>0.3) && (pa.deltaR2>0.3); //study Delta R cut ;
    }
    return decision;
 }
@@ -405,7 +566,7 @@ bool HistogramProducer::testSelection(const selJet& pa, selectionType selection)
    if ((selection==UNCUT)||(selection==PHOTON)){
       decision = (fabs(pa.p.Eta())<2.4) && (pa.isLoose) && !(pa.hasElectronMatch) && !(pa.hasPhotonMatch) && !(pa.hasMuonMatch);
    }
-   if(selection==SEL||selection==DILEP || selection==ONZ || selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ){
+   if(selection==SEL||selection==DILEP || selection==ONZ || selection==TRIGDILEP || selection==TRIGSEL || selection==TRIGONZ || selection==EXO || selection==EGRegression){
       decision = (pa.p.Pt()>30.) && (fabs(pa.p.Eta())<2.4) && (pa.isLoose) && !(pa.hasElectronMatch) && !(pa.hasPhotonMatch) && !(pa.hasMuonMatch); //&& (pa.deltaR1>0.3) && (pa.deltaR2>0.3) //study Delta R cut ;
    }
    return decision;
@@ -417,28 +578,39 @@ void HistogramProducer::Init(TTree *tree)
 {
    fReader.SetTree(tree);
    inputName = fReader.GetTree()->GetCurrentFile()->GetName();
-   cutFlow = *((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("TreeWriter/hCutFlow"));
-   fReader.GetEntries(true); // jumps to last file
-   string lastInputName = fReader.GetTree()->GetCurrentFile()->GetName();
-  
-   nEntries=fReader.GetTree()->GetEntries();
-   //cout<<"Processing "<<nEntries<<" Events!"<<endl;
+   
+   isTotalSignal = (inputName.find("SMS-TChiNG_BF") != string::npos) || (inputName.find("SMS-T5bbbbZg_nTuple")!=string::npos);
    isData = inputName.find("Run201") != string::npos;
    isSignal = inputName.find("SMS") != string::npos;
+   
+   if(! isTotalSignal){
+      cutFlow = *((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("TreeWriter/hCutFlow"));
+   }
+   fReader.GetEntries(true); // jumps to last file
+   //string lastInputName = fReader.GetTree()->GetCurrentFile()->GetName();
+  
+   nEntries=fReader.GetTree()->GetEntries();
+   //isData = inputName.find("Run201") != string::npos;
+   //isSignal = inputName.find("SMS") != string::npos;
+  
+  
+  //rochester muon pt corrections
+   rochcor2016 *rmcor = new rochcor2016();
+  
   
   setHistoNames();
   
-   if (inputName!=lastInputName) {
-      // adds cut flow of last file. This makes only sense if there is for 1 or two files
-      cutFlow.Add((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("TreeWriter/hCutFlow"));
-   }
-   float nGen = cutFlow.GetBinContent(2);
+   //if (inputName!=lastInputName) {
+       ////////adds cut flow of last file. This makes only sense if there is for 1 or two files
+      //cutFlow.Add((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("TreeWriter/hCutFlow"));
+   //}
+   //float nGen = cutFlow.GetBinContent(2);
 
 
    noPromptPhotons = inputName.find("DYJets") != string::npos || inputName.find("TTTo2L2Nu") != string::npos;
-   //noPromptPhotons = inputName.find("DYJets") != string::npos ;
 
-
+   InitCutFlowHistos();
+   InitCutFlowHistos_Fine();
    InitAllHistos();
    InitTriggerStudiesHistos();
    
@@ -485,12 +657,17 @@ void HistogramProducer::InitScaleFactors(){
    FastSimDiMuWeighterSIP3D.fillOverflow2d();
    
    PhotonIDWeighter = Weighter("scaleFactors/ScaleFactorsPhotonsID.root","EGamma_SF2D"); // pt vs eta
+   //PhotonIDWeighter = Weighter("scaleFactors/ScaleFactorsPhotonsID_LooseCut.root","EGamma_SF2D"); // pt vs eta
    PhotonIDWeighter.fillOverflow2d();
+   
+   //electronMllWeighter = Weighter("electronMllWeights.root","769ec98b61da6715"); // vs mll
+   //electronMllWeighter.fillOverflow2d();
    
    }
    
 void HistogramProducer::InitScaleFactorsAlternative(){
-   DiEleWeighterID=Weighter("scaleFactors/Alternative/ScaleFactorElectronID.root","EGamma_SF2D");// pt vs |eta|
+   //DiEleWeighterID=Weighter("scaleFactors/Alternative/ScaleFactorElectronID.root","EGamma_SF2D");// pt vs |eta|
+   DiEleWeighterID=Weighter("scaleFactors/Alternative/ScaleFactorElectronID_LooseCut.root","EGamma_SF2D");// pt vs |eta|
    DiEleWeighterID.fillOverflow2d();
    DiEleWeighterTrack=Weighter("scaleFactors/Alternative/egammaEffi.txt_EGM2D.root","EGamma_SF2D"); //pt vs |eta|
    DiEleWeighterTrack.fillOverflow2d();
@@ -505,6 +682,14 @@ void HistogramProducer::InitScaleFactorsAlternative(){
    DiMuWeighterIso_GH.fillOverflow2d();
    DiMuWeighterTrack = Weighter("scaleFactors/TrackScaleFactorsMuons.root","muonTrackScaleFactorEtaHisto");// |eta|
    DiMuWeighterTrack.fillOverflow2d();
+   
+   //PhotonIDWeighter = Weighter("scaleFactors/ScaleFactorsPhotonsID.root","EGamma_SF2D"); // pt vs eta
+   PhotonIDWeighter = Weighter("scaleFactors/ScaleFactorsPhotonsID_LooseCut.root","EGamma_SF2D"); // pt vs eta
+   PhotonIDWeighter.fillOverflow2d();
+   
+   electronMllWeighter = Weighter("electronMllWeights.root","769ec98b61da6715"); // vs mll
+   electronMllWeighter.fillOverflow2d();
+   
    }
 
 float HistogramProducer::GetScaleFactorAndError(float pt, float eta,bool isFastSim,bool isEle){
@@ -629,7 +814,8 @@ float HistogramProducer::GetScaleFactorAndErrorAlternative(float pt, float eta,b
 
 float HistogramProducer::GetScaleFactorAndErrorPhotons(vector<selPhoton>& vecGamma){
    float totalSF = 1.;
-   for (vector<selPhoton>::iterator it = vecGamma.begin(); it != vecGamma.end(); ++it){
+   //for (vector<selPhoton>::iterator it = vecGamma.begin(); it != vecGamma.end(); ++it){
+   for (vector<selPhoton>::iterator it = vecGamma.begin(); it != vecGamma.end(); it++){
       float tempPt=it->p.Pt();
       float tempEta=it->p.Eta();
       //0.9938 +- 0.0119 https://twiki.cern.ch/twiki/pub/CMS/EgammaIDRecipesRun2/EleVetoScalingFactors_Moriond17.pdf
@@ -662,31 +848,59 @@ map<Histograms1D,TH1F> HistogramProducer::InitHistograms(const selectionType sel
    hMap[ZPT] = TH1F("", ";Z_{p_T}", 5000, 0, 5000);
    hMap[MTLL] = TH1F("", ";m_{T}^{ll}", 5000, 0, 5000);
    hMap[ST] = TH1F("", ";S_T", 5000, 0, 5000.);
+   hMap[MT2] = TH1F("", ";M_{T2}", 50000, 0, 5000.);
    
-   if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)){
+   if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)||(selection_==EXO)){
       hMap[PTG1] = TH1F("", ";#it{p}_{T}^{#gamma 1} (GeV)", 5000, 0, 5000);
       hMap[ETAG1] = TH1F("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
       hMap[PHIG1] = TH1F("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
       hMap[SIGMAIETAIETAG1] = TH1F("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
+      hMap[SIGMAIPHIIPHIG1] = TH1F("", ";#sigma_{i#phii#phi}^{#gamma 1}", 2000, 0, 0.2);
+      hMap[R9] = TH1F("", ";r9", 1500, 0, 1.5);
+      hMap[HOVERE] = TH1F("", ";H/E", 1000, 0, 0.1);
+      hMap[DELTARGL1] = TH1F("", ";#DeltaR_{l1,#gamma}", 6000, 0, 6.);
+      hMap[DELTARGL2] = TH1F("", ";#DeltaR_{l2,#gamma}", 6000, 0, 6.);
       hMap[DeltaRLLG] = TH1F("", ";#DeltaR_{ll,#gamma}", 6000, 0, 6.);
       hMap[DeltaEtaLLG] = TH1F("", ";#Delta#Eta_{ll,#gamma}", 600, 0, 6.);
       hMap[DeltaPhiLLG] = TH1F("", ";#Delta#Phi_{ll,#gamma}", 600, 0, 6.);
       hMap[STG] = TH1F("", ";S_T", 5000, 0, 5000.);
       hMap[STMET] = TH1F("", ";S_T + #it{p}_{T}^{miss} (GeV)", 5000, 0, 5000.);   
       hMap[MTLLG] = TH1F("", ";m_{T}^{ll#gamma}", 5000, 0, 5000);
+      hMap[MTL1MET] = TH1F("", ";m_{T}^{l1,met}", 5000, 0, 5000);
+      hMap[MTL2MET] = TH1F("", ";m_{T}^{l2,met}", 5000, 0, 5000);
+      hMap[MTGMET] = TH1F("", ";m_{T}^{#gamma,met}", 5000, 0, 5000);
+      hMap[MTLLMET] = TH1F("", ";m_{T}^{ll,met}", 5000, 0, 5000);
+      hMap[MTLLGMET] = TH1F("", ";m_{T}^{ll#gamma,met}", 5000, 0, 5000);
+      hMap[MOTHERID] = TH1F("", ";ID_{mother}", 200, 0, 200);
+      hMap[MLLG] = TH1F("", ";ID_{ll#gamma}", 5000, 0, 5000);
+      hMap[PT_llg] = TH1F("", ";p_{T}^{ll#gamma}", 5000, 0, 5000);
+      hMap[MZG_exo] = TH1F("", ";m_{Z#gamma}", 5000, 0, 5000);
+      hMap[gammaMotherID] = TH1F("", ";motherID_{#gamma}", 5000, 0, 5000);
+      hMap[genPhotonPT] = TH1F("", ";gen p_T^{#gamma,matched}", 5000, 0, 5000);
    }
 
    return hMap;
 
 }
 
+map<Histograms1D,TH1F> HistogramProducer::InitSignalScanHistograms(const selectionType selection_){
+   map<Histograms1D,TH1F> sMap;
+   
+   sMap[ETMISS] = TH1F("", ";#it{p}_{T}^{miss} (GeV)", 5000, 0, 5000);
+   
+   return sMap;
+}
+
+
 map<Histograms2D,TH2F> HistogramProducer::Init2DHistograms(const selectionType selection_){
     
    map<Histograms2D,TH2F> h2Map;
    
-   if ((selection_==PHOTON)||(selection_==SEL)){
+   if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)||(selection_==EXO) ){
+      h2Map[PTGvsMLLG] = TH2F("",";#it{m}_{ll#gamma};#it{p}_{T}^{gamma}",1000,0,1000,1000,0,1000);   
       h2Map[ISRVFSR] = TH2F("",";#it{m}_{ll};#it{m}{ll#gamma}",200,0,200,500,0,500);   
    }
+   
 
    return h2Map;
 
@@ -722,17 +936,45 @@ map<Histograms1D,TEfficiency> HistogramProducer::InitTriggerStudies(const select
 }
 
 
+map<Histograms1D,TH1F> HistogramProducer::InitCutFlowHistograms(const selectionType selection){
+   map<Histograms1D,TH1F> cMap;
+   cMap[CUTFLOW] = TH1F("","",5,0,5);
+   cMap[CUTFLOW].Fill("triggered", 0);
+   cMap[CUTFLOW].Fill("2leptons", 0);
+   cMap[CUTFLOW].Fill("m50", 0);
+   cMap[CUTFLOW].Fill("1photon", 0);
+   cMap[CUTFLOW].Fill("Z", 0);
+   return cMap;
+}
 
+
+map<Histograms1D,TH1F> HistogramProducer::InitCutFlowHistograms_Fine(const selectionType selection){
+   map<Histograms1D,TH1F> cMap;
+   cMap[CUTFLOW_fine] = TH1F("","",10,0,10);
+   cMap[CUTFLOW_fine].Fill("triggered", 0);
+   cMap[CUTFLOW_fine].Fill("GenPhotonVeto", 0);
+   cMap[CUTFLOW_fine].Fill("2LeptonID", 0);
+   cMap[CUTFLOW_fine].Fill("2LeptonPT", 0);
+   cMap[CUTFLOW_fine].Fill("m50", 0);
+   cMap[CUTFLOW_fine].Fill("1Photon", 0);
+   cMap[CUTFLOW_fine].Fill("1PhotonID", 0);
+   cMap[CUTFLOW_fine].Fill("1PhotonPT", 0);
+   cMap[CUTFLOW_fine].Fill("1PhotonDeltaR", 0);
+   cMap[CUTFLOW_fine].Fill("Z", 0);
+   return cMap;
+}
 
 void HistogramProducer::SlaveBegin(TTree *tree)
 {
 }
 
 bool HistogramProducer::SelectEvent(selectionType selection){
+   //clearCutFlowMap();
    if (CheckParticles()){//only Fill Histograms if nMu>=2, nEle>=2, nGamma>=0
       if (Cleaning()){//decide in events with DiEle and DiMu where to contribute
          selEvent L;
          L.isDiElectron=isDiElectron;
+         L.isDiMuon=isDiMuon;
          L.trigDiEle=trigDiEle;
          L.trigDiMu=trigDiMu;
          L.trigMuEle=trigMuEle;
@@ -751,84 +993,158 @@ bool HistogramProducer::SelectEvent(selectionType selection){
          L.miniIso1=miniIso1;
          L.miniIso2=miniIso2;
          L.ETmiss=ETmiss;
+         L.ETmiss_vec=ETmiss_vec;
+         L.MT2_val = MT2_val;
          if(!isData){
             //L.totalWeight = totalWeight * GetScaleFactorAndError(pt1,eta1,isSignal,isDiElectron)*GetScaleFactorAndError(pt2,eta2,isSignal,isDiElectron);
             L.totalWeight = totalWeight * GetScaleFactorAndErrorAlternative(pt1,eta1,isSignal,isDiElectron,*runNo)*GetScaleFactorAndErrorAlternative(pt2,eta2,isSignal,isDiElectron,*runNo);
+            //if ((selection==SEL||selection==ONZ||selection==DILEP)&&(isDiElectron)) totalWeight = totalWeight * electronMllWeighter.getWeight(mll);
+            //if ((selection==SEL||ONZ||DILEP)&&(isDiElectron)) L.totalWeight = L.totalWeight * electronMllWeighter.getWeight(mll);
          }else{
             L.totalWeight=totalWeight;
          }
+         //fill cutflowInfo DiEle or DiMu?
+         cutflowDiEle=isDiElectron;
+         cutflowDiMu=isDiMuon;
+         decisionMapCutFlowFine[DIMUON]=isDiMuon;
+         decisionMapCutFlowFine[DIELECTRON]=isDiElectron;
+         
          if (L.isDiElectron){
+            
+            //Fill cutflow triggered bool
+            if(selection==ONZ) cutflowIsTriggered=true;
+            //if(selection==ONZ) decisionMapCutFlowFine[TRIGGERED]=true;
+            if(selection==ONZ) decisionMapCutFlowFine[TRIGGERED]=trigDiEle;
+            
             auto e1 = electrons->at(0);
             auto e2 = electrons->at(1);
-            if(testSelection(e1,selection,true) && testSelection(e2,selection,false) && ((selection==UNCUT)? true : (mll>50.)) ){
+            
+            if(!GenPhotonVeto(5)){
+               if(selection==ONZ) decisionMapCutFlowFine[GENVETO]=true;
+            
+               if(testSelection(e1,selection,true) && testSelection(e2,selection,false)){
+                  //Fill cutflow 2 leptons bool
+                  if(selection==ONZ) cutflow2Leptons=true;
+                  if((selection==UNCUT)? true : (mll>50.)){
+                     //Fill cutflow mll>50 bool
+                     if(selection==ONZ) cutflowMll50=true;
+                     if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
 
-               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
-                  auto g = *it;
-                  selPhoton gamma;
-                  gamma.setAll(g);
-                  gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
-                  gamma.deltaR1=gamma.vec.DeltaR(L.l1);
-                  gamma.deltaR2=gamma.vec.DeltaR(L.l2);
-                  if (testSelection(gamma,selection)){
-                     L.selPhotons.push_back(gamma);
+                     //for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+                     for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); it++){
+                        auto g = *it;
+                        selPhoton gamma;
+                        gamma.setAll(g);
+                        gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
+                        gamma.deltaR1=gamma.vec.DeltaR(L.l1);
+                        gamma.deltaR2=gamma.vec.DeltaR(L.l2);
+                        if (testSelection(gamma,selection)){
+                           L.selPhotons.push_back(gamma);
+                        }
+                        //if(!isData){
+                           //L.totalWeight=L.totalWeight*GetScaleFactorAndErrorPhotons(L.selPhotons);
+                        //}
+                     }
+                     if(selection==ONZ) decisionMapCutFlowFine[PHOTON1]=true;
+                     if(!isData){
+                           L.totalWeight=L.totalWeight*GetScaleFactorAndErrorPhotons(L.selPhotons);
+                     }
+                     //for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+                     for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); it++){
+                        auto j = *it;
+                        selJet jet;
+                        jet.setAll(j);
+                        jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
+                        jet.deltaR1=jet.vec.DeltaR(L.l1);
+                        jet.deltaR2=jet.vec.DeltaR(L.l2);
+                        if (testSelection(jet,selection)){
+                           L.selJets.push_back(jet);
+                        }
+                     }
+                     selectedEvent=L;
+                        if(selectedEvent.selPhotons.size()!=0){
+                           if(selection==ONZ) cutflow1Photon=true;
+                           //if(selection==ONZ) decisionMapCutFlowFine[PHOTON1]=true;
+                           if(L.mll<101. && L.mll>81.){
+                              if(selection==ONZ) cutflowOnZ=true;
+                              if(selection==ONZ) decisionMapCutFlowFine[ZMASS]=true;
+                           }
+                        }
+                     return true;
+                     //else{
+                        //return false;
+                     //}
                   }
-                  if(!isData){
-                     L.totalWeight=L.totalWeight*GetScaleFactorAndErrorPhotons(L.selPhotons);
-                  }
-               }
-               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
-                  auto j = *it;
-                  selJet jet;
-                  jet.setAll(j);
-                  jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
-                  jet.deltaR1=jet.vec.DeltaR(L.l1);
-                  jet.deltaR2=jet.vec.DeltaR(L.l2);
-                  if (testSelection(jet,selection)){
-                     L.selJets.push_back(jet);
-                  }
-               }
-               selectedEvent=L;
-               if(!GenPhotonVeto()){
-                  return true;
-               }else{
-                  return false;
                }
             }
          }
          else{
+            
+            if(selection==ONZ) cutflowIsTriggered=true;
+            //if(selection==ONZ) decisionMapCutFlowFine[TRIGGERED]=true;
+            if(selection==ONZ) decisionMapCutFlowFine[TRIGGERED]=trigDiMu;
+
             auto m1 = muons->at(0); 
             auto m2 = muons->at(1);
-            if(testSelection(m1,selection,true) && testSelection(m2,selection,false) && ((selection==UNCUT)? true : (mll>50.))){
-               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
-                  auto g = *it;
-                  selPhoton gamma;
-                  gamma.setAll(g);
-                  gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
-                  gamma.deltaR1=gamma.vec.DeltaR(L.l1);
-                  gamma.deltaR2=gamma.vec.DeltaR(L.l2);
-                  if (testSelection(gamma,selection)){
-                     L.selPhotons.push_back(gamma);
+            m1.p.SetPtEtaPhi(pt1,eta1,phi1);
+            m2.p.SetPtEtaPhi(pt2,eta2,phi2);
+            m1.miniIso=miniIso1;
+            m2.miniIso=miniIso2;
+            
+            
+            if(!GenPhotonVeto(5)){
+               
+               if(selection==ONZ) decisionMapCutFlowFine[GENVETO]=true;
+
+            
+               if(testSelection(m1,selection,true) && testSelection(m2,selection,false)){
+                  if(selection==ONZ) cutflow2Leptons=true;
+                  if((selection==UNCUT)? true : (mll>50.)){
+                     if(selection==ONZ) cutflowMll50=true;
+                     decisionMapCutFlowFine[M50]=true;
+                     //for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+                     for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); it++){
+                        auto g = *it;
+                        selPhoton gamma;
+                        gamma.setAll(g);
+                        gamma.vec.SetPtEtaPhiM(gamma.p.Pt(),gamma.p.Eta(),gamma.p.Phi(),0.);
+                        gamma.deltaR1=gamma.vec.DeltaR(L.l1);
+                        gamma.deltaR2=gamma.vec.DeltaR(L.l2);
+                        if (testSelection(gamma,selection)){
+                           L.selPhotons.push_back(gamma);
+                        }
+                     }
+                     if(selection==ONZ) decisionMapCutFlowFine[PHOTON1]=true;
+                     if(!isData){
+                           L.totalWeight=L.totalWeight*GetScaleFactorAndErrorPhotons(L.selPhotons);
+                     }
+                     //for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+                     for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); it++){
+                        auto j = *it;
+                        selJet jet;
+                        jet.setAll(j);
+                        jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
+                        jet.deltaR1=jet.vec.DeltaR(L.l1);
+                        jet.deltaR2=jet.vec.DeltaR(L.l2);
+                        if (testSelection(jet,selection)){
+                           L.selJets.push_back(jet);
+                        }
+                     }
+                     selectedEvent=L;
+                        
+                     if(L.selPhotons.size()>0){
+                        if(selection==ONZ) cutflow1Photon=true;
+                        //decisionMapCutFlowFine[PHOTON1]=true;
+                        if(L.mll<101. && L.mll>81.){
+                           if(selection==ONZ) cutflowOnZ=true;
+                           decisionMapCutFlowFine[ZMASS]=true;
+                        }
+                     }
+                     return true;
+                     //else{
+                        //return false;
+                     //}
                   }
-                  if(!isData){
-                     L.totalWeight=L.totalWeight*GetScaleFactorAndErrorPhotons(L.selPhotons);
-                  }
-               }
-               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
-                  auto j = *it;
-                  selJet jet;
-                  jet.setAll(j);
-                  jet.vec.SetPtEtaPhiM(jet.p.Pt(),jet.p.Eta(),jet.p.Phi(),0.);
-                  jet.deltaR1=jet.vec.DeltaR(L.l1);
-                  jet.deltaR2=jet.vec.DeltaR(L.l2);
-                  if (testSelection(jet,selection)){
-                     L.selJets.push_back(jet);
-                  }
-               }
-               selectedEvent=L;
-               if(!GenPhotonVeto()){
-                  return true;
-               }else{
-                  return false;
                }
             }
          }
@@ -873,7 +1189,8 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
             auto e2 = electrons->at(1);
             if(testSelection(e1,selection,true) && testSelection(e2,selection,false) && ((selection==UNCUT)? true : (mll>50.)) ){
 
-               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+               //for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); it++){
                   auto g = *it;
                   selPhoton gamma;
                   gamma.setAll(g);
@@ -884,7 +1201,8 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
                      L.selPhotons.push_back(gamma);
                   }
                }
-               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+               //for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); it++){
                   auto j = *it;
                   selJet jet;
                   jet.setAll(j);
@@ -896,7 +1214,7 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
                   }
                }
                selectedEvent=L;
-               if(!GenPhotonVeto()){
+               if(!GenPhotonVeto(0)){
                   return true;
                }else{
                   return false;
@@ -907,7 +1225,8 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
             auto m1 = muons->at(0); 
             auto m2 = muons->at(1);
             if(testSelection(m1,selection,true) && testSelection(m2,selection,false) && ((selection==UNCUT)? true : (mll>50.))){
-               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+               //for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); ++it){
+               for (vector<tree::Photon>::iterator it = photons->begin(); it != photons->end(); it++){
                   auto g = *it;
                   selPhoton gamma;
                   gamma.setAll(g);
@@ -918,7 +1237,8 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
                      L.selPhotons.push_back(gamma);
                   }
                }
-               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+               //for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); ++it){
+               for (vector<tree::Jet>::iterator it = jets->begin(); it != jets->end(); it++){
                   auto j = *it;
                   selJet jet;
                   jet.setAll(j);
@@ -930,7 +1250,7 @@ bool HistogramProducer::SelectEventTriggerStudies(selectionType selection){
                   }
                }
                selectedEvent=L;
-               if(!GenPhotonVeto()){
+               if(!GenPhotonVeto(0)){
                   return true;
                }else{
                   return false;
@@ -961,13 +1281,62 @@ void HistogramProducer::InitAllHistos(){
    h1Maps["onZEE"]=InitHistograms(ONZ);
    h1Maps["onZMM"]=InitHistograms(ONZ); 
    h1Maps["onZ"]=InitHistograms(ONZ); 
-   //h2Maps["selEE"]=Init2DHistograms("sel");
-   //h2Maps["selMM"]=Init2DHistograms("sel"); 
-   //h2Maps["sel"]=Init2DHistograms("sel"); 
+   h1Maps["onZMetEE"]=InitHistograms(ONZ);
+   h1Maps["onZMetMM"]=InitHistograms(ONZ); 
+   h1Maps["onZMet"]=InitHistograms(ONZ); 
+   h1Maps["onZGEE"]=InitHistograms(ONZ);
+   h1Maps["onZGMM"]=InitHistograms(ONZ); 
+   h1Maps["onZG"]=InitHistograms(ONZ); 
+   h1Maps["mllG110EE"]=InitHistograms(ONZ);
+   h1Maps["mllG110MM"]=InitHistograms(ONZ); 
+   h1Maps["mllG110"]=InitHistograms(ONZ); 
+   h1Maps["exoEE"]=InitHistograms(EXO);
+   h1Maps["exoMM"]=InitHistograms(EXO); 
+   h1Maps["exo"]=InitHistograms(EXO); 
+   h1Maps["EGRegressionEE"]=InitHistograms(EGRegression);
+   h1Maps["EGRegressionMM"]=InitHistograms(EGRegression); 
+   h1Maps["EGRegression"]=InitHistograms(EGRegression); 
+   
    h2Maps["selEE"]=Init2DHistograms(SEL);
    h2Maps["selMM"]=Init2DHistograms(SEL); 
    h2Maps["sel"]=Init2DHistograms(SEL); 
+   h2Maps["onZEE"]=Init2DHistograms(ONZ);
+   h2Maps["onZMM"]=Init2DHistograms(ONZ); 
+   h2Maps["onZ"]=Init2DHistograms(ONZ); 
+   h2Maps["dilepEE"]=Init2DHistograms(DILEP);
+   h2Maps["dilepMM"]=Init2DHistograms(DILEP); 
+   h2Maps["dilep"]=Init2DHistograms(DILEP); 
+   h2Maps["exoEE"]=Init2DHistograms(EXO);
+   h2Maps["exoMM"]=Init2DHistograms(EXO); 
+   h2Maps["exo"]=Init2DHistograms(EXO); 
 }
+
+void HistogramProducer::InitSignalScanHistos(string masspoint){
+   s1Maps[masspoint]["signal"]=InitSignalScanHistograms(ONZ);
+   s1Maps[masspoint]["signalEE"]=InitSignalScanHistograms(ONZ);
+   s1Maps[masspoint]["signalMM"]=InitSignalScanHistograms(ONZ);
+}
+
+
+void HistogramProducer::InitCutFlowHistos(){
+   //c1Maps["dilepEE"]=InitCutFlowHistograms(DILEP);
+   //c1Maps["dilepMM"]=InitCutFlowHistograms(DILEP);
+   //c1Maps["selEE"]=InitCutFlowHistograms(SEL);
+   //c1Maps["selMM"]=InitCutFlowHistograms(SEL);
+   c1Maps["cutFlow_onZEE"]=InitCutFlowHistograms(ONZ);
+   c1Maps["cutFlow_onZMM"]=InitCutFlowHistograms(ONZ);
+}
+
+
+void HistogramProducer::InitCutFlowHistos_Fine(){
+   //c1Maps["dilepEE"]=InitCutFlowHistograms(DILEP);
+   //c1Maps["dilepMM"]=InitCutFlowHistograms(DILEP);
+   //c1Maps["cutFlow_Fine_selEE"]=InitCutFlowHistograms(SEL);
+   //c1Maps["cutFlow_Fine_selMM"]=InitCutFlowHistograms(SEL);
+   c1Maps["cutFlow_Fine_onZEE"]=InitCutFlowHistograms_Fine(ONZ);
+   c1Maps["cutFlow_Fine_onZMM"]=InitCutFlowHistograms_Fine(ONZ);
+}
+
    
 void HistogramProducer::InitTriggerStudiesHistos(){
    eff1Maps["trigDilepEE"]=InitTriggerStudies(TRIGDILEP);
@@ -991,20 +1360,53 @@ void HistogramProducer::InitTriggerStudiesHistos(){
 
 void HistogramProducer::FillHistograms2D(){
    //if(SelectEvent(SEL)){
-   if(SelectEvent(SEL)||SelectEvent(ONZ)){
+   //if(SelectEvent(SEL)||SelectEvent(ONZ)){
+      //if (selectedEvent.selPhotons.size()!=0){
+         //auto m1 = &h2Maps["selEE"];
+         //auto m2 = &h2Maps["selMM"];
+         //auto m3 = &h2Maps["sel"];
+         //m3->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());         
+         //if (selectedEvent.isDiElectron){ 
+            //m1->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());    
+         //}else{
+            //m2->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());          
+         //}
+      //}   
+   //
+   //}
+
+   if(SelectEvent(SEL)){
       if (selectedEvent.selPhotons.size()!=0){
-         auto m1 = &h2Maps["selEE"];
-         auto m2 = &h2Maps["selMM"];
-         auto m3 = &h2Maps["sel"];
-         m3->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());         
-         if (selectedEvent.isDiElectron){ 
-            m1->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());    
+         Filler2D(selectedEvent,h2Maps["sel"],true);
+         if (selectedEvent.isDiElectron){
+            Filler2D(selectedEvent,h2Maps["selEE"],true); 
          }else{
-            m2->at(ISRVFSR).Fill(selectedEvent.mll,(selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M());          
+            if (selectedEvent.isDiMuon) Filler2D(selectedEvent,h2Maps["selMM"],true); 
          }
-      }   
-   
+      }
    }
+   
+   if(SelectEvent(ONZ)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)){
+         Filler2D(selectedEvent,h2Maps["onZ"],true);
+         if (selectedEvent.isDiElectron){ 
+            Filler2D(selectedEvent,h2Maps["onZEE"],true);
+         }else{
+            if (selectedEvent.isDiMuon) Filler2D(selectedEvent,h2Maps["onZMM"],true);
+         }
+      }
+   }
+   if(SelectEvent(EXO)){
+      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>50. && selectedEvent.mll<130.)){
+         Filler2D(selectedEvent,h2Maps["exo"],true);
+         if (selectedEvent.isDiElectron){ 
+            Filler2D(selectedEvent,h2Maps["exoEE"],true);
+         }else{
+            if (selectedEvent.isDiMuon) Filler2D(selectedEvent,h2Maps["exoMM"],true);
+         }
+      }
+   }
+   
 }
 
 
@@ -1028,17 +1430,48 @@ void HistogramProducer::Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool with
    m.at(ZPT).Fill((ev.l1+ev.l2).Pt(),ev.totalWeight);
    m.at(MTLL).Fill((ev.l1+ev.l2).Mt(),ev.totalWeight);
    m.at(ST).Fill(ev.pt1+ev.pt2,ev.totalWeight);
+   m.at(MT2).Fill(ev.MT2_val,ev.totalWeight);
    if(withPhoton){
       m.at(PTG1).Fill(ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
       m.at(PHIG1).Fill(ev.selPhotons.at(0).p.Phi(),ev.totalWeight);
       m.at(ETAG1).Fill(ev.selPhotons.at(0).p.Eta(),ev.totalWeight);
       m.at(SIGMAIETAIETAG1).Fill(ev.selPhotons.at(0).sigmaIetaIeta,ev.totalWeight);
+      m.at(SIGMAIPHIIPHIG1).Fill(ev.selPhotons.at(0).sigmaIphiIphi,ev.totalWeight);
+      m.at(R9).Fill(ev.selPhotons.at(0).r9,ev.totalWeight);
+      m.at(HOVERE).Fill(ev.selPhotons.at(0).hOverE,ev.totalWeight);
+      m.at(DELTARGL1).Fill(ev.selPhotons.at(0).deltaR1,ev.totalWeight);
+      m.at(DELTARGL2).Fill(ev.selPhotons.at(0).deltaR2,ev.totalWeight);
       m.at(DeltaEtaLLG).Fill(fabs((ev.l1+ev.l2).Eta()-ev.selPhotons.at(0).vec.Eta()), ev.totalWeight);
       m.at(DeltaPhiLLG).Fill(fabs((ev.l1+ev.l2).Phi()-ev.selPhotons.at(0).vec.Phi()),ev.totalWeight);
-      m.at(DeltaRLLG).Fill(fabs((ev.l1+ev.l2).DeltaR(ev.selPhotons.at(0).vec)),ev.totalWeight);
-      m.at(MTLLG).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec).Mt(),ev.totalWeight);
-      m.at(STG).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
-      m.at(STMET).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt()+ev.ETmiss,ev.totalWeight);
+      //m.at(DeltaRLLG).Fill(fabs((ev.l1+ev.l2).DeltaR(ev.selPhotons.at(0).vec)),ev.totalWeight);
+      //m.at(MTLLG).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec).Mt(),ev.totalWeight);
+      //m.at(MTL1MET).Fill((ev.l1+ev.ETmiss_vec).Mt(),ev.totalWeight);
+      //m.at(MTL2MET).Fill((ev.l2+ev.ETmiss_vec).Mt(),ev.totalWeight);
+      //m.at(MTGMET).Fill((ev.selPhotons.at(0).vec+ev.ETmiss_vec).Mt(),ev.totalWeight);
+      //m.at(MTLLMET).Fill((ev.l1+ev.l2+ev.ETmiss_vec).Mt(),ev.totalWeight);
+      //m.at(MTLLGMET).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec+ev.ETmiss_vec).Mt(),ev.totalWeight);
+      //m.at(STG).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
+      //m.at(STMET).Fill(ev.pt1+ev.pt2+ev.selPhotons.at(0).p.Pt()+ev.ETmiss,ev.totalWeight);
+      //m.at(MLLG).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec).M(),ev.totalWeight);
+      //m.at(PT_llg).Fill((ev.l1+ev.l2+ev.selPhotons.at(0).vec).Pt(),ev.totalWeight);
+      //m.at(MZG_exo).Fill(40./150. * (ev.l1+ev.l2+ev.selPhotons.at(0).vec).M(),ev.totalWeight);
+      //m.at(genPhotonPT).Fill(40./150. * (ev.l1+ev.l2+ev.selPhotons.at(0).vec).M(),ev.totalWeight);
+      
+      for (vector<tree::GenParticle>::iterator it = genParticles->begin(); it != genParticles->end(); it++){
+         int Id_mother=-1;
+         if (abs(it->pdgId)==22){
+            Id_mother = abs(it->motherId);
+            m.at(gammaMotherID).Fill(Id_mother,ev.totalWeight);
+         }
+      }
+      
+   }
+}
+void HistogramProducer::Filler2D(selEvent& ev, map<Histograms2D,TH2F>& m,bool withPhoton){
+   if(withPhoton){
+      //m.at(PTG1).Fill(ev.selPhotons.at(0).p.Pt(),ev.totalWeight);
+      m.at(ISRVFSR).Fill(ev.mll,(ev.l1+selectedEvent.l2+ev.selPhotons.at(0).vec).M(),ev.totalWeight);  
+      m.at(PTGvsMLLG).Fill((ev.l1+selectedEvent.l2+ev.selPhotons.at(0).vec).M(),ev.selPhotons.at(0).p.Pt(),ev.totalWeight);  
    }
 }
 
@@ -1064,7 +1497,9 @@ void HistogramProducer::FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency
    }
 }
 
-
+void HistogramProducer::FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m){
+   m.at(ETMISS).Fill(ev.ETmiss, ev.totalWeight*1./nGen);
+}
 
 void HistogramProducer::FillHistograms(){
 
@@ -1079,14 +1514,14 @@ void HistogramProducer::FillHistograms(){
          Filler(selectedEvent,h1Maps["uncutMM"],false);      
       }
    }*/
-   if(SelectEvent(DILEP)){
-      //Filler(selectedEvent,h1Maps["dilep"],false);
-      if (selectedEvent.isDiElectron){ 
-         Filler(selectedEvent,h1Maps["dilepEE"],false);
-      }else{
-        Filler(selectedEvent,h1Maps["dilepMM"],false);
-      }
-   }
+   //if(SelectEvent(DILEP)){
+      ////Filler(selectedEvent,h1Maps["dilep"],false);
+      //if (selectedEvent.isDiElectron){ 
+         //Filler(selectedEvent,h1Maps["dilepEE"],false);
+      //}else{
+        //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["dilepMM"],false);
+      //}
+   //}
    /*if(SelectEvent(PHOTON)){
       if (selectedEvent.selPhotons.size()!=0){
          Filler(selectedEvent,h1Maps["1photon"],true);         
@@ -1097,32 +1532,159 @@ void HistogramProducer::FillHistograms(){
          }
       }
    }*/
-   if(SelectEvent(SEL)){
-      if (selectedEvent.selPhotons.size()!=0){
-         //Filler(selectedEvent,h1Maps["sel"],true);
-         if (selectedEvent.isDiElectron){
-            Filler(selectedEvent,h1Maps["selEE"],true); 
-         }else{
-            Filler(selectedEvent,h1Maps["selMM"],true); 
-         }
+   //if(SelectEvent(SEL)){
+      //if (selectedEvent.selPhotons.size()!=0){
+         ////Filler(selectedEvent,h1Maps["sel"],true);
+         //if (selectedEvent.isDiElectron){
+            //Filler(selectedEvent,h1Maps["selEE"],true); 
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["selMM"],true); 
+         //}
+      //}
+   //}
+   //clearCutFlowMap(decisionMapCutFlowFine);
+   //if(SelectEvent(ONZ)){
+        //
+      //if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)){
+         //Filler(selectedEvent,h1Maps["onZ"],true);
+         //if (selectedEvent.isDiElectron){ 
+            //Filler(selectedEvent,h1Maps["onZEE"],true);
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["onZMM"],true);
+         //}
+      //}
+   //}
+   //if(SelectEvent(EXO)){
+        //
+      //if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>50. && selectedEvent.mll<130.)){
+         ////Filler(selectedEvent,h1Maps["exo"],true);
+         //if (selectedEvent.isDiElectron){ 
+            //Filler(selectedEvent,h1Maps["exoEE"],true);
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["exoMM"],true);
+         //}
+      //}
+   //}
+   if(SelectEvent(EGRegression)){
+        
+      //Filler(selectedEvent,h1Maps["EGRegression"],false);
+      if (selectedEvent.isDiElectron){ 
+         Filler(selectedEvent,h1Maps["EGRegressionEE"],false);
+      }else{
+         if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["EGRegressionMM"],false);
       }
    }
-  
-   if(SelectEvent(ONZ)){
-      if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)){
-         //Filler(selectedEvent,h1Maps["onZ"],true);
-         if (selectedEvent.isDiElectron){ 
-            Filler(selectedEvent,h1Maps["onZEE"],true);
+   //if(SelectEvent(ONZ)){ //ONZ+MET>200
+        //
+      //if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)&&(selectedEvent.ETmiss>=200.)){
+         //Filler(selectedEvent,h1Maps["onZMet"],true);
+         //if (selectedEvent.isDiElectron){ 
+            //Filler(selectedEvent,h1Maps["onZMetEE"],true);
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["onZMetMM"],true);
+         //}
+      //}
+   //}
+   //if(SelectEvent(ONZ)){ //ONZG
+        //
+      //if ((selectedEvent.selPhotons.size()!=0)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()>81.)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()<101.)){
+         //Filler(selectedEvent,h1Maps["onZG"],true);
+         //if (selectedEvent.isDiElectron){ 
+            //Filler(selectedEvent,h1Maps["onZGEE"],true);
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["onZGMM"],true);
+         //}
+      //}
+   //}
+   //if(SelectEvent(ONZ)){//MLLG>110
+        //
+      //if ((selectedEvent.selPhotons.size()!=0)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons.at(0).vec).M()>110.)){
+         //Filler(selectedEvent,h1Maps["mllG110"],true);
+         //if (selectedEvent.isDiElectron){ 
+            //Filler(selectedEvent,h1Maps["mllG110EE"],true);
+         //}else{
+            //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["mllG110MM"],true);
+         //}
+      //}
+   //}
+}
+
+void HistogramProducer::FillSignalHistograms(){
+   if(SelectEvent(ONZ)){   
+      if((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)){
+         string signalPoint = getSignalPointName(*nBinos,*signal_m1,*signal_m2);
+         if(!(s1Maps.count(signalPoint)>0)){
+            InitSignalScanHistos(signalPoint);
+         }
+         FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("signal"));
+         if (selectedEvent.isDiElectron){
+            FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("signalEE"));
          }else{
-            Filler(selectedEvent,h1Maps["onZMM"],true);
+            if (selectedEvent.isDiMuon) FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("signalMM"));
          }
       }
    }
 }
 
 
+void HistogramProducer::FillCutFlowHistograms(){
+   if(cutflowDiEle && !(cutflowDiMu)){
+      if (cutflowIsTriggered) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("triggered",selectedEvent.totalWeight);
+      if (cutflow2Leptons) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("2leptons",selectedEvent.totalWeight);
+      if (cutflowMll50) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("m50",selectedEvent.totalWeight);
+      if (cutflow1Photon) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("1photon",selectedEvent.totalWeight);
+      if (cutflowOnZ) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("Z",selectedEvent.totalWeight);
+   }
+   if(cutflowDiMu && !(cutflowDiEle)){
+      if (cutflowIsTriggered) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("triggered",selectedEvent.totalWeight);
+      if (cutflow2Leptons) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("2leptons",selectedEvent.totalWeight);
+      if (cutflowMll50) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("m50",selectedEvent.totalWeight);
+      if (cutflow1Photon) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("1photon",selectedEvent.totalWeight);
+      if (cutflowOnZ) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("Z",selectedEvent.totalWeight);
+   }
+
+}
+void HistogramProducer::SetCutFlowHistogramsStatus(){
+   cutflowIsTriggered=false;
+   cutflow2Leptons=false;
+   cutflowMll50=false;
+   cutflow1Photon=false;
+   cutflowOnZ=false;
+}
 
 
+
+
+void HistogramProducer::FillCutFlowHistograms_Fine(){
+   auto m=decisionMapCutFlowFine;
+   if(m[DIELECTRON] && !(m[DIMUON])){
+      if (m[TRIGGERED]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("triggered",selectedEvent.totalWeight);
+      if (m[GENVETO]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("GenPhotonVeto",selectedEvent.totalWeight);
+      if (m[LEPTONID_leading]&&m[LEPTONID_trailing]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonID",selectedEvent.totalWeight);
+      if (m[LEPTONPT_leading]&&m[LEPTONPT_trailing]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonPT",selectedEvent.totalWeight);
+      if (m[M50]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("m50",selectedEvent.totalWeight);
+      if (m[PHOTON1]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1Photon",selectedEvent.totalWeight);
+      if (m[PHOTON1ID]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonID",selectedEvent.totalWeight);
+      if (m[PHOTON1ID]&&m[PHOTON1PT]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonPT",selectedEvent.totalWeight);
+      if (m[PHOTON1ID]&&m[PHOTON1PT]&&m[PHOTON1DR]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonDeltaR",selectedEvent.totalWeight);
+      if (m[ZMASS]) c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("Z",selectedEvent.totalWeight);
+   }
+   if(m[DIMUON] && !(m[DIELECTRON])){
+      if (m[TRIGGERED]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("triggered",selectedEvent.totalWeight);
+      //if (m[GENVETO]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("GenPhotonVeto",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("GenPhotonVeto",selectedEvent.totalWeight);
+      //if (m[LEPTONID_leading]&&m[LEPTONID_trailing]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonID",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonID",selectedEvent.totalWeight);
+      //if (m[LEPTONPT_leading]&&m[LEPTONPT_trailing]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonPT",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonPT",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("m50",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]&&m[PHOTON1]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1Photon",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]&&m[PHOTON1]&&m[PHOTON1ID]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonID",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]&&m[PHOTON1]&&m[PHOTON1ID]&&m[PHOTON1PT]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonPT",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]&&m[PHOTON1]&&m[PHOTON1ID]&&m[PHOTON1PT]&&m[PHOTON1DR]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonDeltaR",selectedEvent.totalWeight);
+      if (m[TRIGGERED]&&m[GENVETO]&&m[LEPTONID_leading]&&m[LEPTONID_trailing]&&m[LEPTONPT_leading]&&m[LEPTONPT_trailing]&&m[M50]&&m[PHOTON1]&&m[PHOTON1ID]&&m[PHOTON1PT]&&m[PHOTON1DR]&&m[ZMASS]) c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("Z",selectedEvent.totalWeight);
+   }
+}
 
 
 
@@ -1211,25 +1773,35 @@ void HistogramProducer::FillTriggerStudies(){
    }
 }
 
+bool HistogramProducer::FindGenPhotonMatch(const selPhoton& pa){
+   bool genMatch = false;
+   for (auto& gen : *genParticles) {
+      //if (gen.pdgId == 22 &&  gen.p.DeltaR(pa.p) < 0.3 && fabs(gen.p.Pt() - pa.p.Pt()) < 10. ) {
+      if (gen.pdgId == 22 &&  gen.p.DeltaR(pa.p) < 0.2) {
+         genMatch = true;
+         break;
+      }
+   }
+   return genMatch;
+}
+
 
 Bool_t HistogramProducer::Process(Long64_t entry){
-   //float tempPercentage = (float) entry/ (float)nEntries;
-   //if (tempPercentage>0.5){
+   float tempPercentage = (float) entry/ (float)nEntries;
+   //if (tempPercentage>0.25){
+   if (tempPercentage>0.25){
+      return kTRUE;
+   }
+   //if (tempPercentage<0.81){
       //return kTRUE;
    //}
    fReader.SetLocalEntry(entry);
    totalWeight = *mc_weight * *pu_weight;
    
-   //print out progression
-   //double currentEventNo = (double) entry;
-   //double totalEventNo = (double) nEntries;
-   //double tempVerbose = currentEventNo/totalEventNo*100.;
-   //if(entry%1000000==0){
-      //int tempVerbose2 = (int)tempVerbose;
-      //cout<<"output/"+getOutputFilename(inputName)<<" | "<<tempVerbose2<<"%"<<endl;
-   //}
+   //cout<<entry<<" | "<<tempPercentage<<" | "<<*evtNo<<endl;
 
-   //int progress = tempPercentage*100.;
+
+   int progress = tempPercentage*100.;
    //if(entry%100000==0){
    //
 		//std::cout<<"[";
@@ -1244,14 +1816,41 @@ Bool_t HistogramProducer::Process(Long64_t entry){
 		//std::cout.flush();
 	//
 //}
-//std::cout<<std::endl;
 
+   string cutFlowName = "TreeWriter/hCutFlow";
+   
+   if(isTotalSignal){
+      if(inputName.find("TChiNG")!=string::npos){
+         cutFlowName+="TChiNG";
+      }else{
+         if(inputName.find("T5bbbbZg")!=string::npos){
+            cutFlowName+="T5bbbbZg";
+         }
+      }
+      cutFlowName += "_"+to_string(*signal_m1);
+      if (*signal_m2) cutFlowName += "_"+to_string(*signal_m2);
+      cutFlow = *((TH1F*)fReader.GetTree()->GetCurrentFile()->Get(cutFlowName.c_str()));
+      if (cutFlow.GetEntries()) {
+         nGen = cutFlow.GetBinContent(2);
+      }else{
+         cout << "Could not read cutFlow histogram " << cutFlowName << endl;
+      }
+   }
 
+   SetCutFlowHistogramsStatus();
+   clearCutFlowMap();
+   //cout<<"init "<<decisionMapCutFlowFine[TRIGGERED]<<endl;
    FillHistograms();
    //FillHistograms2D();
+   //cout<<cutflowIsTriggered<<" | "<<decisionMapCutFlowFine[TRIGGERED]<<endl;
    if(inputName.find("JetHT")!= string::npos){
       FillTriggerStudies();
    }
+   
+   FillCutFlowHistograms();
+   FillCutFlowHistograms_Fine();
+   
+   //FillSignalHistograms();
    
    return kTRUE;
 }
@@ -1286,31 +1885,49 @@ void save2File(const map<string,map<Histograms2D,T>>& hMaps, TFile& file)
     file.cd();
   }
 }
-
+template<typename T>
+void save2File(const map<string,map<string,map<Histograms1D,T>>>& hMaps, TFile& file)
+{
+   for (auto& hMapIt : hMaps) {
+      if (!file.Get(hMapIt.first.c_str())) {
+         file.mkdir(hMapIt.first.c_str());
+      }
+      file.cd(hMapIt.first.c_str());
+      for(auto& hMapIt2 : hMapIt.second){
+         if (!file.Get(hMapIt2.first.c_str())) {
+            file.mkdir((hMapIt.first+"/"+hMapIt2.first).c_str());
+         }
+         file.cd((hMapIt.first+"/"+hMapIt2.first).c_str());
+         for (auto h: hMapIt2.second){
+            //h.second.Scale(1./nEventMap[hMapMapIt.first]);
+            h.second.Write(histoNames[h.first].c_str(), TObject::kWriteDelete);
+         }
+         file.cd();
+      }
+   }
+}
 
 
 
 void HistogramProducer::Terminate()
 {
-   //auto outputName = "output_01/"+getOutputFilename(inputName);
-   auto outputName = "output/"+getOutputFilename(inputName);
+   //auto outputName = "output/"+getOutputFilename(inputName);
+   auto outputName = "output_EGRegression/"+getOutputFilename(inputName);
+   //auto outputName = "output_noVeto/"+getOutputFilename(inputName);
+   //auto outputName = "output_mllWeight/"+getOutputFilename(inputName);
+   //auto outputName = "output_FSRVeto/"+getOutputFilename(inputName);
+   //auto outputName = "output_FSR+HardVeto/"+getOutputFilename(inputName);
    TFile file(outputName.c_str(), "RECREATE");
-   //save2File(h1Map, file);
    save2File(h1Maps, file);
    save2File(eff1Maps, file);
    save2File(h2Maps, file);
-   cutFlow.Write("hCutFlow");
+   save2File(c1Maps, file);
+   save2File(s1Maps, file);
+   if(! isTotalSignal){
+      cutFlow.Write("hCutFlow");
+   }
    file.Close();
    cout << "Created " << outputName << " in " << (time(NULL) - startTime)/60 << " min" << endl;
    //cout << "Created " << getOutputFilename(inputName) << " in " << (time(NULL) - startTime)/60 << " min" << endl;
 }
-//
-//void HistogramProducer::resetSelection() {
-   //selPhotons.clear();
-   //selJets.clear();
-   //selBJets.clear();
-   //selHEJets.clear();
-   //selElectrons.clear();
-   //selMuons.clear();
-   //artificialPhotons.clear();
-//}
+

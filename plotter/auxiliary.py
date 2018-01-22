@@ -547,6 +547,7 @@ def setMinMaxForLog():
     unity = 1./maxBinWidth(histograms[0]) if style.divideByBinWidth else 1.
     minimum = max([unity,minC]) if style.minimumOne else minC
     minimum /= 9.
+    #minimum /= 90.
     for i in histograms:
         #i.SetMaximum(2.5*maxC)
         i.SetMaximum(10.*maxC)
@@ -687,7 +688,8 @@ def stdHist(dataset, name, binning=None, xCut=True, cut1=0, cut2=1e8):
     if isinstance(h, ROOT.TH2):
         if xCut: h = h.ProjectionY(randomName(), h.GetXaxis().FindFixBin(cut1), h.GetYaxis().FindFixBin(cut2))
         else:    h = h.ProjectionX(randomName(), h.GetYaxis().FindFixBin(cut1), h.GetXaxis().FindFixBin(cut2))
-    if binning: h = rebin(h, binning)
+    #if binning: h = rebin(h, binning)
+    if (binning.any()): h = rebin(h, binning)
     appendFlowBin(h)
     h.SetYTitle(getYAxisTitle(h))
     return h
@@ -997,7 +999,8 @@ class Label:
         saveStuff.append(self)
         if status == "Private Work":
             if sim:
-                self.cms = ROOT.TLatex( 0.2, .887, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
+                #self.cms = ROOT.TLatex( 0.2, .887, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
+                self.cms = ROOT.TLatex( 0.2, .95, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
             else:
                 self.pub = ROOT.TLatex( 0.2, .887, "#scale[0.76]{#font[52]{%s}}"%status )
         else:
@@ -1008,6 +1011,7 @@ class Label:
             self.pub = ROOT.TLatex( 0.2, .857, "#scale[0.76]{#font[52]{%s}}"%status )
         self.lum = ROOT.TLatex( .62, .95, "%.1f fb^{-1} (%s TeV)"%(intLumi/1000., self.cmsEnergy) )
         if info: self.info = ROOT.TLatex( .15, .95, info )
+        #if info: self.info = ROOT.TLatex( .85, .85, info )
 
         if drawAll:
             self.draw()

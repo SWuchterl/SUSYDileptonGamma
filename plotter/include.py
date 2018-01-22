@@ -26,10 +26,10 @@ import subprocess
 import ratio
 import style
 import multiplot
-#from rwthColors import rwth
+from rwthColors import rwth
 import auxiliary as aux
 from datasets import *
-#import limitTools
+import limitTools
 
 #sys.path.insert(0, 'smsPlotter/python')
 #import sms

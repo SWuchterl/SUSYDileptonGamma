@@ -2,6 +2,7 @@
 #include <regex>
 #include <TH2F.h>
 #include <TRandom2.h>
+//#include <TMath>
 //#include <iostream>
 
 const float photonsEtaMaxBarrel = 1.4442;
@@ -26,7 +27,6 @@ const float bWPeta3 = -0.01;
 bool isRunABCDEF(int No){
     return ((No>273149)&&(No<278809));
     }
-
 
 
 
@@ -446,15 +446,30 @@ float topPtReweighting(std::vector<tree::GenParticle>& particles) {
 string getSignalPointName(unsigned short nBinos, unsigned short m1, unsigned short m2) {
   string out = "";
   switch (nBinos) {
-    case 0: out += "WW"; break;
-    case 1: out += "Wg"; break;
-    case 2: out += "gg"; break;
+    //case 0: out += "WW"; break;
+    //case 1: out += "Wg"; break;
+    //case 2: out += "gg"; break;
+    //case 0: out += "NG"; break;
+    case 1: out += "Ng"; break;
+    case 2: out += "Zg"; break;
+    //case 2: out += "gg"; break;
     default: out += "xx";
   }
   out += "_"+to_string(m1);
   out += "_"+to_string(m2);
   return out;
 }
+
+
+//float M_T2(TVector3 const &v1, TVector3 const &v2)
+//{
+   //return 2.0*v1.Pt()*v2.Pt()*(1-TMath::Cos(v1.DeltaPhi(v2)));
+//}
+//
+//float M_T(TVector3 const &v1, TVector3 const &v2){
+  //return TMath::sqrt(M_T2(v1,v2));
+//}
+
 
 float ZGammaKFactor(std::vector<tree::GenParticle>& particles) {
   // k-factor from http://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2016/078 EXO-16-014

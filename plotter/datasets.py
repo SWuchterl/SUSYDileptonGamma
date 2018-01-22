@@ -5,7 +5,12 @@ import os.path
 import style
 
 
-path = "../minimal/output/"
+#path = "../minimal/output/"
+path = "../minimal/output_EGRegression/"
+#path = "../minimal/output_mllWeight/"
+#path = "../minimal/output_noVeto/"
+#path = "../minimal/output_FSRVeto/"
+#path = "../minimal/output_FSR+HardVeto/"
 #path = "../minimal/output_01/"
 
 class Dataset:
@@ -180,9 +185,16 @@ ttgamma.label = "tt#gamma"
 ## DY+jets
 #DYjets = Dataset("DYJetsToLL_M-50_ext", 1921.8*3.  , ROOT.kBlue-7)
 #DYjets = Dataset("DYJetsToLL_M-50_ext", 6024.  , ROOT.kBlue-7)
-DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7)
+DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7) \
+    +Dataset("DYJetsToLL_M-10to50-amcatnloFXFX_ext",18610.,ROOT.kBlue-7)
 #DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 6024.  , ROOT.kBlue-7)
 DYjets.label = "DY+jets"
+
+DYjetsNLO = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7)
+DYjetsNLO.label = "DY+jets (NLO)"
+DYjetsLO = Dataset("DYJetsToLL_M-50-madgraphMLM_ext", 1921.8*3.  , ROOT.kBlue-7)
+#DYjetsLO = Dataset("DYJetsToLL_M-50-madgraphMLM_ext", 6024.  , ROOT.kBlue-7)
+DYjetsLO.label = "DY+jets (LO)"
 
 ###############################################################################
 ## ttbar
@@ -193,6 +205,10 @@ tt.label = "t#bar{t}"
 #wjets = Dataset("WJetsToLNu-madgraphMLM_ext", 61526.7  , ROOT.kGreen+3)#LO
 wjets = Dataset("WJetsToLNu-amcatnloFXFX_ext", 61526.7  , ROOT.kGreen+3)#NLO
 wjets.label = "W+jets"
+###############################################################################
+## WGamma
+wgamma = Dataset("WGToLNuG-amcatnloFXFX_ext", 489  , ROOT.kGreen+5)#NLO
+wgamma.label = "W+#gamma"
 
 
 totalMC= Dataset("WWG-amcatnlo_ext", 0.2147, ROOT.kBlack)\
@@ -224,8 +240,8 @@ t6gg_1100_600 = Dataset("SMS-T6gg_1100_600", 0.0313372, ROOT.kRed+4, "")
 tchiwg_700 = Dataset("SMS-TChiWG_700", 9.51032/1000, ROOT.kRed+4, "")
 
 
-tching_1200 = Dataset("SMS-TChiNG_1200",58.6311/1000.,ROOT.kRed-2,"")
-tching_400 = Dataset("SMS-TChiNG_400",0.196044/1000. ,ROOT.kRed-3,"")
+tching_1200 = Dataset("SMS-TChiNG_1200",0.196044/1000.,ROOT.kRed-2,"")
+tching_400 = Dataset("SMS-TChiNG_400",58.6311/1000. ,ROOT.kRed-3,"")
 
 t5bbbbzg_1800_1700 = Dataset("SMS-T5bbbbZg_1800_1700",0.00276133,ROOT.kBlue-4,"")
 t5bbbbzg_1800_400 = Dataset("SMS-T5bbbbZg_1800_400",0.00276133,ROOT.kBlue+3,"")

@@ -10,6 +10,9 @@ from configs import runConfig as config
 def run(infile="", selector="HistogramProducer.cc", ext=False,amount=100.):
     # load libraries
     ROOT.gSystem.Load("pluginTreeWriterTreeWriterAuto.so")
+    ROOT.gSystem.Load("MT2Functor_cc.so")
+    #ROOT.gSystem.Load("RoccoR_cc.so")
+    #ROOT.gSystem.Load("rochcor2016_cc.so")
     #lib = "AutoDict_map_int_pair_int_int____cxx.so"
     #if not os.path.isfile(lib):
         #ROOT.gInterpreter.GenerateDictionary("map<int,pair<int,int> >", "map")

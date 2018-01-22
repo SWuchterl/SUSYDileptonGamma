@@ -11,6 +11,7 @@ class Multiplot:
         self.maximum = None
 
         self.leg = ROOT.TLegend(.56,.59,.94,.915)
+        #self.leg = ROOT.TLegend(.76,.59,.94,.915)
         self.leg.SetFillColor( ROOT.kWhite )
         self.leg.SetFillStyle(0)
 
@@ -38,6 +39,7 @@ class Multiplot:
         stack = ROOT.THStack()
         stack.SetTitle( ";%s;%s"%(self.histsToStack[0].GetXaxis().GetTitle(),self.histsToStack[0].GetYaxis().GetTitle()) )
         stack.drawOption_ = "hist"
+        #stack.drawOption_ = "hist e2"
         for h in self.histsToStack:
             h.SetFillColor( h.GetLineColor() )
             h.SetLineColor( ROOT.kBlack )
@@ -54,13 +56,16 @@ class Multiplot:
             return False
         self.stackHists()
 
-        minimum = 1e-3
+        #minimum = 1e-5
+        minimum = self.getMinimum()
+        #minimum = 0.001
         maximum = 1.1*self.getMaximum()
+        #maximum = 0.1
 
         if self.maximum != None:
             maximum = self.maximum
-        if self.minimum != None:
-            minimum = self.minimum
+        #if self.minimum != None:
+            #minimum = self.minimum
 
         # Fill legend:
         # Data first

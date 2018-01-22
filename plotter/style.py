@@ -2,6 +2,7 @@ import ROOT
 
 # own style options:
 divideByBinWidth = False
+#divideByBinWidth = True
 minimumOne = True
 additionalPoissonUncertainty = False
 

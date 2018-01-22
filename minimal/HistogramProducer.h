@@ -19,6 +19,9 @@
 //#include "CutFlow.h"
 //#include "Resolution.h"
 
+#include "MT2Functor.h"
+
+
 #include <iostream>
 
 #include "config.h"
@@ -28,6 +31,14 @@
 #include <cstdlib>//for random increments 
 #include <ctime>// --do--
 
+
+
+//#include <rochcor2016.h>
+//#include <RoccoR.h>
+#include "rochcor2016.h"
+#include "RoccoR.h"
+#include "rochcor2016.cc"
+#include "RoccoR.cc"
 
 
 using namespace std;
@@ -104,6 +115,7 @@ class selEvent {
     float totalWeight;
     
     bool isDiElectron;
+    bool isDiMuon;
     //TriggerDecisions(sum)
     bool trigDiEle;
     bool trigDiMu;
@@ -134,6 +146,8 @@ class selEvent {
     vector<selJet> selJets;
     //MET
     float ETmiss;
+    TLorentzVector ETmiss_vec;
+    float MT2_val;
 };
 
 
@@ -157,7 +171,6 @@ class HistogramProducer : public TSelector {
   virtual void Terminate();
   virtual Int_t Version() const { return 2; }
   
-  //void Cleaning();
   bool Cleaning();
   bool CleaningTriggerStudies();
   void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Photon& g,const tree::Particle met ,const particleType particle);
@@ -167,6 +180,8 @@ class HistogramProducer : public TSelector {
   bool Check2Mu();
   
   bool matchGenParticle(const tree::Particle& pa);
+  
+  bool FindGenPhotonMatch(const selPhoton& pa);
   
   bool SelectEvent(selectionType selection);
   bool SelectEventTriggerStudies(selectionType selection);
@@ -178,24 +193,46 @@ class HistogramProducer : public TSelector {
   
   
   void Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
+  void Filler2D(selEvent& ev, map<Histograms2D,TH2F>& m,bool withPhoton);
+  //void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
+  void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m);
   void FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool);
   
   void InitAllHistos();
   void InitTriggerStudiesHistos();
+  void InitCutFlowHistos();
+  void InitCutFlowHistos_Fine();
+  void InitSignalScanHistos(string masspoint);
+  
   void InitScaleFactors();
   void InitScaleFactorsAlternative();
+  
   float GetScaleFactorAndError(float pt, float eta,bool isFastSim, bool isEle);
   float GetScaleFactorAndErrorAlternative(float pt, float eta,bool isFastSim, bool isEle, int runNr);
   float GetScaleFactorAndErrorPhotons(vector<selPhoton>& vecGamma);
+  
   map<Histograms1D,TH1F> InitHistograms(const selectionType selection);
   map<Histograms2D,TH2F> Init2DHistograms(const selectionType selection);
-  //void InitTriggerStudies();
   map<Histograms1D,TEfficiency> InitTriggerStudies(const selectionType selection);
+  map<Histograms1D,TH1F> InitCutFlowHistograms(const selectionType selection);
+  map<Histograms1D,TH1F> InitCutFlowHistograms_Fine(const selectionType selection);
+  map<Histograms1D,TH1F> InitSignalScanHistograms(const selectionType selection);
+  
+  
   void FillHistograms();
   void FillHistograms2D();
   void FillTriggerStudies();
+  void FillCutFlowHistograms();
+  void SetCutFlowHistogramsStatus();
+  
+  void FillSignalHistograms();
 
-  bool GenPhotonVeto();
+  void FillCutFlowHistograms_Fine();
+
+
+  //rochester muon pt corrections
+  rochcor2016 rmcor;
+  bool GenPhotonVeto(const int a);
 
 
     //Tree Variables
@@ -260,7 +297,7 @@ class HistogramProducer : public TSelector {
   //TTreeReaderValue<Bool_t> hlt_mu33_ele33;
 
   // signal scan
-  TTreeReaderValue<UShort_t> signal_nBinos;
+  TTreeReaderValue<UShort_t> nBinos;
   TTreeReaderValue<UShort_t> signal_m1;
   TTreeReaderValue<UShort_t> signal_m2;
 
@@ -272,7 +309,7 @@ class HistogramProducer : public TSelector {
   vector<tree::Electron*> selElectrons;
   vector<tree::Muon*> selMuons;
 
-  vector<tree::Photon> artificialPhotons;
+  //vector<tree::Photon> artificialPhotons;
 
   int nEntries;
 
@@ -283,7 +320,19 @@ class HistogramProducer : public TSelector {
   map<string,map<Histograms1D,TEfficiency>> eff1Maps;
   map<string,map<Histograms2D,TEfficiency>> eff2Maps;
   
+  map<string,map<Histograms1D,TH1F>> c1Maps;
+
+
+  //map<string,map<Histograms1D,TH1F>> s1Maps;
+  map<string,map<string,map<Histograms1D,TH1F>>> s1Maps;
+
+
+
+  map <cutFlowFlags, bool> decisionMapCutFlowFine;
+  void clearCutFlowMap();
+  
   TH1F cutFlow;
+  float nGen;
   string inputName;
 
 
@@ -304,6 +353,7 @@ class HistogramProducer : public TSelector {
 
   //additional variables
   bool isDiElectron;
+  bool isDiMuon;
   //leptons
   TLorentzVector lep1;
   TLorentzVector lep2;
@@ -327,8 +377,21 @@ class HistogramProducer : public TSelector {
   float miniIso;
   //MET
   float ETmiss;
+  TLorentzVector ETmiss_vec;
   //float runNo;
-    
+  float MT2_val;
+  MT2Functor fctMT2_;
+
+  //cutflow booleans
+  bool cutflowIsTriggered;
+  bool cutflow2Leptons;
+  bool cutflowMll50;
+  bool cutflow1Photon;
+  bool cutflowOnZ;
+  bool cutflowDiEle;
+  bool cutflowDiMu;
+
+
 
   //scale factors
   Weighter DiEleWeighterID;
@@ -356,8 +419,11 @@ class HistogramProducer : public TSelector {
 
   Weighter PhotonIDWeighter;
 
+  Weighter electronMllWeighter;
+
   bool isData;
   bool isSignal;
+  bool isTotalSignal;
 
   bool noPromptPhotons;
 

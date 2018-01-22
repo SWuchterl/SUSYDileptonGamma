@@ -12,3 +12,8 @@ scratch
 minimal/submitCondor.txt
 minimal/logs/
 minimal/HistogramProducer_cc.so
+minimal/.nfs*
+minimal/HistogramProducer_cc.so
+plotter/cards
+plotter/plots_mllWeights
+plotter/testDatacard.txt

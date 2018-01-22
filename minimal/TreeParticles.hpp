@@ -1,1 +1,1 @@
-/.automount/home/home__home4/institut_1b/swuchterl/cmssw/TreeWriter_cleaned/CMSSW_8_0_26_patch1/src/TreeWriter/TreeWriter/plugins/TreeParticles.hpp
+/home/home4/institut_1b/swuchterl/cmssw/TreeWriter_cleaned/CMSSW_8_0_26_patch1/src/TreeWriter/TreeWriter/plugins/TreeParticles.hpp
