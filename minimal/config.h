@@ -4,11 +4,12 @@ using namespace std;
 
 
 enum selectionType{UNCUT,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ,
-    TRIGDILEP_ptcuts,TRIGONZ_ptcuts,TRIGSEL_ptcuts,TRIGDILEP_pt1cut,TRIGDILEP_pt2cut,ONZMET,ONZG,ABOVEZG,EXO,EGRegression};
+    TRIGDILEP_ptcuts,TRIGONZ_ptcuts,TRIGSEL_ptcuts,TRIGDILEP_pt1cut,TRIGDILEP_pt2cut,ONZMET,ONZG,ABOVEZG,EXO,EGRegression,ONZMET100,ONZMET200,ONZMET100200,ONZMET200300,ONZMET100300,ONZMET0100};
 enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
     HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,
     DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,ST,STG,STMET,ZPT,MTLL,MTLLG,
-    CUTFLOW,CUTFLOW_fine,HOVERE,R9,SIGMAIPHIIPHIG1,DELTARGL1,DELTARGL2,MTL1MET,MTL2MET,MTGMET,MTLLMET,MTLLGMET,MT2,MOTHERID,MLLG,PT_llg,MZG_exo,gammaMotherID,genPhotonPT};
+    CUTFLOW,CUTFLOW_fine,HOVERE,R9,SIGMAIPHIIPHIG1,DELTARGL1,DELTARGL2,MTL1MET,MTL2MET,MTGMET,MTLLMET,MTLLGMET,MT2,MOTHERID,MLLG,PT_llg,MZG_exo,gammaMotherID,genPhotonPT,
+    genPhotonPT_Veto,PTG1_Veto,genPhotonPT_NoVeto,PTG1_NoVeto,VetoCompare,DeltaPhiLLMet,DeltaEtaLLMet,DeltaRLLMet};
 enum Histograms2D{ISRVFSR,PTGvsMLLG};
 enum particleType{E,M};
 
@@ -63,10 +64,17 @@ histoNames[MT2] = "mt2";
 histoNames[MOTHERID] = "motherID";
 histoNames[MLLG] = "m_llg";
 histoNames[PT_llg] = "pt_llg";
-//histoNames[PTGvsMLLG] = "ptg_mllg";
 histoNames[MZG_exo] = "mzg_exo";
 histoNames[gammaMotherID] = "gammaMotherID";
 histoNames[genPhotonPT] = "genPhotonPT";
+histoNames[genPhotonPT_Veto] = "genPhotonPT_Veto";
+histoNames[PTG1_Veto] = "PhotonPT_Veto";
+histoNames[genPhotonPT_NoVeto] = "genPhotonPT_NoVeto";
+histoNames[PTG1_NoVeto] = "PhotonPT_NoVeto";
+histoNames[VetoCompare] = "VetoCompare";
+histoNames[DeltaPhiLLMet] = "DeltaPhiLLMet";
+histoNames[DeltaEtaLLMet] = "DeltaEtaLLMet";
+histoNames[DeltaRLLMet] = "DeltaRLLMet";
 
 histoNames2D[PTGvsMLLG] = "ptg_mllg";
 histoNames2D[ISRVFSR] = "ISRvFSR";
