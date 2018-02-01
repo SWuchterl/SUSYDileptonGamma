@@ -4,44 +4,14 @@ from array import array
 from include import *
 import numpy as np
 
-list_of_variables = ['pt1',
-                     'pt2',
-                     'eta1',
-                     'eta2',
-                     'met',
-                     'phi1',
-                     'phi2',
-                     'ht',
-                     'gen_ht',
-                     'm_ll',
-                     'm_ll_e',
-                     'm_ll_m',
-                     'n_jets',
-                     'n_vtx',
-                     'pt_g1',
-                     'eta_g1',
-                     'phi_g1',
-                     'sigmaIetaIeta_g1',
-                     'DeltaEtaLL',
-                     'DeltaPhiLL',
-                     'DeltaEtaLLG',
-                     'DeltaPhiLLG',
-                     'DeltaRLL',
-                     'DeltaRLLG',
-                     'st',
-                     'stmet',
-                     'zpt'
-                     ]
 
 
 binnings = {
-    #'pt1':              np.arange(0., 500., 10.),
-    #'pt1':              np.concatenate((np.arange(0,200,10),np.arange(200,1750,50)),axis=0),
-    #'pt1':              np.concatenate((np.arange(0,200,10),np.arange(200,350,50)),axis=0),
-    'cutflow_fine':              np.concatenate((np.arange(0,200,10),np.arange(200,350,50)),axis=0)
+    'cutflow':   np.arange(0, 10, 10),
+    'cutflow_fine':   np.arange(0, 5, 5)
 }
 labels = {
-    #'pt1': ["p_{T}^{leading}[GeV]","Events / 30 GeV"],
+    'cutflow': ["p_{T}^{leading}[GeV]","Events / 30 GeV"],
     'cutflow_fine': ["p_{T}^{leading}[GeV]","Events / 30 GeV"]
 }
 
@@ -75,8 +45,8 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
             h.SetYTitle( yTitle )
         else:
             h.SetYTitle( aux.getYAxisTitle( h ) )
-        if xTitle:
-            h.SetXTitle( xTitle )
+        #if xTitle:
+            #h.SetXTitle( xTitle )
         
         m.addStack( h, d.label )
 
@@ -106,7 +76,7 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
 
         m.add( h, d.label )
 
-    m.sortStackByIntegral()
+    #m.sortStackByIntegral()
     
     
     
@@ -126,24 +96,23 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
         if binningName: binningName = "_"+binningName
         name = name.replace("/","__")
         saveName = "sameHistograms_{}_{}{}".format(sampleNames, name, binningName )
-        #aux.save("DataMC_"+saveName )
         aux.save("DataMC_"+saveName,folder="plots_CutFlow/" )
 
         
 def main():
-    #bkgs=[DYjets,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
     #bkgs=[DYjetsLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
-    bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
-    #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","m_llg","pt_llg","mzg_exo","gammaMotherID"]
-    variables=["cutflow_fine"]
-    groups=["cutFlow_Fine_onZ"]
+    #bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
+    bkgs=[zgamma,DYjetsNLO,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
+    variables=["cutflow_fine","cutflow"]
+    groups=["cutFlow_Fine_onZ","cutFlow_onZ"]
     for group in groups:
         for variable in variables:
-            #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
-            #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],xTitle=labels[variable][0])
-            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],xTitle=labels[variable][0])
-            #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
+            #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG])
+            #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon])
+            #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable])
+            #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable])
+            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400])
+            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400])
 
 
 if __name__=="__main__":

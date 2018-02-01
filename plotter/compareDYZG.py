@@ -4,6 +4,9 @@ from array import array
 from include import *
 import numpy as np
 
+
+import datasetsNoVeto
+
 #from dataMC import binnings,labels
 from dataMC import binnings,labels
 
@@ -76,7 +79,9 @@ def drawHistos(sampleNames, name, binning=None, binningName="", scaleToData=Fals
 
 def main():
     #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","m_llg","pt_llg","mzg_exo","gammaMotherID"]
-    variables=["eta1","pt1","n_jets","phi1","m_ll","ht","n_photons","pt_g1","m_llg","gammaMotherID","sigmaIetaIeta_g1","sigmaIphiIphi_g1","r9_g1","hOverE_g1","deltaR1_g1","deltaR2_g1","eta_g1","phi_g1"]
+    #variables=["eta1","pt1","n_jets","phi1","m_ll","ht","n_photons","pt_g1","m_llg","gammaMotherID","sigmaIetaIeta_g1","sigmaIphiIphi_g1","r9_g1","hOverE_g1","deltaR1_g1","deltaR2_g1","eta_g1","phi_g1"]
+    #variables=["pt_g1","genPhotonPT","genPhotonPT_Veto","PhotonPT_Veto","genPhotonPT_NoVeto","PhotonPT_NoVeto","VetoCompare"]
+    variables=["pt_g1","genPhotonPT","genPhotonPT_Veto","PhotonPT_Veto","genPhotonPT_NoVeto","PhotonPT_NoVeto"]
     #variables=["eta1"]
     #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","sigmaIetaIeta_g1","sigmaIphiIphi_g1","r9_g1","hOverE_g1","deltaR1_g1","deltaR2_g1","eta_g1","phi_g1"]
     #groups=["sel","onZ","dilep","onZG","mllG110"]
@@ -89,5 +94,6 @@ def main():
             #print variable
             drawHistos("EE",group+"EE/"+variable,binning=binnings[variable],xTitle=labels[variable][0])
             drawHistos("MM",group+"MM/"+variable,binning=binnings[variable],xTitle=labels[variable][0])
+            #drawHistos("EE",group+"EE/"+variable,binning=binnings[variable],xTitle=labels[variable[0])
 
 main()
