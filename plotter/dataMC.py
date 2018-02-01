@@ -46,14 +46,17 @@ binnings = {
     #'phi1':             np.arange(0., 3.50, 0.10),
     'phi1':             np.arange(0., 3.50, 0.35),
     'phi2':             np.arange(0., 3.50, 0.10),
-    'ht':               np.arange(0., 5000.,100.),
+    'ht':               np.arange(0., 5000.,500.),
     #'met':              np.arange(0., 1000.,100.),
     #'met':              np.arange(0., 1000.,500.),
     #'met':              np.concatenate((np.arange(0,400,50),np.arange(400,3000,1300)),axis=0),
-    'met':              np.arange(0., 600.,25.),
-    #'met':              np.concatenate((np.arange(0,200,50),np.arange(200,300,100),np.arange(300,3000,1400)),axis=0),
+    #'met':              np.arange(0., 600.,25.),
+    #'met':              np.concatenate((np.arange(0,200,25),np.arange(200,300,100),np.arange(300,3000,1400)),axis=0),
+    'met':              np.concatenate((np.arange(0,200,25),np.arange(200,300,100),np.arange(300,700,200)),axis=0),
     'gen_ht':           np.arange(0., 5000.,100.),
     'm_ll':             np.arange(50., 130.,2.),
+    #'m_ll':             np.arange(50., 300.,2.),
+    #'m_ll':             np.arange(50., 300.,10.),
     #'m_ll':             np.arange(0., 650.,2.),
     #'m_ll':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
     'm_{ll#gamma}':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
@@ -83,7 +86,7 @@ binnings = {
     'deltaPhiLLG':      np.arange(0.,6.,0.1),
     'deltaRLL':         np.arange(0.,6.,0.12),
     'deltaRLLG':        np.arange(0.,6.,0.1),
-    'st':               np.arange(0.,5000.,100.),
+    'st':               np.arange(0.,1000.,100.),
     #'stmet':           np.arange(0.,5000.,100.),
     'stmet':            np.concatenate((np.arange(0,1000,100),np.arange(1000,4000,1000)),axis=0),
     'zpt':              np.arange(0.,2000.,100.),
@@ -96,7 +99,16 @@ binnings = {
     'mtllgmet':            np.concatenate((np.arange(0,200,50),np.arange(200,500,100),np.arange(500,4000,500)),axis=0),
     'mt2':            np.arange(0.,300.,5.),
     'mzg_exo':            np.concatenate((np.arange(0,100,50),np.arange(100,200,50),np.arange(200,500,50)),axis=0),
-    'gammaMotherID':            np.arange(0.,200.,1.)
+    'gammaMotherID':            np.arange(0.,200.,1.),
+    'genPhotonPT':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
+    'genPhotonPT_Veto':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
+    'PhotonPT_Veto':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
+    'genPhotonPT_NoVeto':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
+    'PhotonPT_NoVeto':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
+    'VetoCompare':            np.arange(0.,200.,1.),
+    'DeltaPhiLLMet':            np.arange(0.,6.,0.3),
+    'DeltaEtaLLMet':            np.arange(0.,6.,0.3),
+    'DeltaRLLMet':            np.arange(0.,6.,0.3)
 }
 labels = {
     'pt1': ["p_{T}^{leading}[GeV]","Events / 30 GeV"],
@@ -143,7 +155,16 @@ labels = {
     'm_llg':        ["m_{ll#gamma} [GeV]","Events / 100. GeV"],    
     'pt_llg':        ["pt_llg",""],
     'mzg_exo':        ["mzg_exo",""],
-    'gammaMotherID':        ["gammaMotherID",""]    
+    'gammaMotherID':        ["gammaMotherID",""],    
+    'genPhotonPT':        ["gammaMotherID",""],    
+    'genPhotonPT_Veto':        ["gammaMotherID",""],    
+    'PhotonPT_Veto':        ["gammaMotherID",""],    
+    'genPhotonPT_NoVeto':        ["gammaMotherID",""],    
+    'PhotonPT_NoVeto':        ["gammaMotherID",""],    
+    'VetoCompare':        ["gammaMotherID",""],
+    'DeltaPhiLLMet':        ["DeltaPhiLLMet",""],
+    'DeltaEtaLLMet':        ["DeltaEtaLLMet",""],
+    'DeltaRLLMet':        ["DeltaRLLMet",""]
 }
 
 
@@ -152,10 +173,11 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
     
-    style.divideByBinWidth = True
+    #style.divideByBinWidth = True
+    style.divideByBinWidth = False
     
     
-    yTitle=None
+    #yTitle=None
     
     scale = 1.
     if scaleToData: scale = divideDatasetIntegrals( [ i for i in additional if "Data" in i.label ], bkg, name )
@@ -170,7 +192,7 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
             h = aux.rebin( h, binning )
 
         aux.appendFlowBin( h )
-        #h.SetYTitle( aux.getYAxisTitle( h ) )
+        h.SetYTitle( aux.getYAxisTitle( h ) )
         if yTitle:
             h.SetYTitle( yTitle )
         else:
@@ -224,9 +246,10 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
         if binningName: binningName = "_"+binningName
         name = name.replace("/","__")
         saveName = "sameHistograms_{}_{}{}".format(sampleNames, name, binningName )
-        #aux.save("DataMC_"+saveName )
+        aux.save("DataMC_"+saveName )
         #aux.save("DataMC_"+saveName,folder="plots_noVeto/" )
-        aux.save("DataMC_"+saveName,folder="plots_EGRegression/" )
+        #aux.save("DataMC_"+saveName,folder="plots_uncorrected/" )
+        #aux.save("DataMC_"+saveName,folder="plots_EGRegression/" )
         #aux.save("DataMC_"+saveName,folder="plots_LO/" )
         #aux.save("DataMC_"+saveName,folder="plots_mllWeights/" )
         #aux.save("DataMC_"+saveName,folder="plots_NLO/" )
@@ -234,21 +257,24 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
         
 def main():
     #bkgs=[DYjets,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
-    bkgs=[DYjetsLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
-    #bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
+    #bkgs=[DYjetsLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
+    bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
     #bkgs=[DYjetsNLO,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
+    #bkgs=[DYjetsLO,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
     #bkgs=[DYjets,zgamma]
     #bkgs=[DYjets]
-    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","m_llg","pt_llg","mzg_exo","gammaMotherID"]
+    variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1"]
     #variables=["eta1","pt1","n_jets","n_vtx","phi1","m_ll","ht","n_photons","pt_g1","sigmaIetaIeta_g1","sigmaIphiIphi_g1","r9_g1","hOverE_g1","deltaR1_g1","deltaR2_g1","eta_g1","phi_g1"]
     #groups=["sel","onZ","dilep","onZG","mllG110"]
     #groups=["sel","onZ","dilep","onZG","exo"]
-    groups=["EGRegression"]
+    groups=["sel","dilep","onZ"]
+    #groups=["EGRegression"]
     for group in groups:
         for variable in variables:
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
             drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
+            #drawSameHistogram("LL",group+"/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[zgamma],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[zgamma],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
@@ -260,13 +286,14 @@ def main():
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs,binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
 def main2():
     bkgs=[DYjets,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
-    variables=["met","stmet","st","mtll","mtllg","mtl1met","mtl2met","mtllmet","mtllgmet","mtgmet","m_ll","n_vtx","mt2"]
-    groups=["onZ"]
+    variables=["met","stmet","st","mtll","mtllg","mtl1met","mtl2met","mtllmet","mtllgmet","mtgmet","m_ll","n_vtx","mt2","DeltaPhiLLMet","DeltaEtaLLMet","DeltaRLLMet","pt1","pt_g1","ht"]
+    groups=["onZ","onZMet","onZMet100","onZMet200","onZMet100200","onZMet100300","onZMet200300"]
+    #groups=["onZMet100200",]
     for group in groups:
         for variable in variables:
-            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
-            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
+            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
 
 if __name__=="__main__":
-    main()
-    #main2()
+    #main()
+    main2()

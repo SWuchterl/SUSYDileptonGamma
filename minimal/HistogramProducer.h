@@ -14,6 +14,7 @@
 #include "TTree.h"
 
 #include "TreeParticles.hpp"
+//#include "TreeParticlesDanilo.hpp"
 #include "UserFunctions.h"
 #include "Weighter.h"
 //#include "CutFlow.h"
@@ -39,6 +40,10 @@
 #include "RoccoR.h"
 #include "rochcor2016.cc"
 #include "RoccoR.cc"
+
+
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ini_parser.hpp>
 
 
 using namespace std;
@@ -148,6 +153,8 @@ class selEvent {
     float ETmiss;
     TLorentzVector ETmiss_vec;
     float MT2_val;
+    
+    bool evtHasGenPhotonVeto;
 };
 
 
@@ -182,6 +189,7 @@ class HistogramProducer : public TSelector {
   bool matchGenParticle(const tree::Particle& pa);
   
   bool FindGenPhotonMatch(const selPhoton& pa);
+  tree::GenParticle& GetGenPhotonMatch(const selPhoton& pa);
   
   bool SelectEvent(selectionType selection);
   bool SelectEventTriggerStudies(selectionType selection);
@@ -234,6 +242,16 @@ class HistogramProducer : public TSelector {
   rochcor2016 rmcor;
   bool GenPhotonVeto(const int a);
 
+  // config.ini
+  boost::property_tree::ptree propertyTree;
+  map<selectionType,bool> config_selectionsToProcessMap;
+  int config_veto;
+  bool config_docutflow;
+  bool config_docutflowfine;
+  bool config_dosignalscan;
+  float config_eventpercentage;
+  string config_outputfolder;
+
 
     //Tree Variables
   TTreeReader fReader;
@@ -279,22 +297,25 @@ class HistogramProducer : public TSelector {
   TTreeReaderValue<Bool_t> hlt_mu17_mu8_iso_dz;
   TTreeReaderValue<Bool_t> hlt_mu17_tkMu8_iso_dz;
   TTreeReaderValue<Bool_t> hlt_tkMu17_tkMu8_iso_dz;
-  //TTreeReaderValue<Bool_t> hlt_mu17_ele12_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso_dz;
-  //TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso_dz;
-  //TTreeReaderValue<Bool_t> hlt_mu8_ele17_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso_dz;
-  //TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso;
-  //TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso_dz;
+  
+  TTreeReaderValue<Bool_t> hlt_mu17_ele12_iso;
+  TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso;
+  TTreeReaderValue<Bool_t> hlt_mu23_ele8_iso_dz;
+  TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso;
+  TTreeReaderValue<Bool_t> hlt_mu23_ele12_iso_dz;
+  TTreeReaderValue<Bool_t> hlt_mu8_ele17_iso;
+  TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso;
+  TTreeReaderValue<Bool_t> hlt_mu8_ele23_iso_dz;
+  TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso;
+  TTreeReaderValue<Bool_t> hlt_mu12_ele23_iso_dz;
+  
   TTreeReaderValue<Bool_t> hlt_doubleEle33;
   TTreeReaderValue<Bool_t> hlt_doubleEle33_mw;
   TTreeReaderValue<Bool_t> hlt_mu27_tkMu8;
   TTreeReaderValue<Bool_t> hlt_mu30_tkMu11;
-  //TTreeReaderValue<Bool_t> hlt_mu30_ele30;
-  //TTreeReaderValue<Bool_t> hlt_mu33_ele33;
+  
+  TTreeReaderValue<Bool_t> hlt_mu30_ele30;
+  TTreeReaderValue<Bool_t> hlt_mu33_ele33;
 
   // signal scan
   TTreeReaderValue<UShort_t> nBinos;
@@ -329,6 +350,7 @@ class HistogramProducer : public TSelector {
 
 
   map <cutFlowFlags, bool> decisionMapCutFlowFine;
+  map <cutFlowFlags, float> decisionMapCutFlowFine_weight;
   void clearCutFlowMap();
   
   TH1F cutFlow;
@@ -359,6 +381,12 @@ class HistogramProducer : public TSelector {
   TLorentzVector lep2;
   float pt1;  
   float pt2;  
+  float pt1UnCor;  
+  float pt2UnCor;  
+  float eta1UnCor;  
+  float eta2UnCor;  
+  float phi1UnCor;  
+  float phi2UnCor;  
   float phi1;  
   float phi2;  
   float eta1;  
@@ -381,6 +409,8 @@ class HistogramProducer : public TSelector {
   //float runNo;
   float MT2_val;
   MT2Functor fctMT2_;
+
+  bool evtHasGenPhotonVeto;
 
   //cutflow booleans
   bool cutflowIsTriggered;
@@ -426,6 +456,7 @@ class HistogramProducer : public TSelector {
   bool isTotalSignal;
 
   bool noPromptPhotons;
+  bool isZGammaInclusive;
 
   double startTime;
   ClassDef(HistogramProducer, 1)

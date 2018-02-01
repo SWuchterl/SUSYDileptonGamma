@@ -6,9 +6,10 @@ import style
 
 
 #path = "../minimal/output/"
-path = "../minimal/output_EGRegression/"
+#path = "../minimal/output_uncorrected/"
+#path = "../minimal/output_EGRegression/"
 #path = "../minimal/output_mllWeight/"
-#path = "../minimal/output_noVeto/"
+path = "../minimal/output_noVeto/"
 #path = "../minimal/output_FSRVeto/"
 #path = "../minimal/output_FSR+HardVeto/"
 #path = "../minimal/output_01/"
@@ -126,6 +127,16 @@ dataDoubleEG = Dataset("DoubleEG_Run2016B-03Feb2017_ver2-v2",0,ROOT.kBlack) \
     + Dataset("DoubleEG_Run2016H-03Feb2017_ver2-v1", 0, ROOT.kBlack) 
 dataDoubleEG.label = "Data (ee)"
 
+dataMuonEG = Dataset("MuonEG_Run2016B-03Feb2017_ver2-v2",0,ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016C-03Feb2017-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016D-03Feb2017-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016E-03Feb2017-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016F-03Feb2017-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016G-03Feb2017-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016H-03Feb2017_ver3-v1", 0, ROOT.kBlack) \
+    + Dataset("MuonEG_Run2016H-03Feb2017_ver2-v1", 0, ROOT.kBlack) 
+dataMuonEG.label = "Data (e#mu)"
+
 dataDoubleSF = Dataset("DoubleEG_Run2016B-03Feb2017_ver2-v2",0,ROOT.kBlack) \
     + Dataset("DoubleEG_Run2016C-03Feb2017-v1", 0, ROOT.kBlack) \
     + Dataset("DoubleEG_Run2016D-03Feb2017-v1", 0, ROOT.kBlack) \
@@ -165,8 +176,8 @@ zz.label = "ZZ"
 #zgamma = Dataset("ZGTo2LG", 117.864 , ROOT.kGreen)\
     #+Dataset("ZGTo2LG_ext", 117.864 , ROOT.kGreen) \
     #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen)
-zgamma = Dataset("ZGTo2LG_ext", 117.864 , ROOT.kGreen-3) #\
-    #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
+zgamma = Dataset("ZGTo2LG_ext", (117.864-0.1404) , ROOT.kGreen-3) \
+    +Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
 #zgamma = Dataset("ZGTo2LG", 117.864 , ROOT.kGreen) #\
 zgamma.label = "Z#gamma"
 
@@ -177,7 +188,7 @@ wzgamma.label = "WZ#gamma"
 
 ###############################################################################
 ## TTGamma_dilept
-## LO cross section calculated "by hand" from sample
+## NLO cross section calculated "by hand" from sample
 ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.6352 , ROOT.kRed+1)
 ttgamma.label = "tt#gamma"
 
@@ -190,9 +201,11 @@ DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7) 
 #DYjets = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 6024.  , ROOT.kBlue-7)
 DYjets.label = "DY+jets"
 
-DYjetsNLO = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7)
+DYjetsNLO = Dataset("DYJetsToLL_M-50-amcatnloFXFX_ext", 1921.8*3.  , ROOT.kBlue-7)\
+    +Dataset("DYJetsToLL_M-10to50-amcatnloFXFX_ext",18610.,ROOT.kBlue-7)
 DYjetsNLO.label = "DY+jets (NLO)"
-DYjetsLO = Dataset("DYJetsToLL_M-50-madgraphMLM_ext", 1921.8*3.  , ROOT.kBlue-7)
+DYjetsLO = Dataset("DYJetsToLL_M-50-madgraphMLM_ext", 1921.8*3.  , ROOT.kBlue-7)\
+    +Dataset("DYJetsToLL_M-10to50-madgraphMLM",18610.,ROOT.kBlue-7)
 #DYjetsLO = Dataset("DYJetsToLL_M-50-madgraphMLM_ext", 6024.  , ROOT.kBlue-7)
 DYjetsLO.label = "DY+jets (LO)"
 

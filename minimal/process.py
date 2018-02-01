@@ -12,6 +12,9 @@ ROOT.gErrorIgnoreLevel = ROOT.kWarning
 # own libray
 import run
 
+import createConfig
+
+
 ds={
     "ee": [
         "DoubleEG_Run2016B-03Feb2017_ver2-v2_nTuple.root",
@@ -78,22 +81,20 @@ ds={
     "wgamma":[
         "WGToLNuG-amcatnloFXFX_ext_nTuple.root"
     ],
-#"signal":[
-        #"SMS-T5bbbbZg_1800_1700_nTuple.root",
-        #"SMS-T5bbbbZg_1800_400_nTuple.root",
-        #"SMS-T5bbbbZg_1800_600_nTuple.root",
+"signal":[
+        "SMS-T5bbbbZg_1800_1700_nTuple.root",
+        "SMS-T5bbbbZg_1800_400_nTuple.root",
+        "SMS-T5bbbbZg_1800_600_nTuple.root",
         #"SMS-T5bbbbZg_nTuple.root",
         #"SMS-TChiNG_BF50N50G_nTuple.root",
-        #"SMS-TChiNG_400_nTuple.root",
-        #"SMS-TChiNG_1200_nTuple.root"
-        #]
+        "SMS-TChiNG_400_nTuple.root",
+        "SMS-TChiNG_1200_nTuple.root"
+        ]
 }
     
     
-#dir = "../scratch/v04/"
-#dir = "../scratch/v05/"
-dir = "../scratch/v06/"
-#dir = "/user/swuchterl/nTuples/v04"
+dir = "../scratch/v09/"
+#dir = "../scratch/../dmeuser/master/data/vSebastian/"
 
 #############################################
 # Select datasets to process
@@ -105,13 +106,14 @@ run.run()
 parser = argparse.ArgumentParser()
 parser.add_argument('datasets', nargs='+', default=["all"], help="all "+' '.join(ds.keys()))
 parser.add_argument('--condor', action="store_true")
-parser.add_argument('--ext', action='store_true')
+#parser.add_argument('--ext', action='store_true')
 args = parser.parse_args()
+
 
 if args.datasets == ["all"]:
     toProcess = [x for sublist in ds.values() for x in sublist]
-elif args.datasets == ["2"]:
-    toProcess = [x for sublist in ds.values() for x in sublist if not x.startswith("GJet") and not x.startswith("QCD")]
+#elif args.datasets == ["2"]:
+    #toProcess = [x for sublist in ds.values() for x in sublist if not x.startswith("GJet") and not x.startswith("QCD")]
 else:
     toProcess = ds[args.datasets[0]]
     for n in args.datasets[1:]:
@@ -120,7 +122,8 @@ else:
 print toProcess
 
 if args.condor:
-    extStr = "--ext" if args.ext else ""
+    #extStr = "--ext" if args.ext else ""
+    extStr = ""
     for x in toProcess:
         with open("submitCondor.txt","w") as f:
             f.write("""
@@ -137,6 +140,5 @@ Queue
 else: # local processing
     files = [dir+x for x in toProcess]
     files.sort(key=os.path.getsize, reverse=True)
-    #p = multiprocessing.Pool(6)
     p = multiprocessing.Pool(8)
     p.map(run.runExt, files)

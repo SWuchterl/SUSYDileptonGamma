@@ -446,6 +446,7 @@ def getYAxisTitle( histo ):
     unit = "GeV" if "GeV" in xaxis.GetTitle() else None
 
     if abs(binW-binWmean) < 1e-6: #assume constant bin size
+    #if abs(binW-binWmean) > -1000000000.: #assume constant bin size
         if abs(binW-1) < 1e-6:
             return yTitle
 
@@ -546,8 +547,8 @@ def setMinMaxForLog():
     minC = getMinimum(histograms)
     unity = 1./maxBinWidth(histograms[0]) if style.divideByBinWidth else 1.
     minimum = max([unity,minC]) if style.minimumOne else minC
-    minimum /= 9.
-    #minimum /= 90.
+    #minimum /= 9.
+    minimum /= 90.
     for i in histograms:
         #i.SetMaximum(2.5*maxC)
         i.SetMaximum(10.*maxC)

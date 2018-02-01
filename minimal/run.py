@@ -5,9 +5,14 @@ with suppressor.suppress_stdout_stderr():
 import ROOT
 import argparse
 import os
-from configs import runConfig as config
+#from configs import runConfig as config
+import ConfigParser
 
-def run(infile="", selector="HistogramProducer.cc", ext=False,amount=100.):
+
+
+
+#def run(infile="", selector="HistogramProducer.cc", ext=False,amount=100.):
+def run(infile="", selector="HistogramProducer.cc", ext=False):
     # load libraries
     ROOT.gSystem.Load("pluginTreeWriterTreeWriterAuto.so")
     ROOT.gSystem.Load("MT2Functor_cc.so")
@@ -40,16 +45,25 @@ if __name__ == "__main__":
     parser.add_argument('file', default="", nargs="?")
     parser.add_argument('--ext', action='store_true')
     parser.add_argument('--signal', action='store_true')
-    parser.add_argument('--amount',action='store',default=100.,help="not working yet")
+    #parser.add_argument('--amount',action='store',default=100.,help="not working yet")
+
+    import createConfig
 
     args = parser.parse_args()
     #signalScans = ["SMS-T5Wg_nTuple.root", "SMS-T6Wg_nTuple.root", "SMS-T5Wg_mGo2150To2500_nTuple.root", "SMS-T6Wg_mSq1850To2150_nTuple.root", "SMS-TChiWG_nTuple.root", "SMS-TChiNG_nTuple.root"]
     signalScans = ["nothing"]
     
+    #print args
+    
+    
+    
+    
+    
     #if (args.file==""):
         
     
     if os.path.basename(args.file) in signalScans or args.signal:
-        run(args.file, "SignalScan.cc",amount=args.amount)
+        #run(args.file, "SignalScan.cc",amount=args.amount)
+        run(args.file, "SignalScan.cc")
     else:
-        run(args.file, ext=args.ext,amount=args.amount)
+        run(args.file, ext=args.ext)
