@@ -15,7 +15,7 @@ import ConfigParser
 def run(infile="", selector="HistogramProducer.cc", ext=False):
     # load libraries
     ROOT.gSystem.Load("pluginTreeWriterTreeWriterAuto.so")
-    ROOT.gSystem.Load("MT2Functor_cc.so")
+    #ROOT.gSystem.Load("MT2Functor_cc.so")
     #ROOT.gSystem.Load("RoccoR_cc.so")
     #ROOT.gSystem.Load("rochcor2016_cc.so")
     #lib = "AutoDict_map_int_pair_int_int____cxx.so"
@@ -26,10 +26,11 @@ def run(infile="", selector="HistogramProducer.cc", ext=False):
     if infile:
         ch = ROOT.TChain("TreeWriter/eventTree")
         ch.AddFile(infile)
-        extName = infile.replace("_nTuple", "_ext_nTuple")
-        if ext and os.path.isfile(extName):
-            print "Add file", extName
-            ch.AddFile(extName)
+        #extName = infile.replace("_nTuple", "_ext_nTuple")
+        extName = infile.replace("_nTuple", "_extNEIN_nTuple")
+        #if ext and os.path.isfile(extName):
+            #print "Add file", extName
+            #ch.AddFile(extName)
         ch.Process(selector+"+")
     elif ROOT.TSelector.GetSelector(selector+"++"):
         print "Compiled TSelector"

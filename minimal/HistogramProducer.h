@@ -14,7 +14,6 @@
 #include "TTree.h"
 
 #include "TreeParticles.hpp"
-//#include "TreeParticlesDanilo.hpp"
 #include "UserFunctions.h"
 #include "Weighter.h"
 //#include "CutFlow.h"
@@ -32,14 +31,10 @@
 #include <cstdlib>//for random increments 
 #include <ctime>// --do--
 
-
-
-//#include <rochcor2016.h>
-//#include <RoccoR.h>
-#include "rochcor2016.h"
-#include "RoccoR.h"
-#include "rochcor2016.cc"
-#include "RoccoR.cc"
+//#include "rochcor2016.h"
+//#include "RoccoR.h"
+//#include "rochcor2016.cc"
+//#include "RoccoR.cc"
 
 
 #include <boost/property_tree/ptree.hpp>
@@ -60,17 +55,17 @@ struct selPhoton : public tree::Photon{
       passElectronVeto=g.passElectronVeto;
       r9=g.r9;
       sigmaPt=g.sigmaPt;
-      //hasGainSwitch=g.hasGainSwitch;
+      hasGainSwitch=g.hasGainSwitch;
 //
-      //cIso=g.cIso;
-      //nIso=g.nIso;
-      //pIso=g.pIso;
-      //cIsoWorst=g.cIsoWorst;
+      cIso=g.cIso;
+      nIso=g.nIso;
+      pIso=g.pIso;
+      cIsoWorst=g.cIsoWorst;
 //
-      //isTrue=g.isTrue;
-      //isTrueAlternative=g.isTrueAlternative;
-      //pMultifit=g.pMultifit;
-      //pUncorrected=g.pUncorrected;
+      isTrue=g.isTrue;
+      isTrueAlternative=g.isTrueAlternative;
+      pMultifit=g.pMultifit;
+      pUncorrected=g.pUncorrected;
 
       isLoose=g.isLoose;
       isMedium=g.isMedium;
@@ -78,11 +73,123 @@ struct selPhoton : public tree::Photon{
 
       isMediumMVA=g.isMediumMVA;
       mvaValue=g.mvaValue;
-      //mvaCategory=g.mvaCategory;
+      mvaCategory=g.mvaCategory;
    }
    TLorentzVector vec;
    float deltaR1;
    float deltaR2;
+};
+
+struct selElectron : public tree::Electron{
+   public:
+   void setAll(const tree::Electron& e){
+     
+      p=e.p;
+      
+      charge=e.charge; // +/- 1
+      rIso=e.rIso;
+      passImpactParameter=e.passImpactParameter;
+      d0=e.d0;
+      dZ=e.dZ;
+      SIP3D=e.SIP3D;
+      miniIso=e.miniIso;
+      
+      isVetoID=e.isVetoID;
+      isLoose=e.isLoose;
+      isMedium=e.isMedium;
+      isTight=e.isTight;
+      isMediumMVA=e.isMediumMVA;
+      isTightMVA=e.isTightMVA;
+      isTightMVASlope=e.isTightMVASlope;
+      mvaValue=e.mvaValue;
+      mvaCategory=e.mvaCategory;
+      seedCrystalE=e.seedCrystalE;
+      isPassConvVeto=e.isPassConvVeto;
+      pUncorrected=e.pUncorrected;
+   }
+   TLorentzVector vec;
+   bool matched=false;
+   float deltaR1;
+   float deltaR2;
+   
+   int chargeInt;
+   
+};
+struct selMuon : public tree::Muon{
+   public:
+   void setAll(const tree::Muon& m){
+     
+      p=m.p;
+      
+      charge=m.charge; // +/- 1
+      rIso=m.rIso;
+      passImpactParameter=m.passImpactParameter;
+      d0=m.d0;
+      dZ=m.dZ;
+      SIP3D=m.SIP3D;
+      miniIso=m.miniIso;
+      
+      isTight=m.isTight;
+      isMedium=m.isMedium;
+      isMediumRun=m.isMediumRun;
+      nTrkLayers=m.nTrkLayers;
+   }
+   TLorentzVector vec;
+   bool matched=false;
+   float deltaR1;
+   float deltaR2;
+   
+   int chargeInt;
+   
+};
+struct selLepton : public tree::Lepton{
+   public:
+   void setAll(const selMuon& m){
+     
+      p=m.p;
+      
+      charge=m.charge; // +/- 1
+      rIso=m.rIso;
+      passImpactParameter=m.passImpactParameter;
+      d0=m.d0;
+      dZ=m.dZ;
+      SIP3D=m.SIP3D;
+      miniIso=m.miniIso;
+      
+      vec=m.vec;
+      matched=m.matched;
+      deltaR1=m.deltaR1;
+      deltaR2=m.deltaR2;
+     
+      chargeInt=m.chargeInt;
+      
+   }
+   void setAll(const selElectron& e){
+     
+      p=e.p;
+      
+      charge=e.charge; // +/- 1
+      rIso=e.rIso;
+      passImpactParameter=e.passImpactParameter;
+      d0=e.d0;
+      dZ=e.dZ;
+      SIP3D=e.SIP3D;
+      miniIso=e.miniIso;
+      
+      vec=e.vec;
+      matched=e.matched;
+      deltaR1=e.deltaR1;
+      deltaR2=e.deltaR2;
+     
+      chargeInt=e.chargeInt;
+   }
+   TLorentzVector vec;
+   bool matched=false;
+   float deltaR1;
+   float deltaR2;
+   
+   int chargeInt;
+   
 };
 
 struct selJet : public tree::Jet{
@@ -117,44 +224,65 @@ struct selJet : public tree::Jet{
 class selEvent {
     public:
     
-    float totalWeight;
+    float totalWeight=0.;
+    float puAndMCWeight=0;
+    //float SFsWeight=1.;
+    float ISRNjetWeight=1.;
+    float ISRPtWeight=1.;
+    float EWKWeight=1.;
+    float TopWeight=1.;
     
-    bool isDiElectron;
-    bool isDiMuon;
+    bool isDiElectron=false;
+    bool isDiMuon=false;
+    bool isMuonElectron=false;
+    bool isElectronMuon=false;
     //TriggerDecisions(sum)
-    bool trigDiEle;
-    bool trigDiMu;
-    bool trigMuEle;
-    bool trigHt;
+    bool trigDiEle=false;
+    bool trigDiMu=false;
+    bool trigMuEle=false;
+    bool trigHt=false;
 
     //additional variables
     //leptons
     TLorentzVector l1;
     TLorentzVector l2;
-    float pt1;  
-    float pt2;  
-    float phi1;  
-    float phi2;  
-    float eta1;  
-    float eta2;
+    float pt1=-1000.;  
+    float pt2=-10000.;  
+    float phi1=-10000.;  
+    float phi2=-10000.;  
+    float eta1=-10000.;  
+    float eta2=-10000.;
     //float charge;
     float chargeProduct;
-    float deltaRll;  
-    float deltaRl1e;  
-    float deltaRl2e;  
-    float mll;
-    float miniIso1;
-    float miniIso2;
+    float deltaRll=-1000.;  
+    float deltaRl1e=-10000.;  
+    float deltaRl2e=-1000.;  
+    float mll=-100000.0000000;
+    float miniIso1=5.;
+    float miniIso2=5.;
     //photon
-    //vector<tree::Photon> selPhotons;
     vector<selPhoton> selPhotons;
     vector<selJet> selJets;
+    vector<selElectron> selElectrons;
+    vector<selMuon> selMuons;
     //MET
-    float ETmiss;
+    float ETmiss=-10000.;
     TLorentzVector ETmiss_vec;
-    float MT2_val;
+    float MT2_val=-10000.;
     
-    bool evtHasGenPhotonVeto;
+    float calcHt=0.;
+    
+    bool evtHasGenPhotonVeto=false;
+    
+    int matchedEleSize=0;
+    int matchedMuSize=0;
+    int matchedLeptonSize=0;
+    int selLeptonSize=0;
+    int selMuonSize=0;
+    int selElectronSize=0;
+    
+    float invAddLeptMass=0.;
+    
 };
 
 
@@ -182,28 +310,65 @@ class HistogramProducer : public TSelector {
   bool CleaningTriggerStudies();
   void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2, const tree::Photon& g,const tree::Particle met ,const particleType particle);
   void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2,const tree::Particle met ,const particleType particle);
+  void ClearVariables();
   bool CheckParticles();
   bool Check2Ele();
   bool Check2Mu();
+  bool CheckEMu();
   
   bool matchGenParticle(const tree::Particle& pa);
   
   bool FindGenPhotonMatch(const selPhoton& pa);
   tree::GenParticle& GetGenPhotonMatch(const selPhoton& pa);
+  bool FindGenPhotonMatch(const tree::Photon& pa);
+  tree::GenParticle& GetGenPhotonMatch(const tree::Photon& pa);
+  bool FindRecoPhotonMatch(const tree::GenParticle pa);
+
+  bool matchSelMuon(const selMuon& pa);
+  bool matchSelElectron(const selElectron& pa);
+  //bool matchLepton(const tree::Lepton& pa, selEvent& ev, bool isEle);
+  bool matchLepton(const selElectron& pa, selEvent& ev);
+  bool matchLepton(const selMuon& pa, selEvent& ev);
   
   bool SelectEvent(selectionType selection);
   bool SelectEventTriggerStudies(selectionType selection);
+  bool SelectEventZZ(selectionType selection);
 
   bool testSelection(const tree::Electron& pa, selectionType,bool leading);
   bool testSelection(const tree::Muon& pa, selectionType,bool leading);
   bool testSelection(const selPhoton& pa, selectionType);
+  bool testSelection(const selMuon& pa, selectionType);
+  bool testSelection(const selElectron& pa, selectionType);
   bool testSelection(const selJet& pa, selectionType);
   
   
+  int dummy1=0;
+  int dummy2=0;
+  int dummy3=0;
+  int dummy4=0;
+  int dummy5=0;
+  int dummy6=0;
+  int dummy7=0;
+  int dummy8=0;
+  int dummy9=0;
+  int dummy10=0;
+  int dummy11=0;
+  int dummy12=0;
+  int dummy13=0;
+  int dummy14=0;
+  int dummy15=0;
+  int dummy16=0;
+  int dummy17=0;
+  
+  void CorrectAllMuonPt();
+  
+  
   void Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
+  void FillerZZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3, selLepton& l4);
+  void FillerWZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3);
   void Filler2D(selEvent& ev, map<Histograms2D,TH2F>& m,bool withPhoton);
   //void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
-  void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m);
+  void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m,float divideFactor);
   void FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool);
   
   void InitAllHistos();
@@ -214,10 +379,13 @@ class HistogramProducer : public TSelector {
   
   void InitScaleFactors();
   void InitScaleFactorsAlternative();
+  void InitScaleFactorsFinal();
   
   float GetScaleFactorAndError(float pt, float eta,bool isFastSim, bool isEle);
   float GetScaleFactorAndErrorAlternative(float pt, float eta,bool isFastSim, bool isEle, int runNr);
+  float GetScaleFactorAndErrorFinal(float pt, float eta,bool isFastSim, bool isEle);
   float GetScaleFactorAndErrorPhotons(vector<selPhoton>& vecGamma);
+  //float GetScaleFactorAndErrorPhotonsFinal(vector<selPhoton>& vecGamma);
   
   map<Histograms1D,TH1F> InitHistograms(const selectionType selection);
   map<Histograms2D,TH2F> Init2DHistograms(const selectionType selection);
@@ -226,6 +394,7 @@ class HistogramProducer : public TSelector {
   map<Histograms1D,TH1F> InitCutFlowHistograms_Fine(const selectionType selection);
   map<Histograms1D,TH1F> InitSignalScanHistograms(const selectionType selection);
   
+  void InitCompressedTree();
   
   void FillHistograms();
   void FillHistograms2D();
@@ -236,10 +405,13 @@ class HistogramProducer : public TSelector {
   void FillSignalHistograms();
 
   void FillCutFlowHistograms_Fine();
-
+  
+  void FillCompressedTree();
+  
+  void SaveCompressedTree();
 
   //rochester muon pt corrections
-  rochcor2016 rmcor;
+  //rochcor2016 rmcor;
   bool GenPhotonVeto(const int a);
 
   // config.ini
@@ -249,6 +421,7 @@ class HistogramProducer : public TSelector {
   bool config_docutflow;
   bool config_docutflowfine;
   bool config_dosignalscan;
+  bool config_dosignalscanSplit;
   float config_eventpercentage;
   string config_outputfolder;
 
@@ -278,6 +451,12 @@ class HistogramProducer : public TSelector {
   TTreeReaderValue<Float_t> rho;
   TTreeReaderValue<Int_t> nTruePV;
   TTreeReaderValue<Int_t> nISR;
+  
+  TTreeReaderValue<Float_t> EWKinoPairPt;
+  TTreeReaderValue<Float_t> leptonPairPt;
+  TTreeReaderValue<Float_t> topPt1;
+  TTreeReaderValue<Float_t> topPt2;
+  
   TTreeReaderValue<ULong64_t> evtNo;
   TTreeReaderValue<UInt_t> runNo;
   TTreeReaderValue<UInt_t> lumNo;
@@ -329,8 +508,10 @@ class HistogramProducer : public TSelector {
   vector<tree::Jet*> selHEJets;
   vector<tree::Electron*> selElectrons;
   vector<tree::Muon*> selMuons;
-
-  //vector<tree::Photon> artificialPhotons;
+  
+  
+  
+  //vector<tree::Muon> myMuons;
 
   int nEntries;
 
@@ -370,12 +551,12 @@ class HistogramProducer : public TSelector {
   
   float totalWeight;
   
-  //Decisions for Selection
-  //bool l1_
 
   //additional variables
   bool isDiElectron;
   bool isDiMuon;
+  bool isMuonElectron;
+  bool isElectronMuon;
   //leptons
   TLorentzVector lep1;
   TLorentzVector lep2;
@@ -407,8 +588,8 @@ class HistogramProducer : public TSelector {
   float ETmiss;
   TLorentzVector ETmiss_vec;
   //float runNo;
-  float MT2_val;
-  MT2Functor fctMT2_;
+  //float MT2_val;
+  //MT2Functor fctMT2_;
 
   bool evtHasGenPhotonVeto;
 
@@ -421,6 +602,10 @@ class HistogramProducer : public TSelector {
   bool cutflowDiEle;
   bool cutflowDiMu;
 
+
+  bool alreadyMuonCorrectedDiMu=false;
+  bool alreadyMuonCorrectedEMu=false;
+  bool alreadyMuonCorrectedMuE=false;
 
 
   //scale factors
@@ -448,15 +633,94 @@ class HistogramProducer : public TSelector {
   Weighter FastSimDiMuWeighterSIP3D;
 
   Weighter PhotonIDWeighter;
+  Weighter PhotonConversionWeighter;
 
   Weighter electronMllWeighter;
 
   bool isData;
   bool isSignal;
   bool isTotalSignal;
+  
+  bool doWeights_TopPt;
+  bool doWeights_nISR;
+  bool doWeights_EWKinoPairPt;
+  bool doWeights_LeptonPairPt;
 
   bool noPromptPhotons;
   bool isZGammaInclusive;
+
+
+  // For Compressed Trees
+  TTree* newtreeCompressed;
+  string outputPathCompressed;
+  string outputFilenameCompressed;
+  
+  //Data containing compressed Tree
+  float comp_weight;
+  
+  float comp_Lepton1Pt;
+  float comp_Lepton1Px;
+  float comp_Lepton1Py;
+  float comp_Lepton1Pz;
+  float comp_Lepton1Eta;
+  float comp_Lepton1Phi;
+  float comp_Lepton1MiniIso;
+  bool comp_Lepton1IsElectron;
+  bool comp_Lepton1IsMuon;
+  
+  float comp_Lepton2Pt;
+  float comp_Lepton2Px;
+  float comp_Lepton2Py;
+  float comp_Lepton2Pz;
+  float comp_Lepton2Eta;
+  float comp_Lepton2Phi;
+  float comp_Lepton2MiniIso;
+  bool comp_Lepton2IsElectron;
+  bool comp_Lepton2IsMuon;
+
+  float comp_deltaRll;  
+  float comp_mll;
+
+  int comp_NPhoton;
+  std::vector<float> comp_PhotonPt;
+  std::vector<float> comp_PhotonPx;
+  std::vector<float> comp_PhotonPy;
+  std::vector<float> comp_PhotonPz;
+  std::vector<float> comp_PhotonEta;
+  std::vector<float> comp_PhotonPhi;
+
+  float comp_Photon1Pt;
+  float comp_Photon1Px;
+  float comp_Photon1Py;
+  float comp_Photon1Pz;
+  float comp_Photon1Eta;
+  float comp_Photon1Phi;
+
+  int comp_NJet;
+  std::vector<float> comp_JetPt;
+  std::vector<float> comp_JetPx;
+  std::vector<float> comp_JetPy;
+  std::vector<float> comp_JetPz;
+  std::vector<float> comp_JetEta;
+  std::vector<float> comp_JetPhi;
+  std::vector<float> comp_JetBDiscriminator;
+  std::vector<float> comp_JetChf;
+  std::vector<float> comp_JetNhf;
+  std::vector<float> comp_JetNConstituents;
+  
+  float comp_MetPt;
+  float comp_MetPx;
+  float comp_MetPy;
+  float comp_MetPz;
+  float comp_MetEta;
+  float comp_MetPhi;
+
+  float comp_m1;
+  float comp_m2;
+  
+  float comp_ht;
+
+  float comp_eventNo;
 
   double startTime;
   ClassDef(HistogramProducer, 1)

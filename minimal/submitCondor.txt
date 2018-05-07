@@ -1,8 +1,8 @@
 
 Universe   = vanilla
 Executable = run.sh
-Arguments  = ../scratch/v03/SMS-T5bbbbZg_1800_400_nTuple.root 
-Log        = logs/SMS-T5bbbbZg_1800_400_nTuple.root.log
-Output     = logs/SMS-T5bbbbZg_1800_400_nTuple.root.out
-Error      = logs/SMS-T5bbbbZg_1800_400_nTuple.root.error
+Arguments  = ../scratch/v12/WZTo3LNu_Total_nTuple.root 
+Log        = logs/WZTo3LNu_Total_nTuple.root.log
+Output     = logs/WZTo3LNu_Total_nTuple.root.out
+Error      = logs/WZTo3LNu_Total_nTuple.root.error
 Queue

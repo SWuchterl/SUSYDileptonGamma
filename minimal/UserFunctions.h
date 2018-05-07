@@ -3,7 +3,9 @@
 #include <TH2F.h>
 #include <TRandom2.h>
 //#include <TMath>
-//#include <iostream>
+#include <algorithm>
+#include <iostream>
+#include <string>
 
 const float photonsEtaMaxBarrel = 1.4442;
 //const float photonsEtaMinEndcap = 1.566;
@@ -23,6 +25,13 @@ const float bWPeta2 = 0.11;
 const float aWPeta3 = 0.48;
 const float bWPeta3 = -0.01;
 
+const float workingPointCentralBarrelHighPt = 0.52;
+const float workingPointCentralBarrelLowPt = 0.77;
+const float workingPointOuterBarrelHighPt = 0.11;
+const float workingPointOuterBarrelLowPt = 0.56;
+const float workingPointEndcapHighPt = -0.01;
+const float workingPointEndcapLowPt = 0.48;
+
 
 bool isRunABCDEF(int No){
     return ((No>273149)&&(No<278809));
@@ -31,67 +40,91 @@ bool isRunABCDEF(int No){
 
 
 
+//bool ElectronTightMVA(const float eta, const float pt, const float mvaValue){
+  //
+   //float cut;
+   //float slope;
+   //if (pt<15.){
+      //if (fabs(eta)<0.8){
+         //cut = aWPeta1; 
+      //}else{
+         //if (fabs(eta)<1.479){
+            //cut = aWPeta2; 
+         //}else{
+            //if(fabs(eta)<2.5){
+               //cut = aWPeta3; 
+            //}else{
+               //cut = 9999.; 
+            //}
+         //}
+      //}
+   //}else{
+      //if ((pt>15.) && (pt<25.)){
+         //if (fabs(eta)<0.8){
+            //slope = (bWPeta1-aWPeta1)/10.; 
+            //cut = fmin( aWPeta1, fmax(bWPeta1 , aWPeta1 + slope*(pt-15.) ) );
+         //}else{
+            //if (fabs(eta)<1.479){
+               //slope = (bWPeta2-aWPeta2)/10.; 
+               //cut = fmin( aWPeta2, fmax(bWPeta2 , aWPeta2 + slope*(pt-15.) ) ); 
+            //}else{
+               //if(fabs(eta)<2.5){
+                  //slope = (bWPeta3-aWPeta3)/10.; 
+                  //cut = fmin( aWPeta3, fmax(bWPeta3 , aWPeta3 + slope*(pt-15) ) );
+               //}else{
+                  //cut = 9999.; 
+               //}
+            //}
+         //}         
+      //}else{
+         //if (pt > 25.){
+            //if (fabs(eta)<0.8){
+               //cut = bWPeta1; 
+            //}else{
+               //if (fabs(eta)<1.479){
+                  //cut = bWPeta2; 
+               //}else{
+                  //if(fabs(eta)<2.5){
+                     //cut = bWPeta3; 
+                  //}else{
+                     //cut = 9999.; 
+                  //}
+               //}
+            //}    
+         //}else{
+            //cut=9999.;
+         //}
+      //}
+   //}
+   //if (mvaValue > cut){
+      //return true;
+   //}else{
+      //return false;
+   //}
+//}
 bool ElectronTightMVA(const float eta, const float pt, const float mvaValue){
   
    float cut;
    float slope;
-   if (pt<15.){
-      if (fabs(eta)<0.8){
-         cut = aWPeta1; 
-      }else{
-         if (fabs(eta)<1.479){
-            cut = aWPeta2; 
-         }else{
-            if(fabs(eta)<2.5){
-               cut = aWPeta3; 
-            }else{
-               cut = 9999.; 
-            }
-         }
-      }
-   }else{
-      if ((pt>15.) && (pt<25.)){
-         if (fabs(eta)<0.8){
-            slope = (bWPeta1-aWPeta1)/10.; 
-            cut = fmin( aWPeta1, fmax(bWPeta1 , aWPeta1 + slope*(pt-15.) ) );
-         }else{
-            if (fabs(eta)<1.479){
-               slope = (bWPeta2-aWPeta2)/10.; 
-               cut = fmin( aWPeta2, fmax(bWPeta2 , aWPeta2 + slope*(pt-15.) ) ); 
-            }else{
-               if(fabs(eta)<2.5){
-                  slope = (bWPeta3-aWPeta3)/10.; 
-                  cut = fmin( aWPeta3, fmax(bWPeta3 , aWPeta3 + slope*(pt-15) ) );
-               }else{
-                  cut = 9999.; 
-               }
-            }
-         }         
-      }else{
-         if (pt > 25.){
-            if (fabs(eta)<0.8){
-               cut = bWPeta1; 
-            }else{
-               if (fabs(eta)<1.479){
-                  cut = bWPeta2; 
-               }else{
-                  if(fabs(eta)<2.5){
-                     cut = bWPeta3; 
-                  }else{
-                     cut = 9999.; 
-                  }
-               }
-            }    
-         }else{
-            cut=9999.;
-         }
-      }
-   }
-   if (mvaValue > cut){
+   
+   float workingPoint = -9999.;
+		if (fabs(eta) < 0.8) {
+			slope = (workingPointCentralBarrelHighPt - workingPointCentralBarrelLowPt) / 10.;
+			workingPoint =  std::min(workingPointCentralBarrelLowPt, std::max(workingPointCentralBarrelHighPt, workingPointCentralBarrelLowPt + slope * (static_cast<float>(pt - 15.))));
+		}
+		else if (fabs(eta) > 0.8 && fabs(eta) < 1.479) {
+			slope = (workingPointOuterBarrelHighPt - workingPointOuterBarrelLowPt) / 10.;
+			workingPoint =  std::min(workingPointOuterBarrelLowPt, std::max(workingPointOuterBarrelHighPt, workingPointOuterBarrelLowPt + slope * (static_cast<float>(pt - 15.))));
+		}
+		else {
+			slope = (workingPointEndcapHighPt - workingPointEndcapLowPt) / 10.;
+			workingPoint =  std::min(workingPointEndcapLowPt, std::max(workingPointEndcapHighPt, workingPointEndcapLowPt + slope * ( static_cast<float>(pt - 15.))));
+		}
+		if (mvaValue > workingPoint){
       return true;
-   }else{
+    }else{
       return false;
-   }
+    }
 }
 
 
@@ -416,30 +449,42 @@ bool genMatchToId(const tree::Particle& p, const std::vector<tree::IntermediateG
   return false;
 }
 
-float topPtReweighting(std::vector<tree::GenParticle>& particles) {
-  // scale factors from 8TeV combination https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
-  // Take care that you correct for the additional weight, as this is not fixed to 1
-  float a = 0.156, b = -0.00137;
-  vector<tree::GenParticle*> selTops;
-  for (auto& genP : particles) {
-    if (fabs(genP.pdgId)==6) {
-      selTops.push_back( &genP );
-    }
-  }
+//float topPtReweighting(std::vector<tree::GenParticle>& particles) {
+  ///////// scale factors from 8TeV combination https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
+  //////// Take care that you correct for the additional weight, as this is not fixed to 1
+  //float a = 0.156, b = -0.00137;
+  //vector<tree::GenParticle*> selTops;
+  //for (auto& genP : particles) {
+    //if (fabs(genP.pdgId)==6) {
+      //selTops.push_back( &genP );
+    //}
+  //}
+  //float scaleFactor = 1;
+  //if (selTops.size()==2) {
+    //float pt1 = selTops.at(0)->p.Pt();
+    //float pt2 = selTops.at(1)->p.Pt();
+    //if (pt1>400) pt1=400;
+    //if (pt2>400) pt2=400;
+    //scaleFactor = sqrt( exp(a+b*pt1) * exp(a+b*pt2) );
+  //} else if (selTops.size() == 1 ) {
+    //float pt1 = selTops.at(0)->p.Pt();
+    //if (pt1>400) pt1=400;
+    //scaleFactor = exp(a+b*pt1);
+  //} else if (!selTops.size()) {
+    ///////cout << "Counted " << selTops.size() << " tops, applying scale factor of 1 " << endl;
+  //}
+  //return scaleFactor;
+//}
+float topPtReweighting(float pt1, float pt2) {
+  /////// scale factors from 8TeV combination https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
+  //https://twiki.cern.ch/twiki/bin/viewauth/CMS/TopPtReweighting
+  ////// Take care that you correct for the additional weight, as this is not fixed to 1
+  float a = 0.0615, b = -0.0005;
+
   float scaleFactor = 1;
-  if (selTops.size()==2) {
-    float pt1 = selTops.at(0)->p.Pt();
-    float pt2 = selTops.at(1)->p.Pt();
-    if (pt1>400) pt1=400;
-    if (pt2>400) pt2=400;
-    scaleFactor = sqrt( exp(a+b*pt1) * exp(a+b*pt2) );
-  } else if (selTops.size() == 1 ) {
-    float pt1 = selTops.at(0)->p.Pt();
-    if (pt1>400) pt1=400;
-    scaleFactor = exp(a+b*pt1);
-  } else if (!selTops.size()) {
-    //cout << "Counted " << selTops.size() << " tops, applying scale factor of 1 " << endl;
-  }
+  if (pt1>400.) pt1=400.;
+  if (pt2>400.) pt2=400.;
+  scaleFactor = sqrt( exp(a+b*pt1) * exp(a+b*pt2) );
   return scaleFactor;
 }
 
@@ -452,6 +497,7 @@ string getSignalPointName(unsigned short nBinos, unsigned short m1, unsigned sho
     //case 0: out += "NG"; break;
     case 1: out += "Ng"; break;
     case 2: out += "Zg"; break;
+    case 10: out += "GGM"; break;
     //case 2: out += "gg"; break;
     default: out += "xx";
   }
@@ -519,7 +565,7 @@ float getPropagatorPt(const vector<tree::GenParticle>& genParticles) {
 }
 
 float isrReweightingEWK(float pt, bool err=false) {
-  // Taken from https://indico.cern.ch/event/616816/contributions/2489809/attachments/1418579/
+  //////////// Taken from https://indico.cern.ch/event/616816/contributions/2489809/attachments/1418579/
   if (err) {
     if (pt>600) return 0.023;
     if (pt>400) return 0.012;
@@ -542,7 +588,7 @@ float isrReweightingEWK(float pt, bool err=false) {
 }
 
 float isrReweighting(unsigned nJet, bool err=false) {
-  // Taken from https://indico.cern.ch/event/592621/contributions/2398559/
+  //// Taken from https://indico.cern.ch/event/592621/contributions/2398559/
   if (err) {
     switch (nJet) {
       case 0: return 0;
@@ -565,6 +611,7 @@ float isrReweighting(unsigned nJet, bool err=false) {
     }
   }
 }
+
 
 bool unMatchedSuspiciousJet(const vector<tree::Jet>& jets, const vector<tree::Particle>& genJets) {
   for (const auto& j: jets) {
