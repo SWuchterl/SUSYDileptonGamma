@@ -34,6 +34,15 @@ def getXsecInfoSMS( mother_mass, pklfilename ):
         else:
             print "could not find mass {} in file {}".format(mother_mass, pklfilename)
     return info
+def getXsecInfoGGM( mother_mass1, mother_mass2, pklfilename ):
+    info = (0,0)
+    with open( pklfilename, 'rb') as f:
+        data = pickle.load( f )
+        if mother_mass1 in data:
+            info = data[mother_mass1][mother_mass2]
+        else:
+            print "could not find mass {} in file {}".format(mother_mass, pklfilename)
+    return info
 
 def getXsecSMSglu( mother_mass ):
     return getXsecInfoSMS( mother_mass, "data/xSec_SMS_Gluino_13TeV.pkl" )[0]
@@ -41,6 +50,8 @@ def getXsecSMSsq( mother_mass ):
     return getXsecInfoSMS( mother_mass, "data/xSec_SMS_Squark_13TeV.pkl" )[0]
 def getXsecSMSstop( mother_mass ):
     return getXsecInfoSMS( mother_mass, "data/xSec_SMS_StopSbottom_13TeV.pkl" )[0]
+def getXsecSMSneu( mother_mass ):
+    return getXsecInfoSMS( mother_mass, "data/xSec_SMS_C1C1_13TeV.pkl" )[0]
 
 def getXsecFromName( name ):
     m = re.match( "[^_]*_(\d+)_[^\d]*.*", name )
@@ -49,6 +60,8 @@ def getXsecFromName( name ):
 
     if "T5" in name:
         return getXsecSMSglu( firstNumber )
+    if "TChi" in name:
+        return getXsecSMSneu( firstNumber )
 
     if "T2ttgg" in name:
         return getXsecSMSstop( firstNumber )
@@ -283,10 +296,11 @@ def rebin3d( h, binEdgesX=None, binEdgesY=None, binEdgesZ=None ):
 
 
 def rebin( h, binEdges, scale=True ):
-    #if not binEdges: return h
-    if not binEdges.any(): return h
+    if not binEdges: return h
+    #if not binEdges.any(): return h
     checkRebinningConsistence( h.GetXaxis(), binEdges )
     binEdgesArr = array.array( 'd', binEdges )
+    #print binEdgesArr
     hnew = h.Rebin( len(binEdges)-1, "new", binEdgesArr )
     hnew.drawOption_ = h.drawOption_ if hasattr( h, "drawOption_" ) else ""
     #if scale: hnew.Scale( 1., "width" )
@@ -548,13 +562,16 @@ def setMinMaxForLog():
     unity = 1./maxBinWidth(histograms[0]) if style.divideByBinWidth else 1.
     minimum = max([unity,minC]) if style.minimumOne else minC
     #minimum /= 9.
-    minimum /= 90.
+    #minimum /= 90.
     for i in histograms:
-        #i.SetMaximum(2.5*maxC)
-        i.SetMaximum(10.*maxC)
+        i.SetMaximum(2.5*maxC)
+        #i.SetMaximum(100.*maxC)
+        #i.SetMaximum(100000.*maxC)
         i.SetMinimum(minimum)
     for s in stackedHistograms:
         s.SetMinimum(minimum)
+        #s.SetMaximum(2.5*maxC)
+        s.SetMaximum(10.*maxC)
     ROOT.gPad.Update()
 
 
@@ -689,8 +706,8 @@ def stdHist(dataset, name, binning=None, xCut=True, cut1=0, cut2=1e8):
     if isinstance(h, ROOT.TH2):
         if xCut: h = h.ProjectionY(randomName(), h.GetXaxis().FindFixBin(cut1), h.GetYaxis().FindFixBin(cut2))
         else:    h = h.ProjectionX(randomName(), h.GetYaxis().FindFixBin(cut1), h.GetXaxis().FindFixBin(cut2))
-    #if binning: h = rebin(h, binning)
-    if (binning.any()): h = rebin(h, binning)
+    if binning: h = rebin(h, binning)
+    #if (binning.any()): h = rebin(h, binning)
     appendFlowBin(h)
     h.SetYTitle(getYAxisTitle(h))
     return h
@@ -720,7 +737,8 @@ def drawOpt(h, style):
         h.SetLineColor(ROOT.kBlack)
         h.SetMarkerColor(ROOT.kBlack)
         h.SetMarkerStyle(20)
-        h.SetMarkerSize(0.7)
+        #h.SetMarkerSize(0.7)
+        h.SetMarkerSize(1.)
         h.drawOption_="pz"
         if isinstance(h, ROOT.TH1):
             h.SetBinErrorOption(ROOT.TH1.kPoisson)
@@ -736,8 +754,10 @@ def drawOpt(h, style):
     elif style == "statUnc":
         h.SetLineWidth(5)
         h.SetMarkerStyle(0)
-        h.SetLineColor(ROOT.kGray)
-        h.drawOption_ = "e x0"
+        h.SetLineColor(ROOT.kGray+2)
+        h.drawOption_ = "e2x0"
+        #h.SetFillStyle(3254)
+        #h.drawOption_ = "e2"
     elif style == "totUnc":
         h.SetFillStyle(3254)
         h.SetMarkerSize(0)
@@ -788,6 +808,27 @@ def getPoissonUnc(n):
 def getSysHisto(h, relUncert):
     hsys = h.Clone(randomName())
     for bin in range(hsys.GetNbinsX()+2):
+        c = hsys.GetBinContent(bin)
+        if c > 1e-10:
+            e = relUncert*c
+            hsys.SetBinError(bin, e)
+        elif hsys.GetBinContent(bin-1) or hsys.GetBinContent(bin+1):
+            # check if option "width" should be used
+            # TODO: check if the weight agrees with the lumi+pu weight
+            meanWeight = hsys.Integral(0,-1)/hsys.GetEntries()
+            poissonZeroError = 1.8410216450098775
+            e = meanWeight*poissonZeroError
+            e /= hsys.GetBinWidth(bin) if style.divideByBinWidth else 1.
+            hsys.SetBinError(bin, e)
+    return hsys
+    
+def getSysHistoCut(h, relUncert1,relUncert2,cutBin):
+    hsys = h.Clone(randomName())
+    for bin in range(hsys.GetNbinsX()+2):
+        if bin<cutBin:
+            relUncert=relUncert1
+        else:
+            relUncert=relUncert2
         c = hsys.GetBinContent(bin)
         if c > 1e-10:
             e = relUncert*c
@@ -996,14 +1037,20 @@ class Label:
                 obj.SetNDC()
                 obj.Draw()
 
-    def __init__( self, drawAll=True, sim=False, status="Private Work", info="" ):
+    #def __init__( self, drawAll=True, sim=False, status="Private Work", info="" ):
+    def __init__( self, drawAll=True, sim=False, status="Work in Progress", info="" ):
         saveStuff.append(self)
-        if status == "Private Work":
+        #if status == "Private Work":
+        if status == "Work in Progress":
             if sim:
                 #self.cms = ROOT.TLatex( 0.2, .887, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
-                self.cms = ROOT.TLatex( 0.2, .95, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
+                #self.cms = ROOT.TLatex( 0.2, .95, "#scale[0.76]{#font[52]{Private Work Simulation}}" )
+                #self.cms = ROOT.TLatex( 0.2, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress Simulation}}" )
+                #self.cms = ROOT.TLatex( 0.15, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress Simulation}}" )
+                self.cms = ROOT.TLatex( 0.16, .92, "#splitline{#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}}{#scale[0.76]{#font[52]{  Simulation}}}" )
             else:
-                self.pub = ROOT.TLatex( 0.2, .887, "#scale[0.76]{#font[52]{%s}}"%status )
+                #self.pub = ROOT.TLatex( 0.2, .887, "#font[61]{CMS} #scale[0.76]{#font[52]{%s}}"%status )
+                self.pub = ROOT.TLatex( 0.15, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{%s}}"%status )
         else:
             if sim:
                 self.cms = ROOT.TLatex( 0.2, .887, "#font[61]{CMS} #scale[0.76]{#font[52]{Simulation}}" )

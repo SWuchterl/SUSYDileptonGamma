@@ -62,6 +62,7 @@ class Ratio:
         aux.drawOpt(self.totalUncert, "totUnc")
         aux.drawOpt(self.ratioSys, "sysUnc")
         aux.drawOpt(self.ratioStat, "statUnc")
+        #aux.drawOpt(self.ratioStat, "totUnc")
 
     def calculateRatio( self ):
         for bin in range(self.denominator.GetNbinsX()+2): self.denominator.SetBinError(bin,0)
@@ -134,6 +135,7 @@ class Ratio:
         if stack: aux.drawContributions(stack, yMin, yMax, self.title)
 
         self.ratioStat.Draw("e x0" + "same" if stack else "")
+        #self.ratioStat.Draw("same e2")
         if self.sysHisto:
             if not onlyTotal: self.ratioSys.Draw("same e2")
             self.totalUncert.Draw("same e2")

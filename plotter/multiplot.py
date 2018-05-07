@@ -10,7 +10,9 @@ class Multiplot:
         self.minimum = None
         self.maximum = None
 
-        self.leg = ROOT.TLegend(.56,.59,.94,.915)
+        #self.leg = ROOT.TLegend(.56,.59,.94,.915)
+        self.leg = ROOT.TLegend(.56,.69,.94,.915)
+        #self.leg = ROOT.TLegend(.16,.69,.94,.915)
         #self.leg = ROOT.TLegend(.76,.59,.94,.915)
         self.leg.SetFillColor( ROOT.kWhite )
         self.leg.SetFillStyle(0)
@@ -57,9 +59,11 @@ class Multiplot:
         self.stackHists()
 
         #minimum = 1e-5
+        #minimum = 1e-3
         minimum = self.getMinimum()
         #minimum = 0.001
         maximum = 1.1*self.getMaximum()
+        #maximum = 1.1*self.getMaximum()*100.
         #maximum = 0.1
 
         if self.maximum != None:
@@ -117,6 +121,7 @@ class Multiplot:
                     h.drawOption_ += "same"
                 h.Draw(h.drawOption_)
 
+        self.leg.SetNColumns(2)
         self.leg.Draw()
 
         return True

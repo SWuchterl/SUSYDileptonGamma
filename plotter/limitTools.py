@@ -17,8 +17,8 @@ def infoFromOut(out):
         if line.startswith("Expected 50.0%: r < "): infos["exp"]    = float(line.split("<")[1])
         if line.startswith("Expected 84.0%: r < "): infos["exp1up"] = float(line.split("<")[1])
         if line.startswith("Expected 97.5%: r < "): infos["exp2up"] = float(line.split("<")[1])
-    if "rMinNLL" not in infos or infos["rMinNLL"] > 1.99999:
-        infos = { "obs":0, "exp":0, "exp1up":0, "exp1dn":0, "exp2up":0, "exp2dn":0 }
+    #if "rMinNLL" not in infos or infos["rMinNLL"] > 1.99999:
+        #infos = { "obs":0, "exp":0, "exp1up":0, "exp1dn":0, "exp2up":0, "exp2dn":0 }
     return infos
 
 def significanceFromOut(out):
@@ -65,6 +65,7 @@ def callCombine(name):
     if not os.path.isfile(nameLimit) or os.path.getmtime(name)>os.path.getmtime(nameLimit):
         with open(nameLimit, "w+") as f:
             bn = os.path.basename(name)
+            #print "calculating limit for", name
             out = subprocess.check_output(["combine", "-M", "Asymptotic", name, "-n", bn], stderr=subprocess.STDOUT)
             f.write(out)
             outputFile = "higgsCombine{}.Asymptotic.mH120.root".format(bn)
@@ -228,6 +229,7 @@ class MyDatacard(Datacard):
         self.systs = sorted(systDict.values())
 
     def newSignal(self, exp, unc):
+        #print self.exp
         for bName, newRate in exp.iteritems():
             self.exp[bName]["signal"] = newRate
         systDict = dict([(l[0],l) for l in self.systs])
