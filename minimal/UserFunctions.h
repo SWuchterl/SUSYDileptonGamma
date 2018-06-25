@@ -498,6 +498,7 @@ string getSignalPointName(unsigned short nBinos, unsigned short m1, unsigned sho
     case 1: out += "Ng"; break;
     case 2: out += "Zg"; break;
     case 10: out += "GGM"; break;
+    case 11: out += "GMSB"; break;
     //case 2: out += "gg"; break;
     default: out += "xx";
   }
@@ -566,7 +567,7 @@ float getPropagatorPt(const vector<tree::GenParticle>& genParticles) {
 
 float isrReweightingEWK(float pt, bool err=false) {
   //////////// Taken from https://indico.cern.ch/event/616816/contributions/2489809/attachments/1418579/
-  if (err) {
+  if (err) {//deviation from 1. as syst. unc.
     if (pt>600) return 0.023;
     if (pt>400) return 0.012;
     if (pt>300) return 0.008;

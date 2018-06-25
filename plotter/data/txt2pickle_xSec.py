@@ -40,6 +40,22 @@ def getXsecsGGM(filename):
                 else:
                     xSecs[ int(m1_str) ][int(m2_str)] = ( float(xSec_str), float( uncert_str ) )
     return xSecs
+    
+def getXsecsGMSB(filename):
+    xSecs = {}
+    with open( args.filename ) as f:
+        for line in f.readlines():
+            match = re.match("\s*(\d+)\s*([^\s]*)\s*([^\s]*)\s*([^\s]*)\s*", line )
+            if match:
+                m1_str, m2_str, xSec_str, uncert_str = match.groups()
+                print m1_str,m2_str,xSec_str,uncert_str
+                if not xSecs.get(int(m1_str)):
+                    xSecs[int(m1_str)]={}
+                if float(xSec_str)!=0:
+                    xSecs[ int(m1_str) ][int(m2_str)] = ( float(xSec_str)/1000., float( uncert_str ) / float( xSec_str ) )
+                else:
+                    xSecs[ int(m1_str) ][int(m2_str)] = ( float(xSec_str)/1000., float( uncert_str ) )
+    return xSecs
 
 
 
@@ -57,6 +73,8 @@ if __name__ == "__main__":
         xSecs = getXsecsWeak(filename)
     elif "M1_M2" in filename or "M1_M3" in filename:
         xSecs = getXsecsGGM(filename)
+    elif "GMSB" in filename:
+        xSecs = getXsecsGMSB(filename)
 
     output = open( args.filename.replace("txt", "pkl" ), 'wb')
     pickle.dump(xSecs, output)

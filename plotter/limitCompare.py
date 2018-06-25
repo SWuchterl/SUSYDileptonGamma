@@ -36,6 +36,12 @@ def compare(myFile, joFile, oldFile=""):
         lsp_s = "#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}"
         info = "pp #rightarrow #tilde{g}#tilde{g}, #tilde{g} #rightarrow b#bar{b}%s, %s #rightarrow #gamma/Z#tilde{G}"%(lsp_s,lsp_s)
         h2.SetTitle(";m_{#tilde{g}} (GeV);m_{%s} (GeV)"%lsp_s)
+    elif "GMSB" in myFile:
+        saveName += "GMSB"
+        lsp_s = "#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}"
+        #info = "pp #rightarrow #tilde{g}#tilde{g}, #tilde{g} #rightarrow b#bar{b}%s, %s #rightarrow #gamma/Z#tilde{G}"%(lsp_s,lsp_s)
+        info = "GGM electroweak production"
+        h2.SetTitle(";m_{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}} (GeV);m_{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{2}}}/#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}} (GeV)")
 
     #obsGr_knut = aux.getFromFile(myFile, "obs")
     expGr_knut = aux.getFromFile(myFile, "exp")
@@ -45,6 +51,7 @@ def compare(myFile, joFile, oldFile=""):
     expGr_knut.SetLineColor(ROOT.kRed)
     expGr_knutUp.SetLineColor(ROOT.kRed)
     expGr_knutDown.SetLineColor(ROOT.kRed)
+    expGr_knut.SetLineStyle(1)
     
     #obsGr_knut2 = aux.getFromFile(myFile, "obs")
     expGr_knut2 = aux.getFromFile(joFile, "exp")
@@ -81,13 +88,18 @@ def compare(myFile, joFile, oldFile=""):
             gr.SetLineWidth(2)
 
     #expGr_jo.SetLineStyle(2)
-    expGr_knut.SetLineStyle(2)
+    #expGr_knut.SetLineStyle(2)
+    expGr_knut.SetLineStyle(1)
     expGr_knut2.SetLineStyle(2)
 
     #h2.GetYaxis().SetLimits(0,3200)
     h2.GetYaxis().SetLimits(90,2600)
     h2.GetXaxis().SetLimits(800,2100)
     if "T6" in myFile: h2.GetYaxis().SetLimits(0,2800)
+    #if "GMSB" in myFile: h2.GetYaxis().SetLimits(0,1500)
+    #if "GMSB" in myFile: h2.GetXaxis().SetLimits(200,1000)
+    if "GMSB" in myFile: h2.GetYaxis().SetLimits(0,1200)
+    if "GMSB" in myFile: h2.GetXaxis().SetLimits(205,500)
     h2.Draw("colz")
     #obsGr_knut.Draw("same")
     expGr_knut.Draw("same")
@@ -138,13 +150,18 @@ def compare(myFile, joFile, oldFile=""):
     text.DrawLatexNDC(0.2, .87, "#scale[0.76]{#font[52]{Simulation}}" )
     #text.DrawLatexNDC(0.2, .87, info )
     text.DrawLatexNDC(0.2, .79, info )
-    text.DrawLatexNDC( .59, .95, "%.1f fb^{-1} (%s TeV)"%(aux.intLumi/1000., 13) )
+    
+    
+    addedLumi = 35.867e3 + 41.e3
+    #text.DrawLatexNDC( .59, .95, "%.1f fb^{-1} (%s TeV)"%(aux.intLumi/1000., 13) )
+    text.DrawLatexNDC( .59, .95, "%.1f fb^{-1} (%s TeV)"%(addedLumi/1000., 13) )
 
     #obsGr = obsGr_knut.Clone(aux.randomName())
     expGr = expGr_knut.Clone(aux.randomName())
     expGr2 = expGr_knut2.Clone(aux.randomName())
     #obsGr.SetLineColor(ROOT.kBlack)
     expGr.SetLineColor(ROOT.kRed)
+    expGr.SetLineStyle(1)
     expGr2.SetLineColor(ROOT.kBlack)
 
     #legBlack = ROOT.TLegend(.67,.74,.97,.84)
@@ -152,7 +169,8 @@ def compare(myFile, joFile, oldFile=""):
     legBlack.SetFillStyle(0)
     #legBlack.AddEntry(obsGr, "Observed")
     legBlack.AddEntry(expGr, "Expected #pm 1 #sigma")
-    legBlack.AddEntry(expGr2, "Expected - alternative p_{T} thresholds")
+    #legBlack.AddEntry(expGr2, "Expected - alternative p_{T} thresholds")
+    legBlack.AddEntry(expGr2, "Expected - SUS-16-046(2016)")
     legBlack.Draw()
 
     leg = ROOT.TLegend(.16,.74,.65,.84)
@@ -175,4 +193,5 @@ if __name__ == "__main__":
     #compare("limitCalculations/T6Wg_v11/saved_graphs1d_limit.root", "/home/home4/institut_1b/kiesel/other_photon_limits/CMS-SUS-16-046-T6wg.root")
     #compare("limitCalculations/T5gg_v11/saved_graphs1d_limit.root", "/home/home4/institut_1b/kiesel/other_photon_limits/CMS-SUS-16-046-T5gg.root", "/home/home4/institut_1b/kiesel/other_photon_limits/CMS-PAS-SUS-16-023-T5gg.root")
     #compare("limitCalculations/T5Wg_v11/saved_graphs1d_limit.root", "/home/home4/institut_1b/kiesel/other_photon_limits/CMS-SUS-16-046-T5wg.root")
-    compare("limitCalculations/T5bbbbZg_v10/saved_graphs1d_limit.root", "limitCalculations/T5bbbbZg_v10_higher/saved_graphs1d_limit.root")
+    #compare("limitCalculations/T5bbbbZg_v10/saved_graphs1d_limit.root", "limitCalculations/T5bbbbZg_v10_higher/saved_graphs1d_limit.root")
+    compare("limitCalculations/GMSB_v13_scaleDoubleLumi/saved_graphs1d_limit.root", "~/Downloads/CMS-SUS-16-046_Figure_007.root")

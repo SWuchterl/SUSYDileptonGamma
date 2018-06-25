@@ -7,11 +7,21 @@ import numpy as np
 def frange(start, end, step):
     a=[]
     tmp = start
-    while(tmp < end):
+    #while(tmp < end):
+    while(tmp <= end):
         a.append(tmp)
         tmp += step
     return a
 
+
+def frangeN(start, end, N):
+    a=[]
+    tmp = start
+    step=abs(end-start)/N
+    while(tmp <= end):
+        a.append(tmp)
+        tmp += step
+    return a
 
 list_of_variables = ['pt1',
                      'pt2',
@@ -89,7 +99,7 @@ binnings = {
     #'m_ll':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
     #'m_{ll#gamma}':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
     #'m_llg':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
-    'm_llg':             frange(0,100,10)+frange(100,200,10)+frange(200,500,50),
+    'm_llg':             frange(0,100,50)+frange(100,200,50)+frange(200,500,50),
     #'pt_llg':             np.concatenate((np.arange(0,100,10),np.arange(100,200,10),np.arange(200,500,50)),axis=0),
     'pt_llg':             frange(0,100,10)+frange(100,200,10)+frange(200,500,50),
     #'m_ll':             np.concatenate((np.arange(0,200,10),np.arange(200,950,50)),axis=0),
@@ -97,6 +107,7 @@ binnings = {
     #'m_ll_e':           np.arange(0., 650.,10.),
     #'m_ll_m':           np.arange(0., 650.,10.),
     'n_jets':           frange(0.,10.,1),
+    'n_bjets':           frange(0.,10.,1),
     'n_photons':         frange(0.,10.,1),
     'n_vtx':            frange(0.,40.,1),
     #'pt_g1':            np.array((range(0,100,10)+np.array([100., 150., 200.,300,400.]))),
@@ -105,44 +116,45 @@ binnings = {
     'pt_g1':            frange(20,100,10)+frange(100,150,25)+frange(150,250,50),
     'eta_g1':           frange(0., 2.60, 0.1),
     'phi_g1':           frange(0., 3.50, 0.1),
-    'sigmaIetaIeta_g1': frange(0., 0.04,0.01),
+    'sigmaIetaIeta_g1': frange(0., 0.04,0.001),
     'sigmaIphiIphi_g1': frange(0., 0.2,0.01),
     'deltaR1_g1':       frange(0., 1.,0.05),
     'deltaR2_g1':       frange(0., 1.,0.05),
     'r9_g1':            frange(0., 1.5,0.05),
     'hOverE_g1':        frange(0., 0.1,0.01),
     'deltaEtaLL':       frange(0.,6.,0.1),
-    'deltaPhiLL':       frange(0.,6.,0.1),
+    'deltaPhiLL':       frange(0.,3.2,0.2),
     'deltaEtaLL_neg':       frange(-6.,6.,0.1),
     'deltaPhiLL_neg':       frange(-6.,6.,0.1),
     'deltaEtaLLG':      frange(0.,6.,0.1),
-    'deltaPhiLLG':      frange(0.,6.,0.01),
+    'deltaPhiLLG':      frange(0.,3.2,0.2),
     #'deltaRLL':         frange(0.,6.,0.12),
     'deltaRLL':         frange(0.,1.,0.1),
     'deltaRLLG':        frange(0.,6.,0.1),
     #'st':               np.arange(0.,1000.,100.),
-    'st':               frange(0.,1000.,100),
+    'st':               frange(0.,250.,250)+frange(250.,751.,500.),
     #'stmet':           np.arange(0.,5000.,100.),
     #'stmet':            np.concatenate((np.arange(0,1000,100),np.arange(1000,4000,1000)),axis=0),
-    'stmet':            frange(0,1000,100)+frange(1000,4000,500),
+    'stmet':            frange(0,250,50)+frange(250,1500,250),
     #'zpt':              np.arange(0.,2000.,100.),
-    'zpt':              frange(0.,2000.,100),
+    #'zpt':              frange(0.,100.,50)+frange(100,200,100)+frange(200,500,300),
+    'zpt':              frange(0.,450.,50),
     #'mtll':             np.arange(0.,3000.,100.),
     #'mtll':             np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1250,250)),axis=0),
-    'mtll':             frange(0,200,25)+frange(200,500,50)+frange(500,1250,250),
+    'mtll':             frange(0,300,100)+frange(300,701,400),
     #'mtllg':            np.arange(0.,3000.,100.),
     #'mtllg':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
-    'mtllg':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
+    'mtllg':            frange(0,300,100)+frange(300,500,200)+frange(500,1001,500),
     #'mtgmet':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
     'mtgmet':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
     #'mtl1met':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
-    'mtl1met':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
+    'mtl1met':            frange(0,200,100)+frange(200,500,100)+frange(500,1001,500),
     #'mtl2met':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
-    'mtl2met':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
+    'mtl2met':            frange(0,200,100)+frange(200,500,100)+frange(500,1001,500),
     #'mtllmet':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
     'mtllmet':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
     #'mtllgmet':            np.concatenate((np.arange(0,200,25),np.arange(200,500,50),np.arange(500,1750,250)),axis=0),
-    'mtllgmet':            frange(0,200,25)+frange(200,500,50)+frange(500,1750,250),
+    'mtllgmet':            frange(0,500,250)+frange(500,1001,500),
     #'mt2':            np.arange(0.,425.,25.),
     'mt2':            frange(0.,425.,25.),
     #'mzg_exo':            np.concatenate((np.arange(0,100,50),np.arange(100,200,50),np.arange(200,500,50)),axis=0),
@@ -155,14 +167,16 @@ binnings = {
     'PhotonPT_NoVeto':            np.concatenate((np.arange(0,100,10),np.arange(100,350,50)),axis=0),
     'VetoCompare':            np.arange(0.,200.,1.),
     #'DeltaPhiLLMet':            np.arange(0.,6.,0.3),
-    'DeltaPhiLLMet':            frange(0.,6.,0.3),
+    'DeltaPhiLLMet':            frange(0.,3.2,0.2),
+    'DeltaPhiGMet':            frange(0.,6.,0.3),
     #'DeltaEtaLLMet':            np.arange(0.,6.,0.3),
     'DeltaEtaLLMet':            frange(0.,6.,0.3),
     #'DeltaRLLMet':            np.arange(0.,6.,0.3)
     'DeltaRLLMet':            frange(0.,6.,0.3),
     'nElectrons': frange(0,10,1),
     'nMuons': frange(0,10,1),
-    'mTL3Met': frange(0.,200.,10)
+    'mTL3Met': frange(0.,200.,10),
+    'Fakes': frange(0,5,1)
 }
 labels = {
     'pt1': ["p_{T}^{leading lepton} (GeV)","Events / 30 GeV"],
@@ -197,6 +211,7 @@ labels = {
     'm_llll': ["m_{llll} (GeV)" ,"Events / Bin"],
     'm_ll2': ["m_{ll}2 (GeV)" ,"Events / Bin"],
     'n_jets': ["N Jets", "Events / 1"],
+    'n_bjets': ["N BJets", "Events / 1"],
     'n_photons': ["N Photons", "Events / 1"],
     'n_vtx': ["N Vertices", "Events / 1"],
     'pt_g1': ["p_{T}^{#gamma} (GeV)","Events / 10 GeV"],
@@ -216,9 +231,9 @@ labels = {
     'deltaPhiLLG':      ["#Delta#Phi_{ll,#gamma}","Events / 0.1"],
     'deltaRLL':         ["#DeltaR_{ll}","Events / 0.1"],
     'deltaRLLG':        ["#DeltaR_{ll,#gamma}","Events / 0.1"],    
-    'st':        ["#itS_T (GeV)","Events / 100 GeV"],    
-    'stmet':        [" S_T+E_{T}^{miss} (GeV)","Events / 100 GeV"],    
-    'zpt':        ["#Z_{#p_{T}} (GeV)","Events / 50. GeV"],    
+    'st':        ["S_{T} (GeV)","Events / 100 GeV"],    
+    'stmet':        [" S_{T}+p_{T}^{miss} (GeV)","Events / 100 GeV"],    
+    'zpt':        ["p_{T}^{Z} (GeV)","Events / 50. GeV"],    
     'mtll':        ["m_{T}^{ll} (GeV)","Events / 100. GeV"],    
     'mtllg':        ["m_{T}^{ll#gamma} (GeV)","Events / 100. GeV"],    
     'mtgmet':        ["m_{T}^{#gamma,met} (GeV)","Events / 100. GeV"],    
@@ -239,11 +254,13 @@ labels = {
     'PhotonPT_NoVeto':        ["gammaMotherID",""],    
     'VetoCompare':        ["gammaMotherID",""],
     'DeltaPhiLLMet':        ["DeltaPhiLLMet",""],
+    'DeltaPhiGMet':        ["DeltaPhiGMet",""],
     'DeltaEtaLLMet':        ["DeltaEtaLLMet",""],
     'DeltaRLLMet':        ["DeltaRLLMet",""],
     'nElectrons':           ["N_{Electrons}",""],
     'nMuons':           ["N_{Muons}",""],
-    'mTL3Met':          ["m_{T}^{l3,met}",""]
+    'mTL3Met':          ["m_{T}^{l3,met}",""],
+    'Fakes': ["",""]
 }
 def divideDatasetIntegrals( numerator, denominator, name ):
     numMerged = sum(numerator)
@@ -260,11 +277,11 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
     
-    style.divideByBinWidth = True
-    #style.divideByBinWidth = False
+    #style.divideByBinWidth = True
+    style.divideByBinWidth = False
     
-    #style.minimumOne=False
-    style.minimumOne=True
+    style.minimumOne=False
+    #style.minimumOne=True
     
     #yTitle=None
     
@@ -274,10 +291,10 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
 
     #print name
 
-    folder= (name.split("/"))[0]
+    folder= (name.split("/"))[0]+"/"+(name.split("/"))[1]
     #avgTopPtWeight = d.getHist(folder+"/weight_topPt").GetMean()
     #print avgTopPtWeight
-
+    #print name,folder
 
     for d in bkg[-1::-1]:
         h = d.getHist( name )
@@ -285,7 +302,7 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
         avgTopPtWeightHisto = d.getHist(folder+"/weight_topPt")
         avgNIsrWeightHisto = d.getHist(folder+"/weight_nISR")
         avgEWKinoWeightHisto = d.getHist(folder+"/weight_EWKinoPairPt")
-        avgleptonWeightHisto = d.getHist(folder+"/weight_leptonPairPt")
+        #avgleptonWeightHisto = d.getHist(folder+"/weight_leptonPairPt")
         
         if avgTopPtWeightHisto:
             avgTopPtWeight= avgTopPtWeightHisto.GetMean()
@@ -299,10 +316,10 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
             avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
         else:
             avgEWKinoWeight=1.
-        if avgleptonWeightHisto: 
-            avgleptonWeight = avgleptonWeightHisto.GetMean()
-        else:
-            avgleptonWeight=1.
+        #if avgleptonWeightHisto: 
+            #avgleptonWeight = avgleptonWeightHisto.GetMean()
+        #else:
+            #avgleptonWeight=1.
         
         if not h: continue
         if not h.Integral(): continue
@@ -311,7 +328,7 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
         h.Scale(1./avgTopPtWeight)
         h.Scale(1./avgNIsrWeight)
         h.Scale(1./avgEWKinoWeight)
-        h.Scale(1./avgleptonWeight)
+        #h.Scale(1./avgleptonWeight)
         
         
         if binning: 
@@ -412,13 +429,13 @@ def main():
         for variable in variables:
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("MM",group+"/MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("EM",group+"EM/"+variable, bkgs, additional=[dataMuonEG],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("LL",group+"/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("EE",group+"/EE/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("EM",group+"EM/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("LL",group+"/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("EM",group+"/EM/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("LL",group+"/LL/"+variable, bkgs, additional=[dataLL],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[zgamma],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[zgamma],binning=binnings[variable],yTitle=labels[variable][1],xTitle=labels[variable][0])
@@ -437,33 +454,41 @@ def main3():
     groups=["onZMet0100"]
     for group in groups:
         for variable in variables:
-            drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("LL",group+"/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("EE",group+"/EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("MM",group+"/MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("LL",group+"/LL/"+variable, bkgs, additional=[dataDoubleSF],binning=binnings[variable],xTitle=labels[variable][0])
             
 def main2():
     #bkgs=[DYjetsNLO,zgamma,wwgamma,wzgamma,ttgamma,zz,tt,wjets]
     #bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma]
     bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma,singletop,zz4l,wz,ww]
     #bkgs=[zgamma]
-    variables=["met","stmet","st","mtll","mtllg","mtl1met","mtl2met","mtllmet","mtllgmet","mtgmet","m_llg","m_ll","n_vtx","mt2","DeltaPhiLLMet","DeltaEtaLLMet","DeltaRLLMet","pt1","pt_g1","ht","eta1","phi1","n_jets","n_photons","deltaPhiLLG","deltaEtaLLG","deltaRLLG","deltaPhiLL","deltaEtaLL","deltaRLL","zpt","nElectrons","nMuons","deltaR1_g1","deltaR2_g1"]
+    variables=["Fakes","met","stmet","st","mtll","mtllg","mtl1met","mtl2met","mtllmet","mtllgmet","mtgmet","m_llg","m_ll","n_vtx","DeltaPhiLLMet","DeltaEtaLLMet","DeltaRLLMet","pt1","pt_g1","ht","eta1","phi1","n_jets","n_photons","deltaPhiLLG","deltaEtaLLG","deltaRLLG","deltaPhiLL","deltaEtaLL","deltaRLL","zpt","nElectrons","nMuons","deltaR1_g1","deltaR2_g1","DeltaPhiGMet","n_bjets"]
+    #variables=["met","pt1","pt_g1","ht","eta1","phi1","n_jets","n_photons"]
     #variables=["met"]
+    #variables=["hOverE_g1"]
     #groups=["sel","onZ","onZMet","onZMet0100","onZMet100","onZMet200","onZMet100200","onZMet100300","onZMet200300"]
-    groups=["sel","onZ","onZMet0100","onZMet100","onZMet150","onZMet100150"]
+    #groups=["sel","onZ","onZMet0100","onZMet100","onZMet150","onZMet100150"]
+    groups=["onZMet150"]
+    #groups=["onZMet0100"]
+    #groups=["sel"]
     #groups=["onZ"]
     #groups=["onZMet100200",]
+    binnings_=binnings.copy()
+    binnings_['pt_g1']=frange(0.,100.,50.)+frange(100.,251.,150.)
+    binnings_['met']=[0,25,50,75,100,150,250,450]
     for group in groups:
         for variable in variables:
             #drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400,t5ttttzg_1800_400,t5ttttzg_1800_600],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400,t5ttttzg_1800_400,t5ttttzg_1800_600],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("LL+signal",group+"/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("EM+signal",group+"EM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
+            #drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
+            #drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
+            drawSameHistogram("LL+signal",group+"/LL/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400],binning=binnings_[variable],xTitle=labels[variable][0])
+            #drawSameHistogram("EM+signal",group+"EM/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("EE+signal",group+"EE/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400,ggm_m1550_m2750,ggm_m11200_m21000,ggm_m1800_m2600],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM+signal",group+"MM/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400,ggm_m1550_m2750,ggm_m11200_m21000,ggm_m1800_m2600],binning=binnings[variable],xTitle=labels[variable][0])
 
 if __name__=="__main__":
-    main()
-    #main2()
+    #main()
+    main2()
     #main3()

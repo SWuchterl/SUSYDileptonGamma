@@ -1,0 +1,8 @@
+
+Universe   = vanilla
+Executable = run.sh
+Arguments  = ../scratch/tempTrees/mediumID/WZTo3LNu_Total_myTuple.root 
+Log        = logs/WZTo3LNu_Total_myTuple.root.log
+Output     = logs/WZTo3LNu_Total_myTuple.root.out
+Error      = logs/WZTo3LNu_Total_myTuple.root.error
+Queue

@@ -6,6 +6,10 @@ import style
 
 
 #path = "../minimal/output/"
+#path = "../myAnalyzer/output/"
+#path = "../myAnalyzer/output_medium/"
+path = "../myAnalyzer/output_mediumPOG/"
+#path = "../myAnalyzer/output_mediumPOG/ht/"
 
 #path = "../minimal/output_signalScan/"
 
@@ -14,7 +18,7 @@ import style
 
 #path = "../minimal/output_mllWeight/"
 
-path = "../minimal/output_noVeto/"
+#path = "../minimal/output_noVeto/"
 
 #path = "../minimal/output_FSRVeto/"
 #path = "../minimal/output_FSR+HardVeto/"
@@ -227,7 +231,8 @@ zz4l.label = "ZZ(#rightarrow4l)"
     #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen)
 #zgamma = Dataset("ZGTo2LG_ext", (117.864-0.1404) , ROOT.kGreen-3) \
 #zgamma = Dataset("ZGTo2LG_Total", (117.864-0.1404) , ROOT.kGreen-3) \
-zgamma = Dataset("ZGTo2LG_Total", (117.864) , ROOT.kGreen-3) \
+#zgamma = Dataset("ZGTo2LG_Total", (117.864) , ROOT.kGreen-3) \
+zgamma = Dataset("ZGTo2LG_Total", (117.864-0.1404) , ROOT.kGreen-3) \
     +Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
 #zgamma = Dataset("ZGTo2LG_Total", (117.864) , ROOT.kGreen-3) #\
     #+Dataset("ZGTo2LG_PtG-130", 0.1404 , ROOT.kGreen-3) #\
@@ -243,6 +248,7 @@ wzgamma.label = "WZ#gamma"
 ## TTGamma_dilept
 ## NLO cross section calculated "by hand" from sample
 ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.6352 , ROOT.kRed+1)
+#ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.7056 , ROOT.kRed+1)
 #ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.899 , ROOT.kRed+1)
 #ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.899*1.6 , ROOT.kRed+1)
 #ttgamma = Dataset("TTGamma_Dilept-amcatnlo", 0.6343 , ROOT.kRed+1)
@@ -347,6 +353,8 @@ t5ttttzg_1800_400 = Dataset("SMS-T5ttttZg_1800_400",0.00276133,ROOT.kYellow-1,""
 t5ttttzg_1800_600 = Dataset("SMS-T5ttttZg_1800_600",0.00276133,ROOT.kYellow+1,"")
 t6ttZg_600_300 = Dataset("SMS-T6ttZg_600_300",0.174599,ROOT.kYellow-1,"")
 t6ttZg_900_500 = Dataset("SMS-T6ttZg_900_500",0.0128895,ROOT.kYellow+1,"")
+gmsb_240_230 = Dataset("SMS-GMSB_240_230",645.0941/1000.,ROOT.kYellow+1,"")
+gmsb_290_205 = Dataset("SMS-GMSB_240_230",1350.5800/1000.,ROOT.kYellow-1,"")
 
 #ggm_m1550_m2750 = Dataset("SMS-GGM_M1550_M2750",0.0473802983761, ROOT.kOrange,"")
 #ggm_m11400_m31000 = Dataset("SMS-GGM_M11400_M31000",0.00150699994992, ROOT.kYellow,"")

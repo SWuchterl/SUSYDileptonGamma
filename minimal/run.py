@@ -11,8 +11,8 @@ import ConfigParser
 
 
 
-#def run(infile="", selector="HistogramProducer.cc", ext=False,amount=100.):
-def run(infile="", selector="HistogramProducer.cc", ext=False):
+#def run(infile="", selector="HistogramProducer.cc", ext=False):
+def run(infile="", selector="ntupleAnalyzerShrinked.cc", ext=False):
     # load libraries
     ROOT.gSystem.Load("pluginTreeWriterTreeWriterAuto.so")
     #ROOT.gSystem.Load("MT2Functor_cc.so")
@@ -37,7 +37,8 @@ def run(infile="", selector="HistogramProducer.cc", ext=False):
     else:
         raise Exception ('TSelector could not be compiled!')
 
-def runExt(infile="", selector="HistogramProducer.cc"):
+#def runExt(infile="", selector="HistogramProducer.cc"):
+def runExt(infile="", selector="ntupleAnalyzerShrinked.cc"):
     # wrapper
     run(infile, selector, True)
 

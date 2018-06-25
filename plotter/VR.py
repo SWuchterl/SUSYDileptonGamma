@@ -11,7 +11,8 @@ import os
 binnings = {
     #'pt1':              frange(20,100,10)+frange(100,155,25),
     #'pt1':              frange(20,100,10)+frange(100,155,10),
-    'pt1':              frange(25,151,25),
+    #'pt1':              frange(25,151,25),
+    'pt1':              frange(20,140,20),
     'pt2':              frange(0,151,25),
     #'pt2':              frange(0, 300, 10),
     'eta1':             frange(0., 2.7, 0.52),
@@ -88,7 +89,9 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
     
-    folder= (name.split("/"))[0]
+    #folder= (name.split("/"))[0]
+    #folder= (name.split("/"))[0]+"/"+(name.split("/"))[1]+"/"+(name.split("/"))[2]
+    folder= (name.split("/"))[0]+"/"+(name.split("/"))[1]
     
     style.divideByBinWidth = False
     
@@ -96,6 +99,7 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     #print name
     #dataHist = aux.stdHist(dataMuonEG, name, binning)
     dataHist = aux.stdHist(dataLL, name, binning)
+    #dataHist = aux.stdHist(dataDoubleSF, name, binning)
     aux.drawOpt(dataHist, "data")
     
     zgHist = aux.stdHist(zgamma, name, binning)
@@ -121,71 +125,71 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     zg_AvgTopPtWeightHisto = zgamma.getHist(folder+"/weight_topPt")
     zg_AvgNIsrWeightHisto = zgamma.getHist(folder+"/weight_nISR")
     zg_AvgEWKinoWeightHisto = zgamma.getHist(folder+"/weight_EWKinoPairPt")
-    zg_AvgleptonWeightHisto = zgamma.getHist(folder+"/weight_leptonPairPt")
+    #zg_AvgleptonWeightHisto = zgamma.getHist(folder+"/weight_leptonPairPt")
     ttg_AvgTopPtWeightHisto = ttgamma.getHist(folder+"/weight_topPt")
     ttg_AvgNIsrWeightHisto = ttgamma.getHist(folder+"/weight_nISR")
     ttg_AvgEWKinoWeightHisto = ttgamma.getHist(folder+"/weight_EWKinoPairPt")
-    ttg_AvgleptonWeightHisto = ttgamma.getHist(folder+"/weight_leptonPairPt")
-    ttg080_AvgTopPtWeightHisto = ttgamma.getHist(folder.replace("EM","080EM")+"/weight_topPt")
-    ttg080_AvgNIsrWeightHisto = ttgamma.getHist(folder.replace("EM","080EM")+"/weight_nISR")
-    ttg080_AvgEWKinoWeightHisto = ttgamma.getHist(folder.replace("EM","080EM")+"/weight_EWKinoPairPt")
-    ttg080_AvgleptonWeightHisto = ttgamma.getHist(folder.replace("EM","080EM")+"/weight_leptonPairPt")
-    ttg80_AvgTopPtWeightHisto = ttgamma.getHist(folder.replace("EM","80EM")+"/weight_topPt")
-    ttg80_AvgNIsrWeightHisto = ttgamma.getHist(folder.replace("EM","80EM")+"/weight_nISR")
-    ttg80_AvgEWKinoWeightHisto = ttgamma.getHist(folder.replace("EM","80EM")+"/weight_EWKinoPairPt")
-    ttg80_AvgleptonWeightHisto = ttgamma.getHist(folder.replace("EM","80EM")+"/weight_leptonPairPt")
+    #ttg_AvgleptonWeightHisto = ttgamma.getHist(folder+"/weight_leptonPairPt")
+    ttg080_AvgTopPtWeightHisto = ttgamma.getHist(folder.replace("VR","VR080")+"/weight_topPt")
+    ttg080_AvgNIsrWeightHisto = ttgamma.getHist(folder.replace("VR","VR080")+"/weight_nISR")
+    ttg080_AvgEWKinoWeightHisto = ttgamma.getHist(folder.replace("VR","VR080")+"/weight_EWKinoPairPt")
+    #ttg080_AvgleptonWeightHisto = ttgamma.getHist(folder.replace("EM","080EM")+"/weight_leptonPairPt")
+    ttg80_AvgTopPtWeightHisto = ttgamma.getHist(folder.replace("VR","VR80")+"/weight_topPt")
+    ttg80_AvgNIsrWeightHisto = ttgamma.getHist(folder.replace("VR","VR80")+"/weight_nISR")
+    ttg80_AvgEWKinoWeightHisto = ttgamma.getHist(folder.replace("VR","VR80")+"/weight_EWKinoPairPt")
+    #ttg80_AvgleptonWeightHisto = ttgamma.getHist(folder.replace("EM","80EM")+"/weight_leptonPairPt")
     zz_AvgTopPtWeightHisto = zz.getHist(folder+"/weight_topPt")
     zz_AvgNIsrWeightHisto = zz.getHist(folder+"/weight_nISR")
     zz_AvgEWKinoWeightHisto = zz.getHist(folder+"/weight_EWKinoPairPt")
-    zz_AvgleptonWeightHisto = zz.getHist(folder+"/weight_leptonPairPt")
+    #zz_AvgleptonWeightHisto = zz.getHist(folder+"/weight_leptonPairPt")
     wwg_AvgTopPtWeightHisto = wwgamma.getHist(folder+"/weight_topPt")
     wwg_AvgNIsrWeightHisto = wwgamma.getHist(folder+"/weight_nISR")
     wwg_AvgEWKinoWeightHisto = wwgamma.getHist(folder+"/weight_EWKinoPairPt")
-    wwg_AvgleptonWeightHisto = wwgamma.getHist(folder+"/weight_leptonPairPt")
+    #wwg_AvgleptonWeightHisto = wwgamma.getHist(folder+"/weight_leptonPairPt")
     wzg_AvgTopPtWeightHisto = wzgamma.getHist(folder+"/weight_topPt")
     wzg_AvgNIsrWeightHisto = wzgamma.getHist(folder+"/weight_nISR")
     wzg_AvgEWKinoWeightHisto = wzgamma.getHist(folder+"/weight_EWKinoPairPt")
-    wzg_AvgleptonWeightHisto = wzgamma.getHist(folder+"/weight_leptonPairPt")
+    #wzg_AvgleptonWeightHisto = wzgamma.getHist(folder+"/weight_leptonPairPt")
     dy_AvgTopPtWeightHisto = DYjetsNLO.getHist(folder+"/weight_topPt")
     dy_AvgNIsrWeightHisto = DYjetsNLO.getHist(folder+"/weight_nISR")
     dy_AvgEWKinoWeightHisto = DYjetsNLO.getHist(folder+"/weight_EWKinoPairPt")
-    dy_AvgleptonWeightHisto = DYjetsNLO.getHist(folder+"/weight_leptonPairPt")
+    #dy_AvgleptonWeightHisto = DYjetsNLO.getHist(folder+"/weight_leptonPairPt")
     wjets_AvgTopPtWeightHisto = wjets.getHist(folder+"/weight_topPt")
     wjets_AvgNIsrWeightHisto = wjets.getHist(folder+"/weight_nISR")
     wjets_AvgEWKinoWeightHisto = wjets.getHist(folder+"/weight_EWKinoPairPt")
-    wjets_AvgleptonWeightHisto = wjets.getHist(folder+"/weight_leptonPairPt")
+    #wjets_AvgleptonWeightHisto = wjets.getHist(folder+"/weight_leptonPairPt")
     tt_AvgTopPtWeightHisto = tt.getHist(folder+"/weight_topPt")
     tt_AvgNIsrWeightHisto = tt.getHist(folder+"/weight_nISR")
     tt_AvgEWKinoWeightHisto = tt.getHist(folder+"/weight_EWKinoPairPt")
-    tt_AvgleptonWeightHisto = tt.getHist(folder+"/weight_leptonPairPt")
-    tt080_AvgTopPtWeightHisto = tt.getHist(folder.replace("EM","080EM")+"/weight_topPt")
-    tt080_AvgNIsrWeightHisto = tt.getHist(folder.replace("EM","080EM")+"/weight_nISR")
-    tt080_AvgEWKinoWeightHisto = tt.getHist(folder.replace("EM","080EM")+"/weight_EWKinoPairPt")
-    tt080_AvgleptonWeightHisto = tt.getHist(folder.replace("EM","080EM")+"/weight_leptonPairPt")
-    tt80_AvgTopPtWeightHisto = tt.getHist(folder.replace("EM","80EM")+"/weight_topPt")
-    tt80_AvgNIsrWeightHisto = tt.getHist(folder.replace("EM","80EM")+"/weight_nISR")
-    tt80_AvgEWKinoWeightHisto = tt.getHist(folder.replace("EM","80EM")+"/weight_EWKinoPairPt")
-    tt80_AvgleptonWeightHisto = tt.getHist(folder.replace("EM","80EM")+"/weight_leptonPairPt")
+    #tt_AvgleptonWeightHisto = tt.getHist(folder+"/weight_leptonPairPt")
+    tt080_AvgTopPtWeightHisto = tt.getHist(folder.replace("VR","VR080")+"/weight_topPt")
+    tt080_AvgNIsrWeightHisto = tt.getHist(folder.replace("VR","VR080")+"/weight_nISR")
+    tt080_AvgEWKinoWeightHisto = tt.getHist(folder.replace("VR","VR080")+"/weight_EWKinoPairPt")
+    #tt080_AvgleptonWeightHisto = tt.getHist(folder.replace("EM","080EM")+"/weight_leptonPairPt")
+    tt80_AvgTopPtWeightHisto = tt.getHist(folder.replace("VR","VR80")+"/weight_topPt")
+    tt80_AvgNIsrWeightHisto = tt.getHist(folder.replace("VR","VR80")+"/weight_nISR")
+    tt80_AvgEWKinoWeightHisto = tt.getHist(folder.replace("VR","VR80")+"/weight_EWKinoPairPt")
+    #tt80_AvgleptonWeightHisto = tt.getHist(folder.replace("EM","80EM")+"/weight_leptonPairPt")
     singletop_AvgTopPtWeightHisto = singletop.getHist(folder+"/weight_topPt")
     singletop_AvgNIsrWeightHisto = singletop.getHist(folder+"/weight_nISR")
     singletop_AvgEWKinoWeightHisto = singletop.getHist(folder+"/weight_EWKinoPairPt")
-    singletop_AvgleptonWeightHisto = singletop.getHist(folder+"/weight_leptonPairPt")
+    #singletop_AvgleptonWeightHisto = singletop.getHist(folder+"/weight_leptonPairPt")
     wz_AvgTopPtWeightHisto = wz.getHist(folder+"/weight_topPt")
     wz_AvgNIsrWeightHisto = wz.getHist(folder+"/weight_nISR")
     wz_AvgEWKinoWeightHisto = wz.getHist(folder+"/weight_EWKinoPairPt")
-    wz_AvgleptonWeightHisto = wz.getHist(folder+"/weight_leptonPairPt")
+    #wz_AvgleptonWeightHisto = wz.getHist(folder+"/weight_leptonPairPt")
     ww_AvgTopPtWeightHisto = ww.getHist(folder+"/weight_topPt")
     ww_AvgNIsrWeightHisto = ww.getHist(folder+"/weight_nISR")
     ww_AvgEWKinoWeightHisto = ww.getHist(folder+"/weight_EWKinoPairPt")
-    ww_AvgleptonWeightHisto = ww.getHist(folder+"/weight_leptonPairPt")
+    #ww_AvgleptonWeightHisto = ww.getHist(folder+"/weight_leptonPairPt")
     zz4l_AvgTopPtWeightHisto = zz4l.getHist(folder+"/weight_topPt")
     zz4l_AvgNIsrWeightHisto = zz4l.getHist(folder+"/weight_nISR")
     zz4l_AvgEWKinoWeightHisto = zz4l.getHist(folder+"/weight_EWKinoPairPt")
-    zz4l_AvgleptonWeightHisto = zz4l.getHist(folder+"/weight_leptonPairPt")
+    #zz4l_AvgleptonWeightHisto = zz4l.getHist(folder+"/weight_leptonPairPt")
     wg_AvgTopPtWeightHisto = wgamma.getHist(folder+"/weight_topPt")
     wg_AvgNIsrWeightHisto = wgamma.getHist(folder+"/weight_nISR")
     wg_AvgEWKinoWeightHisto = wgamma.getHist(folder+"/weight_EWKinoPairPt")
-    wg_AvgleptonWeightHisto = wgamma.getHist(folder+"/weight_leptonPairPt")
+    #wg_AvgleptonWeightHisto = wgamma.getHist(folder+"/weight_leptonPairPt")
     
     #histsToScale=[zgHist,ttgHist,zzHist,wwgHist,wzgHist,dyHist,wjetsHist,ttHist,singletopHist,wzHist,wwHist,zz4lHist,wgHist]
     #topWeightHists=[zg_AvgTopPtWeightHisto,ttg_AvgTopPtWeightHisto,zz_AvgTopPtWeightHisto,wwg_AvgTopPtWeightHisto,wzg_AvgTopPtWeightHisto,dy_AvgTopPtWeightHisto,wjets_AvgTopPtWeightHisto,tt_AvgTopPtWeightHisto,singletop_AvgTopPtWeightHisto,wz_AvgTopPtWeightHisto,ww_AvgTopPtWeightHisto,zz4l_AvgTopPtWeightHisto,wg_AvgTopPtWeightHisto]
@@ -196,7 +200,7 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     topWeightHists=[zg_AvgTopPtWeightHisto,ttg_AvgTopPtWeightHisto,ttg080_AvgTopPtWeightHisto,ttg80_AvgTopPtWeightHisto,zz_AvgTopPtWeightHisto,wwg_AvgTopPtWeightHisto,wzg_AvgTopPtWeightHisto,dy_AvgTopPtWeightHisto,wjets_AvgTopPtWeightHisto,tt_AvgTopPtWeightHisto,tt080_AvgTopPtWeightHisto,tt80_AvgTopPtWeightHisto,singletop_AvgTopPtWeightHisto,wz_AvgTopPtWeightHisto,ww_AvgTopPtWeightHisto,zz4l_AvgTopPtWeightHisto,wg_AvgTopPtWeightHisto]
     nISRWeightHists=[zg_AvgNIsrWeightHisto,ttg_AvgNIsrWeightHisto,ttg080_AvgNIsrWeightHisto,ttg80_AvgNIsrWeightHisto,zz_AvgNIsrWeightHisto,wwg_AvgNIsrWeightHisto,wzg_AvgNIsrWeightHisto,dy_AvgNIsrWeightHisto,wjets_AvgNIsrWeightHisto,tt_AvgNIsrWeightHisto,tt080_AvgNIsrWeightHisto,tt80_AvgNIsrWeightHisto,singletop_AvgNIsrWeightHisto,wz_AvgNIsrWeightHisto,ww_AvgNIsrWeightHisto,zz4l_AvgNIsrWeightHisto,wg_AvgNIsrWeightHisto]
     EWKinoWeightHists=[zg_AvgEWKinoWeightHisto,ttg_AvgEWKinoWeightHisto,ttg080_AvgEWKinoWeightHisto,tt80_AvgEWKinoWeightHisto,zz_AvgEWKinoWeightHisto,wwg_AvgEWKinoWeightHisto,wzg_AvgEWKinoWeightHisto,dy_AvgEWKinoWeightHisto,wjets_AvgEWKinoWeightHisto,tt_AvgEWKinoWeightHisto,tt080_AvgEWKinoWeightHisto,tt80_AvgEWKinoWeightHisto,singletop_AvgEWKinoWeightHisto,wz_AvgEWKinoWeightHisto,ww_AvgEWKinoWeightHisto,zz4l_AvgEWKinoWeightHisto,wg_AvgEWKinoWeightHisto]
-    leptonWeightHists=[zg_AvgleptonWeightHisto,ttg_AvgleptonWeightHisto,ttg080_AvgleptonWeightHisto,ttg80_AvgleptonWeightHisto,zz_AvgleptonWeightHisto,wwg_AvgleptonWeightHisto,wzg_AvgleptonWeightHisto,dy_AvgleptonWeightHisto,wjets_AvgleptonWeightHisto,tt_AvgleptonWeightHisto,tt080_AvgleptonWeightHisto,tt80_AvgleptonWeightHisto,singletop_AvgleptonWeightHisto,wz_AvgleptonWeightHisto,ww_AvgleptonWeightHisto,zz4l_AvgleptonWeightHisto,wg_AvgleptonWeightHisto]
+    #leptonWeightHists=[zg_AvgleptonWeightHisto,ttg_AvgleptonWeightHisto,ttg080_AvgleptonWeightHisto,ttg80_AvgleptonWeightHisto,zz_AvgleptonWeightHisto,wwg_AvgleptonWeightHisto,wzg_AvgleptonWeightHisto,dy_AvgleptonWeightHisto,wjets_AvgleptonWeightHisto,tt_AvgleptonWeightHisto,tt080_AvgleptonWeightHisto,tt80_AvgleptonWeightHisto,singletop_AvgleptonWeightHisto,wz_AvgleptonWeightHisto,ww_AvgleptonWeightHisto,zz4l_AvgleptonWeightHisto,wg_AvgleptonWeightHisto]
      
       
     for i in range(len(histsToScale)):
@@ -206,8 +210,8 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
             histsToScale[i].Scale(nISRWeightHists[i].GetMean())
         if EWKinoWeightHists[i].Integral>0.:
             histsToScale[i].Scale(EWKinoWeightHists[i].GetMean())
-        if leptonWeightHists[i].Integral>0.:
-            histsToScale[i].Scale(leptonWeightHists[i].GetMean())
+        #if leptonWeightHists[i].Integral>0.:
+            #histsToScale[i].Scale(leptonWeightHists[i].GetMean())
 
 
     zgHist.SetLineColor(ROOT.kGreen-3)
@@ -289,20 +293,20 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     signal2_AvgTopPtWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_topPt")
     signal2_AvgNIsrWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_nISR")
     signal2_AvgEWKinoWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_EWKinoPairPt")
-    signal2_AvgleptonWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_leptonPairPt")
+    #signal2_AvgleptonWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_leptonPairPt")
     signal1_AvgTopPtWeightHisto = tching_600.getHist(folder+"/weight_topPt")
     signal1_AvgNIsrWeightHisto = tching_600.getHist(folder+"/weight_nISR")
     signal1_AvgEWKinoWeightHisto = tching_600.getHist(folder+"/weight_EWKinoPairPt")
-    signal1_AvgleptonWeightHisto = tching_600.getHist(folder+"/weight_leptonPairPt")
+    #signal1_AvgleptonWeightHisto = tching_600.getHist(folder+"/weight_leptonPairPt")
 
     signal2.Scale((1./(signal2_AvgTopPtWeightHisto.GetMean() if signal2_AvgTopPtWeightHisto.GetMean() >0. else 1.)))
     signal2.Scale((1./(signal2_AvgNIsrWeightHisto.GetMean() if signal2_AvgNIsrWeightHisto.GetMean() >0. else 1.)))
     signal2.Scale((1./(signal2_AvgEWKinoWeightHisto.GetMean() if signal2_AvgEWKinoWeightHisto.GetMean() >0. else 1.)))
-    signal2.Scale((1./(signal2_AvgleptonWeightHisto.GetMean() if signal2_AvgleptonWeightHisto.GetMean() >0. else 1.)))
+    #signal2.Scale((1./(signal2_AvgleptonWeightHisto.GetMean() if signal2_AvgleptonWeightHisto.GetMean() >0. else 1.)))
     signal1.Scale((1./(signal1_AvgTopPtWeightHisto.GetMean() if signal1_AvgTopPtWeightHisto.GetMean() >0. else 1.)))
     signal1.Scale((1./(signal1_AvgNIsrWeightHisto.GetMean() if signal1_AvgNIsrWeightHisto.GetMean() >0. else 1.)))
     signal1.Scale((1./(signal1_AvgEWKinoWeightHisto.GetMean() if signal1_AvgEWKinoWeightHisto.GetMean() >0. else 1.)))
-    signal1.Scale((1./(signal1_AvgleptonWeightHisto.GetMean() if signal1_AvgleptonWeightHisto.GetMean() >0. else 1.)))
+    #signal1.Scale((1./(signal1_AvgleptonWeightHisto.GetMean() if signal1_AvgleptonWeightHisto.GetMean() >0. else 1.)))
     
     for h in signal1, signal2:
         aux.drawOpt(h, "signal")
@@ -310,8 +314,8 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     signal2.SetLineColor(ROOT.kBlue+3)
     signal2.SetLineStyle(2)    
 
-    m.add(signal2, "T5bbbbZg")
-    m.add(signal1, "TChiNg")
+    #m.add(signal2, "T5bbbbZg")
+    #m.add(signal1, "TChiNg")
     
     
     
@@ -387,10 +391,10 @@ TTsf=pklTT["EM"]["eta1"]
 WZsf=pklWZ["LL"]["eta1"]
 for group in groups:
     for variable in variables:
-        drawVR("EE",group+"EE/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
-        drawVR("MM",group+"MM/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
-        drawVR("LL",group+"/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
-        drawVR("EM",group+"EM/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
+        #drawVR("EE",group+"/EE/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
+        #drawVR("MM",group+"/MM/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
+        drawVR("LL",group+"/LL/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
+        #drawVR("EM",group+"/EM/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
 
         
         

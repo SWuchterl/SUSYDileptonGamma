@@ -17,8 +17,8 @@ def getPointFromDir(name):
 #Weak SMS TChiNG
 
 #path="../minimal/output_signalScan/"
-#path="../minimal/output/"
-path="../minimal/output_noVeto/"
+path="../minimal/output/"
+#path="../minimal/output_noVeto/"
 
 lumi=35867.
 xSec_tching = pickle.load(open("../SUSYxSections/xSec_SMS_C1C1_13TeV.pkl","rb"))
@@ -36,7 +36,7 @@ strongSampleName = "SMS-T5bbbbZg_hists.root"
 GGM12SampleName = "GGM_GravitinoLSP_M1-200to1500_M2-200to1500_hists.root"
 GGM13SampleName = "GGM_GravitinoLSP_M1-50to1500_M3-1000to2500_hists.root"
 
-
+gmsbSampleName = "GMSB_GravitinoLSP_N1decays_hists.root"
 
 
 file_weak = ROOT.TFile(path+weakSampleName)
@@ -135,6 +135,51 @@ for key in dirs:
     strong.SetPoint(i,mGluino,mNeutralino,acc)
     i+=1
     
+file_gmsb = ROOT.TFile(path+gmsbSampleName)
+dirs = [k.GetName() for k in file_gmsb.GetListOfKeys() if k.GetName().startswith("GMSB")]
+
+gmsb = TGraph2D();
+
+k=0
+for key in dirs:
+    folder = "sig/"
+    hName = "met"
+    point = getPointFromDir(key)
+    mGluino = point[1]
+    mNeutralino = point[2]
+    histo = file_gmsb.Get(key+"/"+folder+hName)
+    #acc = histo.Integral()*100.
+    avgTopPtWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_topPt")
+    avgNIsrWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_nISR")
+    avgEWKinoWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_EWKinoPairPt")
+    avgleptonWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_leptonPairPt")
+    
+    if avgTopPtWeightHisto.Integral()>0.:
+        avgTopPtWeight = avgTopPtWeightHisto.GetMean()
+    else:
+        avgTopPtWeight=1.
+    if avgNIsrWeightHisto.Integral()>0.:
+        avgNIsrWeight = avgNIsrWeightHisto.GetMean()
+    else:
+        avgNIsrWeight=1.
+    if avgEWKinoWeightHisto.Integral()>0.:
+        avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
+    else: avgEWKinoWeight=1.
+    if avgleptonWeightHisto.Integral()>0.:
+        avgleptonWeight = avgleptonWeightHisto.GetMean()
+    else:
+        avgleptonWeight=1.
+#
+    histo.Scale(1./avgTopPtWeight)
+    histo.Scale(1./avgNIsrWeight)
+    histo.Scale(1./avgEWKinoWeight)
+    histo.Scale(1./avgleptonWeight)
+    #acc = histo.Integral(histo.FindFixBin(150.),-1)*100.
+    acc = histo.Integral()*100.
+    #gmsb.SetPoint(i,mGluino,mNeutralino,acc)
+    gmsb.SetPoint(k,mNeutralino,mGluino,acc)
+    k+=1
+    
 
 file_GGM12 = ROOT.TFile(path+GGM12SampleName)
 dirs = [k.GetName() for k in file_GGM12.GetListOfKeys() if k.GetName().startswith("GGM")]
@@ -215,6 +260,7 @@ s= style.style2d()
 s.SetPadLeftMargin(0.18)
 c = TCanvas("canvas","",800,800)
 strong.SetTitle("; m_{#tilde{g}} (GeV);m_{#tilde{#chi_{0}^{1}}} (GeV); Acceptance x Efficiency [%]")
+gmsb.SetTitle("; m_{#tilde{B}} (GeV);m_{#tilde{W}} (GeV); Acceptance x Efficiency [%]")
 ggm1m2.SetTitle("; M1;M2; Acceptance x Efficiency [%]")
 
 lum = ROOT.TLatex( .62, .95, "#scale[0.76]{%.1f fb^{-1} (%s TeV)}"%(aux.intLumi/1000., aux.Label.cmsEnergy) )
@@ -234,6 +280,15 @@ l.Draw()
 lum.Draw()
 c.Update()
 c.SaveAs("ggm1m2.pdf")
+
+#c.Clear()
+#gmsb.SetPoint(k+1,0,1300,.0)
+gmsb.Draw("COLZ")
+#l = aux.Label(sim=True)
+l.Draw()
+lum.Draw()
+c.Update()
+c.SaveAs("gmsb.pdf")
 
 
 #c.Clear()

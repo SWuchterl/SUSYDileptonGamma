@@ -2,20 +2,20 @@
 import ConfigParser
 
 generalSettings = {
+    #"eventPercentage" : 1.,
     #"eventPercentage" : 0.1,
     "eventPercentage" : 100.,
     "doSignalScan" : 1,
     "doSignalScanTChiNGSplit" : 1,
-    #"veto" : 6,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None
-    "veto" : 7,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None
+    "veto" : 6,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None
     "doCutFlow" : 1,
     "doCutFlowFine" : 1
 }
-#outputFolder = "standard" ## old variant  before v12
+#outputFolder = "standard"
 #outputFolder = "danilo"
-outputFolder = "uncorrected" ## will now be without veto
+#outputFolder = "uncorrected" 
 #outputFolder = "EGRegression"
-#outputFolder = "noVeto" ## for now right folder
+outputFolder = "noVeto" 
 #outputFolder = "signalScan"
 
 selectionsToProcess = {
@@ -39,7 +39,8 @@ outputFolders = {
     "uncorrected" : "_uncorrected",
     "danilo" : "_danilo",
     "EGRegression" : "_EGRegression",
-    "signalScan" : "_signalScan"
+    "signalScan" : "_signalScan",
+    "medium": "_mediumID"
 }
 
 

@@ -1021,6 +1021,7 @@ def addUncertaintiesQuadratic(hlist):
     return out
 
 intLumi = 35.867e3
+#intLumi = 35.867e3 + 41.e3
 
 class Label:
     # Create labels

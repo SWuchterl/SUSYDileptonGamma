@@ -18,11 +18,13 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     #nBins = range(0,200,25)+[200, 300,500]
     #nBins = [0,100,150]+[150,190, 230,500]
     #nBins = [0,100,150,190, 230,500]
-    nBinsOld = [0,25,50,75,100,150,190,230,500]
-    nBinsDataOld = [0,25,50,75,100]
+    #nBinsOld = [0,25,50,75,100,150,190,230,500]
+    #nBinsDataOld = [0,25,50,75,100]
+    #nBins = [0,25,50,75,100,150,190,230,500]
+    #nBinsData = [0,25,50,75,100]
     #according to Knuts Tool ->250
     nBins = [0,25,50,75,100,150,250,450]
-    #nBinsData = [0,25,50,75,100]
+    #nBinsData = [0,25,50,75,100]????
     nBinsData = [0,25,50,75,100,150]
     
     #nBins = [200, 300,500]
@@ -78,61 +80,61 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     zg_AvgTopPtWeightHisto = zgamma.getHist(dirDir+"/weight_topPt")
     zg_AvgNIsrWeightHisto = zgamma.getHist(dirDir+"/weight_nISR")
     zg_AvgEWKinoWeightHisto = zgamma.getHist(dirDir+"/weight_EWKinoPairPt")
-    zg_AvgleptonWeightHisto = zgamma.getHist(dirDir+"/weight_leptonPairPt")
+    #zg_AvgleptonWeightHisto = zgamma.getHist(dirDir+"/weight_leptonPairPt")
     ttg_AvgTopPtWeightHisto = ttgamma.getHist(dirDir+"/weight_topPt")
     ttg_AvgNIsrWeightHisto = ttgamma.getHist(dirDir+"/weight_nISR")
     ttg_AvgEWKinoWeightHisto = ttgamma.getHist(dirDir+"/weight_EWKinoPairPt")
-    ttg_AvgleptonWeightHisto = ttgamma.getHist(dirDir+"/weight_leptonPairPt")
+    #ttg_AvgleptonWeightHisto = ttgamma.getHist(dirDir+"/weight_leptonPairPt")
     zz_AvgTopPtWeightHisto = zz.getHist(dirDir+"/weight_topPt")
     zz_AvgNIsrWeightHisto = zz.getHist(dirDir+"/weight_nISR")
     zz_AvgEWKinoWeightHisto = zz.getHist(dirDir+"/weight_EWKinoPairPt")
-    zz_AvgleptonWeightHisto = zz.getHist(dirDir+"/weight_leptonPairPt")
+    #zz_AvgleptonWeightHisto = zz.getHist(dirDir+"/weight_leptonPairPt")
     wwg_AvgTopPtWeightHisto = wwgamma.getHist(dirDir+"/weight_topPt")
     wwg_AvgNIsrWeightHisto = wwgamma.getHist(dirDir+"/weight_nISR")
     wwg_AvgEWKinoWeightHisto = wwgamma.getHist(dirDir+"/weight_EWKinoPairPt")
-    wwg_AvgleptonWeightHisto = wwgamma.getHist(dirDir+"/weight_leptonPairPt")
+    #wwg_AvgleptonWeightHisto = wwgamma.getHist(dirDir+"/weight_leptonPairPt")
     wzg_AvgTopPtWeightHisto = wzgamma.getHist(dirDir+"/weight_topPt")
     wzg_AvgNIsrWeightHisto = wzgamma.getHist(dirDir+"/weight_nISR")
     wzg_AvgEWKinoWeightHisto = wzgamma.getHist(dirDir+"/weight_EWKinoPairPt")
-    wzg_AvgleptonWeightHisto = wzgamma.getHist(dirDir+"/weight_leptonPairPt")
+    #wzg_AvgleptonWeightHisto = wzgamma.getHist(dirDir+"/weight_leptonPairPt")
     dy_AvgTopPtWeightHisto = DYjetsNLO.getHist(dirDir+"/weight_topPt")
     dy_AvgNIsrWeightHisto = DYjetsNLO.getHist(dirDir+"/weight_nISR")
     dy_AvgEWKinoWeightHisto = DYjetsNLO.getHist(dirDir+"/weight_EWKinoPairPt")
-    dy_AvgleptonWeightHisto = DYjetsNLO.getHist(dirDir+"/weight_leptonPairPt")
+    #dy_AvgleptonWeightHisto = DYjetsNLO.getHist(dirDir+"/weight_leptonPairPt")
     wjets_AvgTopPtWeightHisto = wjets.getHist(dirDir+"/weight_topPt")
     wjets_AvgNIsrWeightHisto = wjets.getHist(dirDir+"/weight_nISR")
     wjets_AvgEWKinoWeightHisto = wjets.getHist(dirDir+"/weight_EWKinoPairPt")
-    wjets_AvgleptonWeightHisto = wjets.getHist(dirDir+"/weight_leptonPairPt")
+    #wjets_AvgleptonWeightHisto = wjets.getHist(dirDir+"/weight_leptonPairPt")
     tt_AvgTopPtWeightHisto = tt.getHist(dirDir+"/weight_topPt")
     tt_AvgNIsrWeightHisto = tt.getHist(dirDir+"/weight_nISR")
     tt_AvgEWKinoWeightHisto = tt.getHist(dirDir+"/weight_EWKinoPairPt")
-    tt_AvgleptonWeightHisto = tt.getHist(dirDir+"/weight_leptonPairPt")
+    #tt_AvgleptonWeightHisto = tt.getHist(dirDir+"/weight_leptonPairPt")
     singletop_AvgTopPtWeightHisto = singletop.getHist(dirDir+"/weight_topPt")
     singletop_AvgNIsrWeightHisto = singletop.getHist(dirDir+"/weight_nISR")
     singletop_AvgEWKinoWeightHisto = singletop.getHist(dirDir+"/weight_EWKinoPairPt")
-    singletop_AvgleptonWeightHisto = singletop.getHist(dirDir+"/weight_leptonPairPt")
+    #singletop_AvgleptonWeightHisto = singletop.getHist(dirDir+"/weight_leptonPairPt")
     wz_AvgTopPtWeightHisto = wz.getHist(dirDir+"/weight_topPt")
     wz_AvgNIsrWeightHisto = wz.getHist(dirDir+"/weight_nISR")
     wz_AvgEWKinoWeightHisto = wz.getHist(dirDir+"/weight_EWKinoPairPt")
-    wz_AvgleptonWeightHisto = wz.getHist(dirDir+"/weight_leptonPairPt")
+    #wz_AvgleptonWeightHisto = wz.getHist(dirDir+"/weight_leptonPairPt")
     ww_AvgTopPtWeightHisto = ww.getHist(dirDir+"/weight_topPt")
     ww_AvgNIsrWeightHisto = ww.getHist(dirDir+"/weight_nISR")
     ww_AvgEWKinoWeightHisto = ww.getHist(dirDir+"/weight_EWKinoPairPt")
-    ww_AvgleptonWeightHisto = ww.getHist(dirDir+"/weight_leptonPairPt")
+    #ww_AvgleptonWeightHisto = ww.getHist(dirDir+"/weight_leptonPairPt")
     zz4l_AvgTopPtWeightHisto = zz4l.getHist(dirDir+"/weight_topPt")
     zz4l_AvgNIsrWeightHisto = zz4l.getHist(dirDir+"/weight_nISR")
     zz4l_AvgEWKinoWeightHisto = zz4l.getHist(dirDir+"/weight_EWKinoPairPt")
-    zz4l_AvgleptonWeightHisto = zz4l.getHist(dirDir+"/weight_leptonPairPt")
+    #zz4l_AvgleptonWeightHisto = zz4l.getHist(dirDir+"/weight_leptonPairPt")
     wg_AvgTopPtWeightHisto = wgamma.getHist(dirDir+"/weight_topPt")
     wg_AvgNIsrWeightHisto = wgamma.getHist(dirDir+"/weight_nISR")
     wg_AvgEWKinoWeightHisto = wgamma.getHist(dirDir+"/weight_EWKinoPairPt")
-    wg_AvgleptonWeightHisto = wgamma.getHist(dirDir+"/weight_leptonPairPt")
+    #wg_AvgleptonWeightHisto = wgamma.getHist(dirDir+"/weight_leptonPairPt")
     
     histsToScale=[zgHist,ttgHist,zzHist,wwgHist,wzgHist,dyHist,wjetsHist,ttHist,singletopHist,wzHist,wwHist,zz4lHist,wgHist]
     topWeightHists=[zg_AvgTopPtWeightHisto,ttg_AvgTopPtWeightHisto,zz_AvgTopPtWeightHisto,wwg_AvgTopPtWeightHisto,wzg_AvgTopPtWeightHisto,dy_AvgTopPtWeightHisto,wjets_AvgTopPtWeightHisto,tt_AvgTopPtWeightHisto,singletop_AvgTopPtWeightHisto,wz_AvgTopPtWeightHisto,ww_AvgTopPtWeightHisto,zz4l_AvgTopPtWeightHisto,wg_AvgTopPtWeightHisto]
     nISRWeightHists=[zg_AvgNIsrWeightHisto,ttg_AvgNIsrWeightHisto,zz_AvgNIsrWeightHisto,wwg_AvgNIsrWeightHisto,wzg_AvgNIsrWeightHisto,dy_AvgNIsrWeightHisto,wjets_AvgNIsrWeightHisto,tt_AvgNIsrWeightHisto,singletop_AvgNIsrWeightHisto,wz_AvgNIsrWeightHisto,ww_AvgNIsrWeightHisto,zz4l_AvgNIsrWeightHisto,wg_AvgNIsrWeightHisto]
     EWKinoWeightHists=[zg_AvgEWKinoWeightHisto,ttg_AvgEWKinoWeightHisto,zz_AvgEWKinoWeightHisto,wwg_AvgEWKinoWeightHisto,wzg_AvgEWKinoWeightHisto,dy_AvgEWKinoWeightHisto,wjets_AvgEWKinoWeightHisto,tt_AvgEWKinoWeightHisto,singletop_AvgEWKinoWeightHisto,wz_AvgEWKinoWeightHisto,ww_AvgEWKinoWeightHisto,zz4l_AvgEWKinoWeightHisto,wg_AvgEWKinoWeightHisto]
-    leptonWeightHists=[zg_AvgleptonWeightHisto,ttg_AvgleptonWeightHisto,zz_AvgleptonWeightHisto,wwg_AvgleptonWeightHisto,wzg_AvgleptonWeightHisto,dy_AvgleptonWeightHisto,wjets_AvgleptonWeightHisto,tt_AvgleptonWeightHisto,singletop_AvgleptonWeightHisto,wz_AvgleptonWeightHisto,ww_AvgleptonWeightHisto,zz4l_AvgleptonWeightHisto,wg_AvgleptonWeightHisto]
+    #leptonWeightHists=[zg_AvgleptonWeightHisto,ttg_AvgleptonWeightHisto,zz_AvgleptonWeightHisto,wwg_AvgleptonWeightHisto,wzg_AvgleptonWeightHisto,dy_AvgleptonWeightHisto,wjets_AvgleptonWeightHisto,tt_AvgleptonWeightHisto,singletop_AvgleptonWeightHisto,wz_AvgleptonWeightHisto,ww_AvgleptonWeightHisto,zz4l_AvgleptonWeightHisto,wg_AvgleptonWeightHisto]
       
     #print len(histsToScale),len(topWeightHists),len(nISRWeightHists),len(EWKinoWeightHists),len(leptonWeightHists)
     
@@ -143,8 +145,8 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
             histsToScale[i].Scale(nISRWeightHists[i].GetMean())
         if EWKinoWeightHists[i].Integral>0.:
             histsToScale[i].Scale(EWKinoWeightHists[i].GetMean())
-        if leptonWeightHists[i].Integral>0.:
-            histsToScale[i].Scale(leptonWeightHists[i].GetMean())
+        #if leptonWeightHists[i].Integral>0.:
+            #histsToScale[i].Scale(leptonWeightHists[i].GetMean())
             
 
     pklZZ = pkl.load( open( "plots_CR_zz/factors/CRZZ.pkl", "rb" ) )
@@ -236,28 +238,29 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
 
     #signal1 = aux.stdHist(t5bbbbzg_1500_400, dirDir+"/met", nBins)
     #signal2 = aux.stdHist(tching_400, dirDir+"/met", nBins)
-    signal2 = aux.stdHist(t5bbbbzg_1500_400, dirDir+"/met", nBins)
+    #signal2 = aux.stdHist(t5bbbbzg_1500_400, dirDir+"/met", nBins)
+    signal2 = aux.stdHist(gmsb_290_205, dirDir+"/met", nBins)
     #signal1 = aux.stdHist(tching_400, dirDir+"/met", nBins)
     signal1 = aux.stdHist(tching_600, dirDir+"/met", nBins)
     
     signal2_AvgTopPtWeightHisto = t5bbbbzg_1500_400.getHist(dirDir+"/weight_topPt")
     signal2_AvgNIsrWeightHisto = t5bbbbzg_1500_400.getHist(dirDir+"/weight_nISR")
     signal2_AvgEWKinoWeightHisto = t5bbbbzg_1500_400.getHist(dirDir+"/weight_EWKinoPairPt")
-    signal2_AvgleptonWeightHisto = t5bbbbzg_1500_400.getHist(dirDir+"/weight_leptonPairPt")
+    #signal2_AvgleptonWeightHisto = t5bbbbzg_1500_400.getHist(dirDir+"/weight_leptonPairPt")
     signal1_AvgTopPtWeightHisto = tching_600.getHist(dirDir+"/weight_topPt")
     signal1_AvgNIsrWeightHisto = tching_600.getHist(dirDir+"/weight_nISR")
     signal1_AvgEWKinoWeightHisto = tching_600.getHist(dirDir+"/weight_EWKinoPairPt")
-    signal1_AvgleptonWeightHisto = tching_600.getHist(dirDir+"/weight_leptonPairPt")
+    #signal1_AvgleptonWeightHisto = tching_600.getHist(dirDir+"/weight_leptonPairPt")
 
 #
     signal2.Scale((1./signal2_AvgTopPtWeightHisto.GetMean()))
     signal2.Scale((1./signal2_AvgNIsrWeightHisto.GetMean()))
     signal2.Scale((1./signal2_AvgEWKinoWeightHisto.GetMean()))
-    signal2.Scale((1./signal2_AvgleptonWeightHisto.GetMean()))
+    #signal2.Scale((1./signal2_AvgleptonWeightHisto.GetMean()))
     signal1.Scale((1./signal1_AvgTopPtWeightHisto.GetMean()))
     signal1.Scale((1./signal1_AvgNIsrWeightHisto.GetMean()))
     signal1.Scale((1./signal1_AvgEWKinoWeightHisto.GetMean()))
-    signal1.Scale((1./signal1_AvgleptonWeightHisto.GetMean()))
+    #signal1.Scale((1./signal1_AvgleptonWeightHisto.GetMean()))
 
 
 
@@ -297,7 +300,8 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
 #   m.add(signal1_pre, "contamination")
     #m.add(signal1, "T5bbbbZg")
     #m.add(signal2, "TChiNg")
-    m.add(signal2, "T5bbbbZg")
+    #m.add(signal2, "T5bbbbZg")
+    m.add(signal2, "GMSB")
     m.add(signal1, "TChiNg")
     #m.addStack(eHist, "e#rightarrow#gamma")
     m.addStack(zgHist, "Z#gamma")
@@ -526,6 +530,6 @@ def main():
     #finalDistributionSignalHist("final_MC_EE", allMC, "onZEE")
     #finalDistributionSignalHist("final_MC", allMC, "onZMet100")
     #finalDistributionSignalHist("final_MC", allMC, "onZMet150")
-    finalDistributionSignalHist("final_MC", allMC, "onZ")
+    finalDistributionSignalHist("final_MC", allMC, "onZ/LL")
 
 main()

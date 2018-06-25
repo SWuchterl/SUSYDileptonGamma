@@ -53,8 +53,8 @@ sigSet = tching_600
 
 #bkgHist = bkgSet.getHist("tr/met")
 #sigHist = sigSet.getHist("tr/met")
-bkgHist = bkgSet.getHist("onZMet150/met")
-sigHist = sigSet.getHist("onZMet150/met")
+bkgHist = bkgSet.getHist("onZMet150/LL/met")
+sigHist = sigSet.getHist("onZMet150/LL/met")
 
 def frange(start, end, step):
     a=[]

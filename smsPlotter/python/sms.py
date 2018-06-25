@@ -23,6 +23,8 @@ class sms():
         if modelname.find("T6gg") != -1: self.T6gg()
         if modelname.find("T6Wg") != -1: self.T6Wg()
         if modelname.find("GGM") != -1: self.GGM()
+        if modelname.find("GMSB") != -1: self.GMSB()
+        #if modelname.find("GMSB") != -1: self.GGM()
         if modelname.find("M2") != -1: self.GGMM1M2()
         if modelname.find("M3") != -1: self.GGMM1M3()
         if modelname.find("TChiNG") != -1: self.TChiNG_BR()
@@ -177,6 +179,27 @@ class sms():
         self.LSP = "m_{#tilde{W}} [GeV]"
         # diagonal lines
         self.diagOn = False
+        
+    def GMSB(self):
+        # model name
+        self.modelname = "GMSB"
+        # decay chain
+        self.label= "GMSB"
+        self.label2= "";
+        # scan range to plot
+        self.Xmin = 200-10
+        self.Xmax = 1015+10
+        self.Ymin = 200-10
+        # self.Ymax = 1015+12.5
+        self.Ymax = 1300+10
+        self.Zmin = 0.001
+        self.Zmax = 2.
+        # produce sparticle
+        self.sParticle = "m_{#tilde{B}} [GeV]"
+        # LSP
+        self.LSP = "m_{#tilde{W}} [GeV]"
+        # diagonal lines
+        self.diagOn = True
         
     def GGMM1M3(self):
         # model name

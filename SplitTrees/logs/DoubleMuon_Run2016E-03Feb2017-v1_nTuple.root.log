@@ -1,0 +1,404 @@
+000 (356.000.000) 06/01 16:26:47 Job submitted from host: <134.61.5.1:9618?addrs=134.61.5.1-9618+[--1]-9618&noUDP&sock=1924_484e_15>
+...
+001 (356.000.000) 06/01 16:32:22 Job executing on host: <134.61.17.168:9618?addrs=134.61.17.168-9618+[--1]-9618&noUDP&sock=4953_ecac_3>
+...
+006 (356.000.000) 06/01 16:32:31 Image size of job updated: 18412
+	8  -  MemoryUsage of job (MB)
+	7320  -  ResidentSetSize of job (KB)
+...
+010 (356.000.000) 06/01 16:36:34 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (356.000.000) 06/01 16:36:34 Image size of job updated: 579964
+	484  -  MemoryUsage of job (MB)
+	495368  -  ResidentSetSize of job (KB)
+...
+011 (356.000.000) 06/01 16:36:49 Job was unsuspended.
+...
+005 (356.000.000) 06/01 17:16:32 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:01:48, Sys 0 00:00:02  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:01:48, Sys 0 00:00:02  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   1556473
+	   Memory (MB)          :      484     1500      1500
+...
+000 (418.000.000) 06/04 11:40:31 Job submitted from host: <134.61.5.1:9618?addrs=134.61.5.1-9618+[--1]-9618&noUDP&sock=1924_484e_15>
+...
+001 (418.000.000) 06/04 11:40:47 Job executing on host: <134.61.17.159:9618?addrs=134.61.17.159-9618+[--1]-9618&noUDP&sock=4670_cf5e_3>
+...
+006 (418.000.000) 06/04 11:40:56 Image size of job updated: 173292
+	138  -  MemoryUsage of job (MB)
+	140964  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 11:45:57 Image size of job updated: 364052
+	318  -  MemoryUsage of job (MB)
+	325300  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 11:50:57 Image size of job updated: 365808
+	320  -  MemoryUsage of job (MB)
+	327056  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 11:55:57 Image size of job updated: 368544
+	323  -  MemoryUsage of job (MB)
+	329792  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 12:00:58 Image size of job updated: 368636
+	323  -  MemoryUsage of job (MB)
+	329884  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 12:05:59 Image size of job updated: 368972
+	323  -  MemoryUsage of job (MB)
+	330220  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 12:10:59 Image size of job updated: 370004
+	324  -  MemoryUsage of job (MB)
+	331252  -  ResidentSetSize of job (KB)
+...
+006 (418.000.000) 06/04 12:31:01 Image size of job updated: 370784
+	325  -  MemoryUsage of job (MB)
+	332032  -  ResidentSetSize of job (KB)
+...
+005 (418.000.000) 06/04 12:40:27 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:06:53, Sys 0 00:00:06  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:06:53, Sys 0 00:00:06  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   1556473
+	   Memory (MB)          :      325     1500      1500
+...
+000 (480.000.000) 06/04 15:47:22 Job submitted from host: <134.61.5.1:9618?addrs=134.61.5.1-9618+[--1]-9618&noUDP&sock=1924_484e_15>
+...
+001 (480.000.000) 06/04 16:36:29 Job executing on host: <134.61.15.36:9618?addrs=134.61.15.36-9618+[--1]-9618&noUDP&sock=1477_ad78_3>
+...
+006 (480.000.000) 06/04 16:36:37 Image size of job updated: 11488
+	7  -  MemoryUsage of job (MB)
+	7100  -  ResidentSetSize of job (KB)
+...
+010 (480.000.000) 06/04 16:37:19 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 16:37:19 Image size of job updated: 363292
+	340  -  MemoryUsage of job (MB)
+	347840  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 16:37:34 Job was unsuspended.
+...
+006 (480.000.000) 06/04 16:37:34 Image size of job updated: 363296
+	340  -  MemoryUsage of job (MB)
+	347840  -  ResidentSetSize of job (KB)
+...
+010 (480.000.000) 06/04 16:39:30 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 16:39:30 Image size of job updated: 511360
+	485  -  MemoryUsage of job (MB)
+	495904  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 16:39:50 Job was unsuspended.
+...
+010 (480.000.000) 06/04 16:40:45 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 16:40:45 Image size of job updated: 541576
+	514  -  MemoryUsage of job (MB)
+	526120  -  ResidentSetSize of job (KB)
+...
+006 (480.000.000) 06/04 16:41:38 Image size of job updated: 543572
+	516  -  MemoryUsage of job (MB)
+	528116  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 16:43:56 Job was unsuspended.
+...
+010 (480.000.000) 06/04 16:45:01 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 16:45:01 Image size of job updated: 549272
+	522  -  MemoryUsage of job (MB)
+	533816  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 16:48:18 Job was unsuspended.
+...
+010 (480.000.000) 06/04 16:48:38 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 16:57:10 Job was unsuspended.
+...
+010 (480.000.000) 06/04 16:57:46 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 16:57:46 Image size of job updated: 549276
+	522  -  MemoryUsage of job (MB)
+	533820  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 16:58:01 Job was unsuspended.
+...
+010 (480.000.000) 06/04 16:58:56 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:01:37 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:02:37 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:04:23 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:05:58 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 17:05:58 Image size of job updated: 552204
+	525  -  MemoryUsage of job (MB)
+	536748  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 17:07:59 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:08:13 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:08:33 Job was unsuspended.
+...
+006 (480.000.000) 06/04 17:11:43 Image size of job updated: 552204
+	532  -  MemoryUsage of job (MB)
+	544420  -  ResidentSetSize of job (KB)
+...
+010 (480.000.000) 06/04 17:11:49 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:12:24 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:12:55 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:13:25 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:13:35 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:14:10 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:16:57 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (480.000.000) 06/04 17:17:52 Job was unsuspended.
+...
+010 (480.000.000) 06/04 17:35:52 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (480.000.000) 06/04 17:35:52 Image size of job updated: 558528
+	532  -  MemoryUsage of job (MB)
+	544420  -  ResidentSetSize of job (KB)
+...
+011 (480.000.000) 06/04 17:36:07 Job was unsuspended.
+...
+005 (480.000.000) 06/04 17:51:31 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:36:14, Sys 0 00:00:19  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:36:14, Sys 0 00:00:19  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   1138300
+	   Memory (MB)          :      532     1500      1500
+...
+000 (541.000.000) 06/05 16:10:39 Job submitted from host: <134.61.5.1:9618?addrs=134.61.5.1-9618+[--1]-9618&noUDP&sock=1924_484e_15>
+...
+007 (541.000.000) 06/05 16:14:20 Shadow exception!
+	Error from slot1_5@lxcip55.physik.rwth-aachen.de: Failed to open '/.automount/home/home__home4/institut_1b/swuchterl/SUSYDileptonGamma/SplitTrees/logs/DoubleMuon_Run2016E-03Feb2017-v1_nTuple.root.out' as standard output: No such file or directory (errno 2)
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (541.000.000) 06/05 16:14:20 Job was held.
+	Error from slot1_5@lxcip55.physik.rwth-aachen.de: Failed to open '/.automount/home/home__home4/institut_1b/swuchterl/SUSYDileptonGamma/SplitTrees/logs/DoubleMuon_Run2016E-03Feb2017-v1_nTuple.root.out' as standard output: No such file or directory (errno 2)
+	Code 7 Subcode 2
+...
+013 (541.000.000) 06/05 18:20:18 Job was released.
+	via condor_release (by user swuchterl)
+...
+001 (541.000.000) 06/05 18:23:29 Job executing on host: <134.61.17.187:9618?addrs=134.61.17.187-9618+[--1]-9618&noUDP&sock=4493_671b_3>
+...
+006 (541.000.000) 06/05 18:23:37 Image size of job updated: 36904
+	32  -  MemoryUsage of job (MB)
+	31892  -  ResidentSetSize of job (KB)
+...
+006 (541.000.000) 06/05 18:28:37 Image size of job updated: 516772
+	499  -  MemoryUsage of job (MB)
+	510600  -  ResidentSetSize of job (KB)
+...
+006 (541.000.000) 06/05 18:33:38 Image size of job updated: 530244
+	499  -  MemoryUsage of job (MB)
+	510600  -  ResidentSetSize of job (KB)
+...
+006 (541.000.000) 06/05 18:43:39 Image size of job updated: 531760
+	499  -  MemoryUsage of job (MB)
+	510600  -  ResidentSetSize of job (KB)
+...
+006 (541.000.000) 06/05 18:58:40 Image size of job updated: 532004
+	499  -  MemoryUsage of job (MB)
+	510600  -  ResidentSetSize of job (KB)
+...
+005 (541.000.000) 06/05 19:08:21 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:32:51, Sys 0 00:01:28  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:32:51, Sys 0 00:01:28  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   1556473
+	   Memory (MB)          :      499     1500      1500
+...
+000 (662.000.000) 06/06 15:35:16 Job submitted from host: <134.61.5.1:9618?addrs=134.61.5.1-9618+[--1]-9618&noUDP&sock=1924_484e_15>
+...
+001 (662.000.000) 06/06 15:43:31 Job executing on host: <134.61.15.6:9618?addrs=134.61.15.6-9618+[--1]-9618&noUDP&sock=1223743_7d6a_3>
+...
+006 (662.000.000) 06/06 15:43:40 Image size of job updated: 8364
+	8  -  MemoryUsage of job (MB)
+	8140  -  ResidentSetSize of job (KB)
+...
+010 (662.000.000) 06/06 15:47:33 Job was suspended.
+	Number of processes actually suspended: 3
+...
+006 (662.000.000) 06/06 15:47:33 Image size of job updated: 511608
+	497  -  MemoryUsage of job (MB)
+	508736  -  ResidentSetSize of job (KB)
+...
+011 (662.000.000) 06/06 15:52:34 Job was unsuspended.
+...
+006 (662.000.000) 06/06 15:53:28 Image size of job updated: 530176
+	515  -  MemoryUsage of job (MB)
+	527328  -  ResidentSetSize of job (KB)
+...
+004 (662.000.000) 06/06 15:53:28 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:01:12, Sys 0 00:00:02  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   3541765
+	   Memory (MB)          :      515     1500      1500
+...
+012 (662.000.000) 06/06 15:53:28 Job was held.
+	via condor_hold (by user swuchterl)
+	Code 1 Subcode 0
+...
+013 (662.000.000) 06/06 15:54:13 Job was released.
+	via condor_release (by user swuchterl)
+...
+001 (662.000.000) 06/06 15:56:14 Job executing on host: <134.61.15.24:9618?addrs=134.61.15.24-9618+[--1]-9618&noUDP&sock=1353_9fba_3>
+...
+010 (662.000.000) 06/06 15:56:29 Job was suspended.
+	Number of processes actually suspended: 3
+...
+004 (662.000.000) 06/06 16:02:01 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:00:04, Sys 0 00:00:01  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    273180
+	   Memory (MB)          :      733     1500      1500
+...
+012 (662.000.000) 06/06 16:02:01 Job was held.
+	via condor_hold (by user swuchterl)
+	Code 1 Subcode 0
+...
+013 (662.000.000) 06/06 16:02:07 Job was released.
+	via condor_release (by user swuchterl)
+...
+001 (662.000.000) 06/06 16:08:08 Job executing on host: <134.61.17.162:9618?addrs=134.61.17.162-9618+[--1]-9618&noUDP&sock=5149_5d3c_3>
+...
+010 (662.000.000) 06/06 16:12:29 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 16:12:44 Job was unsuspended.
+...
+010 (662.000.000) 06/06 16:33:53 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 16:39:34 Job was unsuspended.
+...
+010 (662.000.000) 06/06 17:01:19 Job was suspended.
+	Number of processes actually suspended: 3
+...
+004 (662.000.000) 06/06 17:03:55 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:27:27, Sys 0 00:00:22  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   1556473
+	   Memory (MB)          :      733     1500      1500
+...
+012 (662.000.000) 06/06 17:03:55 Job was held.
+	via condor_hold (by user swuchterl)
+	Code 1 Subcode 0
+...
+013 (662.000.000) 06/06 17:04:01 Job was released.
+	via condor_release (by user swuchterl)
+...
+001 (662.000.000) 06/06 17:04:02 Job executing on host: <134.61.5.33:9618?addrs=134.61.5.33-9618+[--1]-9618&noUDP&sock=1717_4c33_3>
+...
+010 (662.000.000) 06/06 17:28:42 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 17:29:07 Job was unsuspended.
+...
+010 (662.000.000) 06/06 17:29:22 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 17:29:57 Job was unsuspended.
+...
+010 (662.000.000) 06/06 17:36:32 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 17:37:37 Job was unsuspended.
+...
+010 (662.000.000) 06/06 17:38:43 Job was suspended.
+	Number of processes actually suspended: 3
+...
+011 (662.000.000) 06/06 17:38:58 Job was unsuspended.
+...
+005 (662.000.000) 06/06 17:39:03 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:21:06, Sys 0 00:00:14  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:21:06, Sys 0 00:00:14  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   3529167
+	   Memory (MB)          :      733     1500      1500
+...

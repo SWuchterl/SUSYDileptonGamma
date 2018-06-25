@@ -244,12 +244,15 @@ def getXsecFile(name):
     elif "TChiNG" in name: xsecFile = "data/xSec_SMS_TChiNG_13TeV.pkl"
     elif "M2" in name: xsecFile = "data/xsec_GGM_M1_M2.pkl"
     elif "M3" in name: xsecFile = "data/xsec_GGM_M1_M3.pkl"
+    elif "GMSB" in name: xsecFile = "data/xSec_GMSB.pkl"
     else: print "Do not know which cross section belongs to", name
     return xsecFile
 
 def getMultiScanName(inputSignal):
-    if not "M1" in inputSignal:
+    if not "M1" in inputSignal and not "GMSB" in inputSignal:
         return os.path.basename(inputSignal).split("_")[0][4:]
+    elif "GMSB" in inputSignal:
+        return os.path.basename(inputSignal).split("_")[0]
     else:
         return os.path.basename(inputSignal).split("_")[0]+os.path.basename(inputSignal).split("_")[2][:2]+os.path.basename(inputSignal).split("_")[3][:2]
 
@@ -355,7 +358,10 @@ def getSignalUncertainties(inputSignal, dirname):
     cont = [0. for b in range(1,4)]
     #cont = [0. for b in range(1,3)]
     #cont = [0. for b in range(1,5)]
-    acc = [hNominal.GetBinContent(b) for b in range(1,4)]
+    if "TChiNG" in inputSignal:
+        acc = [hNominal.GetBinContent(b)*2. for b in range(1,4)]
+    else:
+        acc = [hNominal.GetBinContent(b) for b in range(1,4)]
     #acc[2] = hNominalOld.Integral(3,100)
 
     #acc = [hNominal.GetBinContent(b) for b in range(1,3)]
@@ -390,10 +396,16 @@ def writeDataCards(outputDir, inputData, inputSignal, combi="", xsecFile=""):
 
     dc = limitTools.MyDatacard(inputData)
     for d in dirs:
+        #print d
         combi2, m1, m2 = getPointFromDir(d)
-        if not "M1" in inputSignal:
+        newD = combi2+"_"+str(m2)+"_"+str(m1)
+        newM2=m1
+        newM1=m2
+        #print newD
+        if not "M1" in inputSignal and not "GMSB" in inputSignal:
             xsec = aux.getXsecInfoSMS(m1, xsecFile)[0]
         else:
+            #print m1,m2
             xsec = aux.getXsecInfoGGM(m1,m2,xsecFile)[0]
         #acc, cont, syst = getSignalUncertainties(inputSignal, d+"/signal")
         acc, cont, syst = getSignalUncertainties(inputSignal, d+"/sig")
@@ -430,7 +442,11 @@ def writeDataCards(outputDir, inputData, inputSignal, combi="", xsecFile=""):
                 systs[sName] = dict(zip(binNames, valueList))
 
         dc.newSignal( dict(zip(binNames, acc)), systs)
+        #if not "GMSB" in inputSignal:
+            #dcName = "{}/{}.txt".format(outputDir, d)
         dcName = "{}/{}.txt".format(outputDir, d)
+        #else:
+            #dcName = "{}/{}.txt".format(outputDir, newD)
         dc.write(dcName)
 
 def callMultiCombine(outputDir):
@@ -460,7 +476,9 @@ def clearWrongCombineOutputs(outputDir):
 def build2dGraphsLimit(outputDir):
     files = glob.glob("{}/*.txt.limit".format(outputDir))
     defaultGr = ROOT.TGraph2D(len(files))
-    defaultHist = ROOT.TH2F("","",26,200,1500,26,200,1500)
+    #defaultHist = ROOT.TH2F("","",26,200,1500,26,200,1500)
+    #defaultHist = ROOT.TH2F("","",150,0,1500,150,0,1500)
+    defaultHist = ROOT.TH2F("","",40,200,1200,40,200,1200)
     graphs = dict( (x,defaultGr.Clone(x)) for x in ["obs","exp","exp1up","exp1dn","exp2up","exp2dn"] )
     hists = dict( (x,defaultHist.Clone(x)) for x in ["obs","exp","exp1up","exp1dn","exp2up","exp2dn"] )
     for g in graphs.values(): g.SetDirectory(0)
@@ -468,6 +486,9 @@ def build2dGraphsLimit(outputDir):
         m = re.match(".*_(\d+)_(\d+).txt.limit", _file)
         m1 = int(m.group(1))
         m2 = int(m.group(2))
+        if "GMSB" in outputDir:
+            m2=int(m.group(1))
+            m1=int(m.group(2))
         with open(_file) as f:
             rInfo = limitTools.infoFromOut(f.read())
             #print rInfo
@@ -558,15 +579,22 @@ def drawLimitInput(outputDir, scanName, xsecFile):
         m = re.match(".*_(\d+)_(\d+).txt", f)
         m1 = int(m.group(1))
         m2 = int(m.group(2))
-        if not "M1" in outputDir:
+        if not "M1" in outputDir and not "GMSB" in outputDir:
             xsec = aux.getXsecInfoSMS(m1, xsecFile)[0]
         else:
             xsec = aux.getXsecInfoGGM(m1,m2,xsecFile)[0]
-        graphs["xsec"].SetPoint(ifile, m1, m2, xsec)
+        if "GMSB" in outputDir:
+            graphs["xsec"].SetPoint(ifile, m2, m1, xsec)
+        else:
+            graphs["xsec"].SetPoint(ifile, m1, m2, xsec)
         dc = limitTools.MyDatacard(f)
         systDict = dict([(l[0],l) for l in dc.systs])
         for b in dc.bins:
-            graphs["Acceptance_"+b].SetPoint(ifile, m1, m2, dc.exp[b]["signal"]/(xsec*aux.intLumi))
+            if "GMSB" in outputDir:
+                graphs["Acceptance_"+b].SetPoint(ifile, m2, m1, dc.exp[b]["signal"]/(xsec*aux.intLumi))
+            else:
+                graphs["Acceptance_"+b].SetPoint(ifile, m1, m2, dc.exp[b]["signal"]/(xsec*aux.intLumi))
+                
             #for unc in uncerts:
                 #graphs[unc+"_"+b].SetPoint(ifile, m1, m2, systDict[unc][4][b]["signal"]-1)
     for name, gr in graphs.iteritems():
@@ -593,8 +621,11 @@ def getObsUncertainty(gr2d, xsecFile):
     gr2ddn.SetDirectory(0)
     points = [ (gr2d.GetX()[i], gr2d.GetY()[i], gr2d.GetZ()[i]) for i in range(gr2d.GetN()) ]
     for ip, (x,y,z) in enumerate(points):
-        if "M1" in xsecFile:
-            xsec,unc= aux.getXsecInfoGGM(x,y,xsecFile)
+        if "M1" in xsecFile or "GMSB" in xsecFile:
+            if "GMSB" in xsecFile:
+                xsec,unc= aux.getXsecInfoGGM(y,x,xsecFile)
+            else:
+                xsec,unc= aux.getXsecInfoGGM(x,y,xsecFile)
         else:
             xsec, unc = aux.getXsecInfoSMS(x, xsecFile)
         gr2dup.SetPoint(ip, x, y, z*(1-unc/100))
@@ -637,8 +668,11 @@ def getXsecLimitHist( gr2d, h, xsecFile ):
     h.SetDirectory(0) # or the next line will overwrite the hist?
     points = [ (gr2d.GetX()[i], gr2d.GetY()[i], gr2d.GetZ()[i]) for i in range(gr2d.GetN()) ]
     for x,y,z in points:
-        if "M1" in xsecFile:
-            xsec = aux.getXsecInfoGGM(x,y,xsecFile)[0]
+        if "M1" in xsecFile or "GMSB" in xsecFile:
+            if "GMSB" in xsecFile:
+                xsec = aux.getXsecInfoGGM(y,x,xsecFile)[0]
+            else:
+                xsec = aux.getXsecInfoGGM(x,y,xsecFile)[0]
         else:
             xsec = aux.getXsecInfoSMS(x, xsecFile)[0]
         h.SetBinContent(h.FindBin(x,y), z*xsec )
@@ -650,6 +684,7 @@ def getHistForModel( model ):
     elif "T6" in model: h = ROOT.TH2F("", "", 24, 975, 2175, 220, 0, 2200)
     elif "BR" in model: h = ROOT.TH2F("", "", 25, 300, 1300, 50, 0, 100)
     elif "M1M2" in model: h = ROOT.TH2F("", "", 26, 200, 1500, 26, 200, 1500)
+    elif "GMSB" in model: h = ROOT.TH2F("", "", 36, 200, 1100, 36, 200, 1100)
     else: print "Not specified model", model
     smsScan = sms.sms(model)
     h.SetTitle("{};{};{};95% CL upper limit on cross section (fb)".format(model, smsScan.sParticle, smsScan.LSP))
@@ -728,24 +763,30 @@ def signalScan(combi, version, inputData, inputSignal):
     #callMultiCombine(outputDir)
     #callMultiSignificance(outputDir)
     ######clearWrongCombineOutputs(outputDir)
-    #if "TChi" in inputSignal: return proceedWithWeakScan(outputDir, scanName, xsecFile)
-    build2dGraphs(outputDir, xsecFile)
-    build1dGraphs(outputDir, xsecFile, scanName)
+    if "TChi" in inputSignal: return proceedWithWeakScan(outputDir, scanName, xsecFile)
+    #build2dGraphs(outputDir, xsecFile)
+    #build1dGraphs(outputDir, xsecFile, scanName)
     #drawSignificance(outputDir, scanName)
-    writeSMSLimitConfig(outputDir+"/saved_graphs1d_limit.root", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName)
-    writeSMSLimitConfig("/.automount/home/home__home4/institut_1b/swuchterl/SUSYDileptonGamma/plotter/"+outputDir+"/saved_graphs1d_limit.root", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName)
-    subprocess.call(["python2", "../smsPlotter/python/makeSMSplots.py", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName, "plots/%s_limits_"%scanName])
+    #writeSMSLimitConfig(outputDir+"/saved_graphs1d_limit.root", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName)
+    #writeSMSLimitConfig("/.automount/home/home__home4/institut_1b/swuchterl/SUSYDileptonGamma/plotter/"+outputDir+"/saved_graphs1d_limit.root", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName)
+    #subprocess.call(["python2", "../smsPlotter/python/makeSMSplots.py", "../smsPlotter/config/SUS16047/%s_SUS16047.cfg"%scanName, "plots/%s_limits_"%scanName])
 
 
 if __name__ == "__main__":
     #signalScan("Zg", "v11", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-T5bbbbZg_hists.root")
     #signalScan("Zg", "v11", "limitCalculations/testDatacard.txt", "../minimal/output_noVeto/SMS-T5bbbbZg_hists.root")
-    signalScan("Zg", "v12", "limitCalculations/testDatacard.txt", "../minimal/output_noVeto/SMS-T5bbbbZg_hists.root")
+    #signalScan("Zg", "v12", "limitCalculations/testDatacard.txt", "../minimal/output_noVeto/SMS-T5bbbbZg_hists.root")
     #signalScan("Ng", "v11", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-TChiNG_BF50N50G_hists.root")
     #signalScan("GGM", "v11", "limitCalculations/testDatacard.txt", "../minimal/output/GGM_GravitinoLSP_M1-200to1500_M2-200to1500_hists.root")
+    #signalScan("GGM", "v13", "limitCalculations/testDatacard.txt", "../minimal/output/GGM_GravitinoLSP_M1-200to1500_M2-200to1500_hists.root")
+    #signalScan("GMSB", "v13", "limitCalculations/testDatacard.txt", "../minimal/output/GMSB_GravitinoLSP_N1decays_hists.root")
+    #signalScan("GMSB", "v13_scaleDoubleLumi", "limitCalculations/testDatacard.txt", "../minimal/output/GMSB_GravitinoLSP_N1decays_hists.root")
     #signalScan("Ng_BR", "v11", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-TChiNG_BF50N50G_hists.root")
     #signalScan("Ng", "v11", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-TChiNG_BF50N50G_hists.root")
     #signalScan("Ng", "v12", "limitCalculations/testDatacard.txt", "../minimal/output_noVeto/SMS-TChiNG_BF50N50G_hists.root")
+    signalScan("Ng", "v13_scaleDoubleLumi", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-TChiNG_BF50N50G_hists.root")
+    #signalScan("Zg", "v13", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-T5bbbbZg_hists.root")
+    #signalScan("Zg", "v13_normal16", "limitCalculations/testDatacard.txt", "../minimal/output/SMS-T5bbbbZg_hists.root")
     
     
     

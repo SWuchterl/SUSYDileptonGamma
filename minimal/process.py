@@ -16,73 +16,68 @@ import createConfig
 
 
 ds={
-    #"ee": [
-        #"DoubleEG_Run2016B-03Feb2017_ver2-v2_nTuple.root",
-        #"DoubleEG_Run2016C-03Feb2017-v1_nTuple.root",
-        #"DoubleEG_Run2016D-03Feb2017-v1_nTuple.root",
-        #"DoubleEG_Run2016E-03Feb2017-v1_nTuple.root",
-        #"DoubleEG_Run2016F-03Feb2017-v1_nTuple.root",
-        #"DoubleEG_Run2016G-03Feb2017-v1_nTuple.root",
-        #"DoubleEG_Run2016H-03Feb2017_ver2-v1_nTuple.root",
-        #"DoubleEG_Run2016H-03Feb2017_ver3-v1_nTuple.root" 
-        #],
-    #"mm": [
-        #"DoubleMuon_Run2016B-03Feb2017_ver2-v2_nTuple.root",
-        #"DoubleMuon_Run2016C-03Feb2017-v1_nTuple.root",
-        #"DoubleMuon_Run2016D-03Feb2017-v1_nTuple.root",
-        #"DoubleMuon_Run2016E-03Feb2017-v1_nTuple.root",
-        #"DoubleMuon_Run2016F-03Feb2017-v1_nTuple.root",
-        #"DoubleMuon_Run2016G-03Feb2017-v1_nTuple.root",
-        #"DoubleMuon_Run2016H-03Feb2017_ver2-v1_nTuple.root",
-        #"DoubleMuon_Run2016H-03Feb2017_ver3-v1_nTuple.root"
-        #],
-    #"em": [
-        #"MuonEG_Run2016B-03Feb2017_ver2-v2_nTuple.root",
-        #"MuonEG_Run2016C-03Feb2017-v1_nTuple.root",
-        #"MuonEG_Run2016D-03Feb2017-v1_nTuple.root",
-        #"MuonEG_Run2016E-03Feb2017-v1_nTuple.root",
-        #"MuonEG_Run2016F-03Feb2017-v1_nTuple.root",
-        #"MuonEG_Run2016G-03Feb2017-v1_nTuple.root",
-        #"MuonEG_Run2016H-03Feb2017_ver2-v1_nTuple.root",
-        #"MuonEG_Run2016H-03Feb2017_ver3-v1_nTuple.root"
-        #],
-    #"ht": [
-        #"JetHT_Run2016B-03Feb2017_ver2-v2_nTuple.root",
-        #"JetHT_Run2016C-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016D-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016E-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016F-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016G-03Feb2017-v1_nTuple.root",
-        #"JetHT_Run2016H-03Feb2017_ver2-v1_nTuple.root",
-        #"JetHT_Run2016H-03Feb2017_ver3-v1_nTuple.root"
-        #],
-    #"dy": [
-        ############################"DYJetsToLL_M-50_ext_nTuple.root",
-        #"DYJetsToLL_M-50-amcatnloFXFX_ext_nTuple.root",
-        #############"DYJetsToLL_M-10to50-amcatnloFXFX_ext_nTuple.root",
-        #################"DYJetsToLL_M-50-madgraphMLM_ext_nTuple.root",
-        ###########"DYJetsToLL_M-10to50-madgraphMLM_nTuple.root"
-        #],
-    #"ttg": [
-        #"TTGamma_Dilept-amcatnlo_nTuple.root"
-        #],
-    #"wwg": [
-        #"WWG-amcatnlo_ext_nTuple.root"
-        #],
-    #"ww": [
-        #"WWTo2L2Nu_nTuple.root"
-        #],
-    #"wzg": [
-        #"WZG-amcatnlo_nTuple.root"
-        #],
+    "ee": [
+        "DoubleEG_Run2016B-03Feb2017_ver2-v2_nTuple.root",
+        "DoubleEG_Run2016C-03Feb2017-v1_nTuple.root",
+        "DoubleEG_Run2016D-03Feb2017-v1_nTuple.root",
+        "DoubleEG_Run2016E-03Feb2017-v1_nTuple.root",
+        "DoubleEG_Run2016F-03Feb2017-v1_nTuple.root",
+        "DoubleEG_Run2016G-03Feb2017-v1_nTuple.root",
+        "DoubleEG_Run2016H-03Feb2017_ver2-v1_nTuple.root",
+        "DoubleEG_Run2016H-03Feb2017_ver3-v1_nTuple.root" 
+        ],
+    "mm": [
+        "DoubleMuon_Run2016B-03Feb2017_ver2-v2_nTuple.root",
+        "DoubleMuon_Run2016C-03Feb2017-v1_nTuple.root",
+        "DoubleMuon_Run2016D-03Feb2017-v1_nTuple.root",
+        "DoubleMuon_Run2016E-03Feb2017-v1_nTuple.root",
+        "DoubleMuon_Run2016F-03Feb2017-v1_nTuple.root",
+        "DoubleMuon_Run2016G-03Feb2017-v1_nTuple.root",
+        "DoubleMuon_Run2016H-03Feb2017_ver2-v1_nTuple.root",
+        "DoubleMuon_Run2016H-03Feb2017_ver3-v1_nTuple.root"
+        ],
+    "em": [
+        "MuonEG_Run2016B-03Feb2017_ver2-v2_nTuple.root",
+        "MuonEG_Run2016C-03Feb2017-v1_nTuple.root",
+        "MuonEG_Run2016D-03Feb2017-v1_nTuple.root",
+        "MuonEG_Run2016E-03Feb2017-v1_nTuple.root",
+        "MuonEG_Run2016F-03Feb2017-v1_nTuple.root",
+        "MuonEG_Run2016G-03Feb2017-v1_nTuple.root",
+        "MuonEG_Run2016H-03Feb2017_ver2-v1_nTuple.root",
+        "MuonEG_Run2016H-03Feb2017_ver3-v1_nTuple.root"
+        ],
+    "ht": [
+        "JetHT_Run2016B-03Feb2017_ver2-v2_nTuple.root",
+        "JetHT_Run2016C-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016D-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016E-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016F-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016G-03Feb2017-v1_nTuple.root",
+        "JetHT_Run2016H-03Feb2017_ver2-v1_nTuple.root",
+        "JetHT_Run2016H-03Feb2017_ver3-v1_nTuple.root"
+        ],
+    "dy": [
+        "DYJetsToLL_M-50-amcatnloFXFX_ext_nTuple.root"
+        ],
+    "ttg": [
+        "TTGamma_Dilept-amcatnlo_nTuple.root"
+        ],
+    "wwg": [
+        "WWG-amcatnlo_ext_nTuple.root"
+        ],
+    "ww": [
+        "WWTo2L2Nu_nTuple.root"
+        ],
+    "wzg": [
+        "WZG-amcatnlo_nTuple.root"
+        ],
     "wz": [
-        ########"WZTo3LNu_ext_nTuple.root"
         "WZTo3LNu_Total_nTuple.root"
         ],
     "zg": [
-        ###############"ZGTo2LG_ext_nTuple.root",
+        ##############"ZGTo2LG_ext_nTuple.root",
         "ZGTo2LG_PtG-130_nTuple.root",
-        #########"ZGTo2LG_nTuple.root"
+        ########"ZGTo2LG_nTuple.root"
         "ZGTo2LG_Total_nTuple.root"
         ],
     "zz": [
@@ -90,50 +85,49 @@ ds={
         ###########"ZZTo2L2Nu_powheg_nTuple.root",
         "ZZTo2L2Nu_powheg_Total_nTuple.root",
         ###########"ZZTo4L_powheg_ext1_nTuple.root",
-        #"ZZTo4L_powheg_nTuple.root"
+        ############"ZZTo4L_powheg_nTuple.root"
         "ZZTo4L_powheg_Total_nTuple.root"
         ],
-    #"tt":[
-        #"TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_nTuple.root"
-        #],
-    #"singletop":[
-        #"ST_s-channel_4f_leptonDecays-amcatnlo_nTuple.root",
-        #"ST_t-channel_antitop_4f_inclusiveDecaysV2_nTuple.root",
-        #"ST_t-channel_top_4f_inclusiveDecaysV2_nTuple.root",
-        #"ST_tW_antitop_5f_NoFullyHadronicDecays_ext_nTuple.root",
-        #"ST_tWll_5f_LO-MadGraph_nTuple.root",
-        #"ST_tW_top_5f_NoFullyHadronicDecays_ext_nTuple.root"
-    #],
-    "wjets":[
-        #"WJetsToLNu-amcatnloFXFX_ext_nTuple.root",
-        "WJetsToLNu-amcatnloFXFX_Total_nTuple.root",
-        #####"WJetsToLNu-amcatnloFXFX_nTuple.root"#,
-        ############"WJetsToLNu-madgraphMLM_ext_nTuple.root"
+    "tt":[
+        "TTTo2L2Nu_TuneCUETP8M2_ttHtranche3_nTuple.root"
         ],
-    #"wgamma":[
-        #"WGToLNuG-amcatnloFXFX_ext_nTuple.root"
-    #],
-#"signal":[
-        ####"SMS-T5bbbbZg_1800_1700_nTuple.root",
-        ####"SMS-T5bbbbZg_1800_400_nTuple.root",
-        #####"SMS-T5bbbbZg_1800_600_nTuple.root",
-        #"SMS-T5bbbbZg_1500_1400_nTuple.root",
-        #"SMS-T5bbbbZg_1500_400_nTuple.root",
-        #"SMS-T5bbbbZg_1500_600_nTuple.root",
-        #"SMS-T5bbbbZg_nTuple.root",
-        #"SMS-TChiNG_BF50N50G_nTuple.root",
-        #"SMS-TChiNG_400_nTuple.root",
-        #"SMS-TChiNG_600_nTuple.root",
-        #"SMS-TChiNG_1200_nTuple.root",
-        #"GGM_GravitinoLSP_M1-200to1500_M2-200to1500_nTuple.root",
-        #"GGM_GravitinoLSP_M1-50to1500_M3-1000to2500_nTuple.root"
-        #]
+    "singletop":[
+        "ST_s-channel_4f_leptonDecays-amcatnlo_nTuple.root",
+        "ST_t-channel_antitop_4f_inclusiveDecaysV2_nTuple.root",
+        "ST_t-channel_top_4f_inclusiveDecaysV2_nTuple.root",
+        "ST_tW_antitop_5f_NoFullyHadronicDecays_ext_nTuple.root",
+        "ST_tWll_5f_LO-MadGraph_nTuple.root",
+        "ST_tW_top_5f_NoFullyHadronicDecays_ext_nTuple.root"
+    ],
+    "wjets":[
+        #############"WJetsToLNu-amcatnloFXFX_ext_nTuple.root",
+        "WJetsToLNu-amcatnloFXFX_Total_nTuple.root",
+        #############"WJetsToLNu-amcatnloFXFX_nTuple.root"#,
+        ],
+    "wgamma":[
+        "WGToLNuG-amcatnloFXFX_ext_nTuple.root"
+    ],
+"signal":[
+        ######"SMS-T5bbbbZg_1800_1700_nTuple.root",
+        ######"SMS-T5bbbbZg_1800_400_nTuple.root",
+        ######"SMS-T5bbbbZg_1800_600_nTuple.root",
+        "SMS-T5bbbbZg_1500_1400_nTuple.root",
+        "SMS-T5bbbbZg_1500_400_nTuple.root",
+        "SMS-T5bbbbZg_1500_600_nTuple.root",
+        "SMS-T5bbbbZg_nTuple.root",
+        "SMS-TChiNG_BF50N50G_nTuple.root",
+        "GMSB_GravitinoLSP_N1decays_nTuple.root",
+        "SMS-TChiNG_400_nTuple.root",
+        "SMS-TChiNG_600_nTuple.root",
+        "SMS-TChiNG_1200_nTuple.root",
+        "GGM_GravitinoLSP_M1-200to1500_M2-200to1500_nTuple.root",
+        "GGM_GravitinoLSP_M1-50to1500_M3-1000to2500_nTuple.root"
+        ]
 }
     
     
-#dir = "../scratch/v10/"
-#dir = "../scratch/v11/"
-dir = "../scratch/v12/"
+#dir = "../scratch/v12/"
+dir = "../scratch/v13/"
 
 #############################################
 # Select datasets to process

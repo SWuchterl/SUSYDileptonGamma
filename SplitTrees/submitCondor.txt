@@ -1,0 +1,8 @@
+
+Universe   = vanilla
+Executable = run.sh
+Arguments  = ../scratch/v13/WZG-amcatnlo_nTuple.root 
+Log        = logs/WZG-amcatnlo_nTuple.root.log
+Output     = logs/WZG-amcatnlo_nTuple.root.out
+Error      = logs/WZG-amcatnlo_nTuple.root.error
+Queue

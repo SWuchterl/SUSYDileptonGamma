@@ -17,5 +17,16 @@ minimal/HistogramProducer_cc.so
 plotter/cards
 plotter/plots_mllWeights
 plotter/testDatacard.txt
+plotter/tmpDataCard.txt
+plotter/tmpDataCard.txt.limit
+plotter/plots_CR/
+plotter/plots_CR_dy/
+plotter/plots_CR_tt/
+plotter/plots_CR_wz/
+plotter/plots_CR_zz/
+plotter/limitCalculations/
+minimal/TreeParticlesDanilo.hpp
+minimal/AutoDict_map_int_pair_int_int___.cxx
+
 
 minimal/example.ini
