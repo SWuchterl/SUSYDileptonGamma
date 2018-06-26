@@ -3,8 +3,8 @@ import ConfigParser
 
 generalSettings = {
     #"eventPercentage" : 1.,
-    "eventPercentage" : 0.1,
-    #"eventPercentage" : 100.,
+    #"eventPercentage" : 0.1,
+    "eventPercentage" : 100.,
     "doSignalScan" : 1,
     "doSignalScanTChiNGSplit" : 1,
     "veto" : 6,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None

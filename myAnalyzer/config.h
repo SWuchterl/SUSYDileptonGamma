@@ -3,12 +3,12 @@ using namespace std;
 
 
 
-enum selectionType{UNCUT,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ,
+enum selectionType{UNCUT=0,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ,
     TRIGDILEP_ptcuts,TRIGONZ_ptcuts,TRIGSEL_ptcuts,TRIGDILEP_pt1cut,TRIGDILEP_pt2cut,
     ONZMET,ONZG,ABOVEZG,EXO,EGRegression,ONZMET100,ONZMET200,ONZMET100200,ONZMET200300,ONZMET100300,ONZMET0100,ONZMET100150,ONZMET150,
     ControlRegionDY,ControlRegionTT,ControlRegionTT080,ControlRegionTT80,ValidationRegion,ValidationRegion080,ValidationRegion80,ControlRegionZZ,LooseLeptons,ControlRegionWZ,ControlRegionWW};
     //CRDY,CRTT,CRTT080,CRTT80,VR,VR080,VR80,CRZZ,LooseLeptons,CRWZ,CRWW};
-enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
+enum Histograms1D{PT1=0,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
     HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,
     DeltaEtaLLG,DeltaPhiLLG,DeltaRLL,DeltaRLLG,ST,STG,STMET,ZPT,MTLL,MTLLG,
     CUTFLOW,CUTFLOW_fine,HOVERE,R9,SIGMAIPHIIPHIG1,DELTARGL1,DELTARGL2,MTL1MET,MTL2MET,MTGMET,MTLLMET,MTLLGMET,MT2,MOTHERID,MLLG,PT_llg,MZG_exo,gammaMotherID,genPhotonPT,
@@ -19,16 +19,16 @@ enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
     JetPt1,JetPt2,JetPt3,JetPt4,JetPhi1,JetPhi2,JetPhi3,JetPhi4,JetEta1,JetEta2,JetEta3,JetEta4,
     DeltaEtaLL_neg,DeltaPhiLL_neg,DeltaRLL_neg,NBJETS,DeltaPhiGMet,DeltaRGMet,
     FakeElectron,FakeJet,FakePhoton,Fakes};
-enum Histograms2D{ISRVFSR,PTGvsMLLG};
-enum particleType{E,M,DUMMYPARTICLE,ElMu,MuEl};
+enum Histograms2D{ISRVFSR=0,PTGvsMLLG};
+enum particleType{E=0,M,DUMMYPARTICLE,ElMu,MuEl};
 
-enum cutFlowFlags{TRIGGERED,TRIGGEREDMATCHED,LEPTONID_leading,LEPTONPT_leading,LEPTONID_trailing,LEPTONPT_trailing,PHOTON1,PHOTON1ID,PHOTON1PT,PHOTON1DR,M50,ZMASS,DIELECTRON,DIMUON,GENVETO,
+enum cutFlowFlags{TRIGGERED=0,TRIGGEREDMATCHED,LEPTONID_leading,LEPTONPT_leading,LEPTONID_trailing,LEPTONPT_trailing,PHOTON1,PHOTON1ID,PHOTON1PT,PHOTON1DR,M50,ZMASS,DIELECTRON,DIMUON,GENVETO,
     LEPTONIDPure_leading,LEPTONIDIso_leading,LEPTONIDImpact_leading,LEPTONIDEta_leading,LEPTONIDPure_trailing,LEPTONIDIso_trailing,LEPTONIDImpact_trailing,LEPTONIDEta_trailing,
     LEPTONIDDeltaR_leading,LEPTONIDDeltaR_trailing,genZLL,PHOTON1SEED,PHOTON1ETA,EMUON};
 
 
 enum selectionFolderName{ 
-    dilep,DILEPEE,DILEPMM,DILEPEM,DILEPLL,
+    dilep=0,DILEPEE,DILEPMM,DILEPEM,DILEPLL,
     photon,PHOTONEE,PHOTONMM,PHOTONEM,PHOTONLL,
     sel,SELEE,SELMM,SELEM,SELLL,
     onz,ONZEE,ONZMM,ONZEM,ONZLL,
@@ -93,12 +93,12 @@ selectionFolderName PDFNAMES[110] = {
     PDF100,PDF101,PDF102,PDF103,PDF104,PDF105,PDF106,PDF107,PDF108,PDF109,
     };
 
-enum changemet{normal,JESUP,JESDOWN,JERUP,JERDOWN};
-enum changepu{normalPU,upPU,downPU};
-enum changeLEPSF{normalLEPSF,upLEPSF,downLEPSF};
-enum changePHOTONSF{normalPHOTONSF,upPHOTONSF,downPHOTONSF};
-enum changeISR{normalISR,upISR,downISR};
-enum changeEWK{normalEWK,upEWK,downEWK};
+enum changemet{normal=0,JESUP,JESDOWN,JERUP,JERDOWN};
+enum changepu{normalPU=0,upPU,downPU};
+enum changeLEPSF{normalLEPSF=0,upLEPSF,downLEPSF};
+enum changePHOTONSF{normalPHOTONSF=0,upPHOTONSF,downPHOTONSF};
+enum changeISR{normalISR=0,upISR,downISR};
+enum changeEWK{normalEWK=0,upEWK,downEWK};
 
 map<selectionFolderName,string> selectionFolderNameString;
 void setFolderNames(){

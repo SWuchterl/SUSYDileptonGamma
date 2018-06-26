@@ -28,5 +28,7 @@ plotter/limitCalculations/
 minimal/TreeParticlesDanilo.hpp
 minimal/AutoDict_map_int_pair_int_int___.cxx
 
+myAnalyzer/logs
+SplitTrees/logs
 
 minimal/example.ini

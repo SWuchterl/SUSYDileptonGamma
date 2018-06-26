@@ -14,6 +14,11 @@
 #include "TRandom2.h"
 #include "TTree.h"
 
+#include "TKey.h"
+#include "TList.h"
+//#include "TIter.h"
+#include "TObject.h"
+
 #include "TLorentzVector.h"
 
 #include "TreeParticles.hpp"
@@ -23,9 +28,11 @@
 //#include "CutFlow.h"
 //#include "Resolution.h"
 
-
+	
+#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string/split.hpp>
 #include <iostream>
-
+//using namespace boost;
 #include "config.h"
 
 #include <chrono> //for sleeping
@@ -36,6 +43,7 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
+//#include <unordered_map>
 
 using namespace std;
 
@@ -45,6 +53,84 @@ using namespace std;
 typedef pair<UShort_t,UShort_t> SignalPoint;
 
 
+
+//selectionType,Histograms1D,Histograms2D,cutFlowFlags,selectionFolderName,changemet,changepu,changeLEPSF,changePHOTONSF,changeISR,changeEWK,
+//namespace std{
+	//template <>
+	//struct hash<selectionType>{
+		//size_t operator()(const selectionType& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<Histograms1D>{
+		//size_t operator()(const Histograms1D& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<Histograms2D>{
+		//size_t operator()(const Histograms2D& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<cutFlowFlags>{
+		//size_t operator()(const cutFlowFlags& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<selectionFolderName>{
+		//size_t operator()(const selectionFolderName& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changemet>{
+		//size_t operator()(const changemet& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changepu>{
+		//size_t operator()(const changepu& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changeLEPSF>{
+		//size_t operator()(const changeLEPSF& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changePHOTONSF>{
+		//size_t operator()(const changePHOTONSF& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changeISR>{
+		//size_t operator()(const changeISR& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<changeEWK>{
+		//size_t operator()(const changeEWK& v) const{
+			//return hash<int>()(v);
+		//}
+	//};
+	//template <>
+	//struct hash<SignalPoint>{
+		//size_t operator()(const SignalPoint& v) const{
+        //size_t h1 = std::hash<unsigned short>()(v.first);
+        //size_t h2 = std::hash<unsigned short>()(v.second);
+        //return h1 ^ ( h2 << 1 );
+		//}
+	//};
+//}
 
 
 
@@ -320,6 +406,18 @@ class myAnalyzer : public TSelector {
   long nEntries;
   SignalPoint sp_;
 
+  float puWeights[3];
+  float lepSfWeights[3];
+  float photonSfWeights[3];
+  float ewkWeights[3];
+  float isrWeights[3];
+
+  char *emptyLabelPtr;
+  char *weightLabelPtr;
+  char *metLabelPtr;
+
+
+
   //map<string,map<Histograms1D,TH1F>> h1Maps;
   //map<string,map<Histograms2D,TH2F>> h2Maps;
   
@@ -353,8 +451,8 @@ class myAnalyzer : public TSelector {
   map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>> cr1Maps;
 
 
-  map <cutFlowFlags, bool> decisionMapCutFlowFine;
-  map <cutFlowFlags, float> decisionMapCutFlowFine_weight;
+  map<cutFlowFlags, bool> decisionMapCutFlowFine;
+  map<cutFlowFlags, float> decisionMapCutFlowFine_weight;
   void clearCutFlowMap();
   
   TH1F cutFlow;
@@ -368,6 +466,8 @@ class myAnalyzer : public TSelector {
   float totalWeight;
   float totalWeightCalc;
   
+  
+
 
 
   //cutflow booleans

@@ -182,60 +182,94 @@ void myAnalyzer::Init(TTree *tree)
       config_doTrigger = false;
    }
    
+   
+     emptyLabelPtr="";
+     weightLabelPtr = "weight";
+     metLabelPtr=";#it{p}_{T}^{miss} (GeV)";
+   
+   
    //cout<<"a"<<endl;
+   
+   //map<unsigned short,unsigned short> massPointsForMaps;
+   vector<SignalPoint> massPointsForMaps;
+   massPointsForMaps.clear();
    
    if(! isTotalSignal){
       //cutFlow = *((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("TreeWriter/hCutFlow"));
       cutFlow = *((TH1F*)fReader.GetTree()->GetCurrentFile()->Get("hCutFlow"));
+      //massPointsForMaps[0]=[0];
+      sp_.first=0;
+      sp_.second=0;
+      massPointsForMaps.push_back(sp_);
+   }else{
+     TList* list = fReader.GetTree()->GetCurrentFile()->GetListOfKeys() ;
+     if (!list) { printf("<E> No keys found in file\n") ; exit(1) ; }
+     TIter next(list) ;
+     TKey* key ;
+     TObject* obj ;
+         
+     while ( (key = ((TKey*)next())) ) {
+       obj = key->ReadObj() ;
+       if (    (strcmp(obj->IsA()->GetName(),"TProfile")!=0)
+            //&& (!obj->InheritsFrom("TH2"))
+            && (!obj->InheritsFrom("TH1"))
+       && (!obj->InheritsFrom("TH1")) 
+          ) {
+         printf("<W> Object %s is not 1D or 2D histogram : "
+                "will not be converted\n",obj->GetName()) ;
+       }else{
+       
+         string text = obj->GetName();
+         vector<string> results;
+         results.clear();
+       
+         boost::split(results, text, boost::is_any_of("_"), boost::token_compress_on);
+         
+         unsigned short toFillM1=0;
+         unsigned short toFillM2=0;
+         
+         if(results.size()>1){
+            toFillM1=atoi(results.at(1).c_str());
+            toFillM2=atoi(results.at(2).c_str());
+         }else{
+            if(results.size()>0){
+               toFillM1=atoi(results.at(1).c_str());
+            }
+         }
+         //massPointsForMaps[toFillM1]=toFillM2;
+         sp_.first=toFillM1;
+         sp_.second=toFillM2;
+         massPointsForMaps.push_back(sp_);
+         }
+     }
    }
-         //cout<<"aab"<<endl;
+   
+   
+   
+   
    fReader.GetEntries(true);
-         //cout<<"ab"<<endl;
    nEntries=fReader.GetTree()->GetEntries();
-      //cout<<"b"<<endl;
+
+
+
 
   setHistoNames();
   setFolderNames();
-     //cout<<"c"<<endl;
 
-   //string pileUpHistotoUseUp;
-   //string pileUpHistotoUseDown;
-   //if((inputName.find("GMSB") != string::npos)){
-      //pileUpHistotoUseUp = "pileupWeightUp_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-      //pileUpHistotoUseDown = "pileupWeightDown_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-   //}else{
-      //if((inputName.find("GGM") != string::npos)){
-         //pileUpHistotoUseUp = "pileupWeightUp_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-         //pileUpHistotoUseDown = "pileupWeightDown_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-      //}else{
-         //if((inputName.find("SMS") != string::npos)){
-            //pileUpHistotoUseUp = "pileupWeightUp_mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU";
-            //pileUpHistotoUseDown = "pileupWeightDown_mix_2016_25ns_SpringMC_PUScenarioV1_PoissonOOTPU";
-         //}else{
-            //pileUpHistotoUseUp = "pileupWeightUp_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-            //pileUpHistotoUseDown = "pileupWeightDown_mix_2016_25ns_Moriond17MC_PoissonOOTPU";
-         //}
-      //}
-   //}
 
-   //puWeighterUp= Weighter("/home/home4/institut_1b/swuchterl/cmssw/TreeWriter_16/CMSSW_8_0_26_patch2/src/TreeWriter/PUreweighting/data/puWeights.root", pileUpHistotoUseUp);
-   //puWeighterDown= Weighter("/home/home4/institut_1b/swuchterl/cmssw/TreeWriter_16/CMSSW_8_0_26_patch2/src/TreeWriter/PUreweighting/data/puWeights.root", pileUpHistotoUseDown);
+
 
 
   
    if(isSignal){
-      //nWeights=9;
-      //nWeights=2;
       nWeights=((inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
    }else{
          //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos))? 0 : 110;
          //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos))? 0 : 9;
-         nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 110;
+         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 110;
          //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : pdf_weights->size();
          //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 50;
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
-         //nWeights=isData? 0 : 9;
-         //nWeights=9;
+         nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
    }
   
    //noPromptPhotons = inputName.find("DYJets") != string::npos;
@@ -250,6 +284,22 @@ void myAnalyzer::Init(TTree *tree)
          InitTriggerStudiesHistos();
       }else{
          InitAllHistos();
+         for(vector<SignalPoint>::iterator it = massPointsForMaps.begin(); it != massPointsForMaps.end(); it++){
+            //cout<<it->first<<" "<<it->second;
+            InitSignalScanHistos(*it);
+         }
+      }
+   }else{
+      float counter=0.;
+      float maxCounter=massPointsForMaps.size();
+      float initProgress= counter/maxCounter;
+      for(vector<SignalPoint>::iterator it = massPointsForMaps.begin(); it != massPointsForMaps.end(); it++){
+         //cout<<it->first<<" "<<it->second;
+         initProgress= counter/maxCounter;
+         //cout<<counter<<"/"<<maxCounter<<" ["<<initProgress*100.<<"%] in "<<(time(NULL) - startTime)/60 << " min" <<endl;
+         InitSignalScanHistos(*it);
+         cout<<counter<<"/"<<maxCounter<<" ["<<initProgress*100.<<"%] in "<<(time(NULL) - startTime)/60 << " min" <<endl;
+         counter+=1.;
       }
    }
       //cout<<"d"<<endl;
@@ -282,12 +332,39 @@ Bool_t myAnalyzer::Process(Long64_t entry){
 
    sp_.first=*signal_m1;
    sp_.second=*signal_m2;
+   //sp_.first=100;
+   //sp_.second=0;
 //cout<<"2"<<endl;
    totalWeight = *mc_weight * *pu_weight;
    
+   
+   //puWeights={*pu_weight,*pu_weightUp,*pu_weightDown};
+   puWeights[normalPU]=*pu_weight;
+   puWeights[upPU]=*pu_weightUp;
+   puWeights[downPU]=*pu_weightDown;
+
+   //lepSfWeights={*lepSF_weight,*lepSF_weightUp,*lepSF_weightDown};
+   lepSfWeights[normalLEPSF]=*lepSF_weight;
+   lepSfWeights[upLEPSF]=*lepSF_weightUp;
+   lepSfWeights[downLEPSF]=*lepSF_weightDown;
+   //photonSfWeights={*photonSF_weight,*photonSF_weightUp,*photonSF_weightDown};
+   photonSfWeights[normalPHOTONSF]=*photonSF_weight;
+   photonSfWeights[upPHOTONSF]=*photonSF_weightUp;
+   photonSfWeights[downPHOTONSF]=*photonSF_weightDown;
+   //ewkWeights={*ewk_weight,*ewk_weightUp,*ewk_weightDown};
+   ewkWeights[normalEWK]=*ewk_weight;
+   ewkWeights[upEWK]=*ewk_weightUp;
+   ewkWeights[downEWK]=*ewk_weightDown;
+   //isrWeights={*isr_weight,*isr_weightUp,*isr_weightDown};
+   isrWeights[normalISR]=*isr_weight;
+   isrWeights[upISR]=*isr_weightUp;
+   isrWeights[downISR]=*isr_weightDown;
+   
+   
    long progress = tempPercentage*100.;
    //if(entry%100000==0){
-   if(entry%10000==0){
+   //if(entry%10000==0){
+   if(entry%100==0){
    
 		std::cout<<"[";
 		//for(int i=0;i<100;i++)
@@ -367,12 +444,12 @@ Bool_t myAnalyzer::Process(Long64_t entry){
    }
    //cout<<"4"<<endl;
    if(!config_doTrigger){
-   if (config_docutflow) FillCutFlowHistograms();
-   if (config_docutflowfine) FillCutFlowHistograms_Fine();
-   if (!isTotalSignal){
-      clearCutFlowMap();
+      if (config_docutflow) FillCutFlowHistograms();
+      if (config_docutflowfine) FillCutFlowHistograms_Fine();
+      if (!isTotalSignal){
+         clearCutFlowMap();
+      }
    }
-}
    //cout<<"5"<<endl;
 
    //FillHistograms2D();
@@ -453,10 +530,10 @@ void myAnalyzer::FillSignalHistograms(){
             //}
             //SignalPoint sp_;
             //if(!(s1Maps.count(signalPoint)>0)){
-            if(!(s1Maps.count(sp_)>0)){
+            //if(!(s1Maps.count(sp_)>0)){
                //InitSignalScanHistos(signalPoint);
-               InitSignalScanHistos(sp_);
-            }
+               //InitSignalScanHistos(sp_);
+            //}
             auto signalPoint=sp_;
             //cout<<"a"<<endl;
             if(*isDiMuon || *isDiElectron){
@@ -464,52 +541,41 @@ void myAnalyzer::FillSignalHistograms(){
 
                //FillerSignal(float divideFactor,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a11"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(JESu),1.,9999,JESUP,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a2"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(JESd),1.,9999,JESDOWN,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(JERu),1.,9999,JERUP,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a3"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(JERd),1.,9999,JERDOWN,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(PUUP),1.,9999,normal,upPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a4"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(PUDOWN),1.,9999,normal,downPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(LEPSFUP),1.,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a5"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(LEPSFDOWN),1.,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(PHOTONSFUP),1.,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
-                                 //cout<<"a6"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(PHOTONSFDOWN),1.,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(ISRUP),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,upISR,normalEWK);
-                                 //cout<<"a7"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(ISRDOWN),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,downISR,normalEWK);
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(EWKUP),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,upEWK);
-                                 //cout<<"a8"<<endl;
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(EWKDOWN),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,downEWK);
-                                 //cout<<"a9"<<endl;
 
                for(int i=0; i<nWeights; i++){
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(PDFNAMES[i]),1.,i,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                }
                
-                           //cout<<"b"<<endl;
 
-               //if(tempPhotonLeadingPt>=80.){
+               if(tempPhotonLeadingPt>=80.){
                   //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(LL).at(nom));
-                  //FillerSignal(s1Maps.at(signalPoint).at(sig80).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-               //}else{
+                  FillerSignal(s1Maps.at(signalPoint).at(sig80).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+               }else{
                   //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(LL).at(nom));
-                  //FillerSignal(s1Maps.at(signalPoint).at(sig080).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-               //}
-                           //cout<<"c"<<endl;
+                  FillerSignal(s1Maps.at(signalPoint).at(sig080).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+               }
 
             //}
                if (*isDiElectron){
@@ -532,13 +598,14 @@ void myAnalyzer::FillSignalHistograms(){
                   for(int i=0; i<nWeights; i++){
                      FillerSignal(s1Maps.at(signalPoint).at(sig).at(EE).at(PDFNAMES[i]),1.,i,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }
-                  //if(tempPhotonLeadingPt>=80.){
+                  
+                  if(tempPhotonLeadingPt>=80.){
                      //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(EE).at(nom));
-                     //FillerSignal(s1Maps.at(signalPoint).at(sig80).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                  //}else{
+                     FillerSignal(s1Maps.at(signalPoint).at(sig80).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                  }else{
                      //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(EE).at(nom));
-                     //FillerSignal(s1Maps.at(signalPoint).at(sig080).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                  //}
+                     FillerSignal(s1Maps.at(signalPoint).at(sig080).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                  }
                }
                if (*isDiMuon){
                   //FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM));
@@ -560,13 +627,14 @@ void myAnalyzer::FillSignalHistograms(){
                   for(int i=0; i<nWeights; i++){
                      FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM).at(PDFNAMES[i]),1.,i,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }
-                  //if(tempPhotonLeadingPt>=80.){
+                  
+                  if(tempPhotonLeadingPt>=80.){
                      //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(MM).at(nom));
-                     //FillerSignal(s1Maps.at(signalPoint).at(sig80).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                  //}else{
+                     FillerSignal(s1Maps.at(signalPoint).at(sig80).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                  }else{
                      //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(MM).at(nom));
-                     //FillerSignal(s1Maps.at(signalPoint).at(sig080).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                  //}
+                     FillerSignal(s1Maps.at(signalPoint).at(sig080).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                  }
                }
             }
             if(*isElectronMuon || *isMuonElectron){
@@ -1947,81 +2015,93 @@ void myAnalyzer::FillHistograms(){
 
 //void myAnalyzer::Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,int changePDF,string changeMET){
 void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
-   float tempWeight=*mc_weight * *pu_weight;
+   //float tempWeight=*mc_weight * *pu_weight;
    
-   if(changePU==normalPU){
-      tempWeight = *mc_weight**pu_weight;
-   }
-   if(changePU==upPU){
-      tempWeight = *mc_weight**pu_weightUp;
-   }
-   if(changePU==downPU){
-      tempWeight = *mc_weight**pu_weightDown;
-   }
+   //if(changePU==normalPU){
+      //tempWeight = *mc_weight**pu_weight;
+   //}
+   //if(changePU==upPU){
+      //tempWeight = *mc_weight**pu_weightUp;
+   //}
+   //if(changePU==downPU){
+      //tempWeight = *mc_weight**pu_weightDown;
+   //}
    
    
-   float weight_TopPt=*topPt_weight;
-   float weight_nIsr=*isr_weight;
-   float weight_EWKinoPt=*ewk_weight;
-   float weight_LepSF = *lepSF_weight;
-   float weight_PhotonSF = *photonSF_weight;
+   //float weight_TopPt=*topPt_weight;
+   //float weight_nIsr=*isr_weight;
+   //float weight_EWKinoPt=*ewk_weight;
+   //float weight_LepSF = *lepSF_weight;
+   //float weight_PhotonSF = *photonSF_weight;
    
-   float weight_PDF=1.;
+   //float weight_PDF=1.;
 
+   //if(changePDF>150){
+      //weight_PDF=1.;
+   //}else{
+      //weight_PDF=pdf_weights->at(changePDF);
+   //}
+   
+   //if (changeLepSF==normalLEPSF){
+      //weight_LepSF=*lepSF_weight;
+   //}
+   //if (changeLepSF==upLEPSF){
+      //weight_LepSF=*lepSF_weightUp;
+   //}
+   //if (changeLepSF==downLEPSF){
+      //weight_LepSF=*lepSF_weightDown;
+   //}
+   
+   //if (changePhotonSF==normalPHOTONSF){
+      //weight_PhotonSF=*photonSF_weight;
+   //}
+   //if (changePhotonSF==upPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightUp;
+   //}
+   //if (changePhotonSF==downPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightDown;
+   //}
+   
+   //if(changeisr==normalISR){
+      //weight_nIsr = *isr_weight;
+   //}
+   //if(changeisr==upISR){
+      //weight_nIsr = *isr_weightUp;
+   //}
+   //if(changeisr==downISR){
+      //weight_nIsr = *isr_weightDown;
+   //}
+
+   //if(changeewk==normalEWK){
+      //weight_EWKinoPt = *ewk_weight;
+   //}
+   //if(changeewk==upEWK){
+      //weight_EWKinoPt = *ewk_weightUp;
+   //}
+   //if(changeewk==downEWK){
+      //weight_EWKinoPt = *ewk_weightDown;
+   //}
+
+
+   
+   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
+   float tempWeight=*mc_weight;
+   float weight_PDF=1.;
    if(changePDF>150){
       weight_PDF=1.;
    }else{
       weight_PDF=pdf_weights->at(changePDF);
    }
-   
-   if (changeLepSF==normalLEPSF){
-      weight_LepSF=*lepSF_weight;
-   }
-   if (changeLepSF==upLEPSF){
-      weight_LepSF=*lepSF_weightUp;
-   }
-   if (changeLepSF==downLEPSF){
-      weight_LepSF=*lepSF_weightDown;
-   }
-   
-   if (changePhotonSF==normalPHOTONSF){
-      weight_PhotonSF=*photonSF_weight;
-   }
-   if (changePhotonSF==upPHOTONSF){
-      weight_PhotonSF=*photonSF_weightUp;
-   }
-   if (changePhotonSF==downPHOTONSF){
-      weight_PhotonSF=*photonSF_weightDown;
-   }
-   
-   if(changeisr==normalISR){
-      weight_nIsr = *isr_weight;
-   }
-   if(changeisr==upISR){
-      weight_nIsr = *isr_weightUp;
-   }
-   if(changeisr==downISR){
-      weight_nIsr = *isr_weightDown;
-   }
-
-   if(changeewk==normalEWK){
-      weight_EWKinoPt = *ewk_weight;
-   }
-   if(changeewk==upEWK){
-      weight_EWKinoPt = *ewk_weightUp;
-   }
-   if(changeewk==downEWK){
-      weight_EWKinoPt = *ewk_weightDown;
-   }
-
+   tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
    
-   tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
-   
-   m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
+   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
    //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   m.at(WEIGHT_NISR).Fill(weight_nIsr);
-   m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
+   m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
+   m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
+   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
    
    if(changeMET==normal){
@@ -2179,83 +2259,96 @@ void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,i
 }
 void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& le1, selLepton& le2, selLepton& le3, selLepton& le4,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
    
-   float tempWeight=*mc_weight * *pu_weight;
+   //float tempWeight=*mc_weight * *pu_weight;
    
    
-   if(changePU==normalPU){
-      tempWeight = *mc_weight**pu_weight;
-   }
-   if(changePU==upPU){
-      tempWeight = *mc_weight**pu_weightUp;
-   }
-   if(changePU==downPU){
-      tempWeight = *mc_weight**pu_weightDown;
-   }
+   //if(changePU==normalPU){
+      //tempWeight = *mc_weight**pu_weight;
+   //}
+   //if(changePU==upPU){
+      //tempWeight = *mc_weight**pu_weightUp;
+   //}
+   //if(changePU==downPU){
+      //tempWeight = *mc_weight**pu_weightDown;
+   //}
    
    
    
-   float weight_TopPt=*topPt_weight;
-   float weight_nIsr=*isr_weight;
-   float weight_EWKinoPt=*ewk_weight;
-   float weight_LepSF = *lepSF_weight;
-   float weight_PhotonSF = *photonSF_weight;
+   //float weight_TopPt=*topPt_weight;
+   //float weight_nIsr=*isr_weight;
+   //float weight_EWKinoPt=*ewk_weight;
+   //float weight_LepSF = *lepSF_weight;
+   //float weight_PhotonSF = *photonSF_weight;
    
-   float weight_PDF=1.;
+   //float weight_PDF=1.;
 
+   //if(changePDF>150){
+      //weight_PDF=1.;
+   //}else{
+      //weight_PDF=pdf_weights->at(changePDF);
+   //}
+   
+   //if (changeLepSF==normalLEPSF){
+      //weight_LepSF=*lepSF_weight;
+   //}
+   //if (changeLepSF==upLEPSF){
+      //weight_LepSF=*lepSF_weightUp;
+   //}
+   //if (changeLepSF==downLEPSF){
+      //weight_LepSF=*lepSF_weightDown;
+   //}
+   
+   //if (changePhotonSF==normalPHOTONSF){
+      //weight_PhotonSF=*photonSF_weight;
+   //}
+   //if (changePhotonSF==upPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightUp;
+   //}
+   //if (changePhotonSF==downPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightDown;
+   //}
+   
+   //if(changeisr==normalISR){
+      //weight_nIsr = *isr_weight;
+   //}
+   //if(changeisr==upISR){
+      //weight_nIsr = *isr_weightUp;
+   //}
+   //if(changeisr==downISR){
+      //weight_nIsr = *isr_weightDown;
+   //}
+
+   //if(changeewk==normalEWK){
+      //weight_EWKinoPt = *ewk_weight;
+   //}
+   //if(changeewk==upEWK){
+      //weight_EWKinoPt = *ewk_weightUp;
+   //}
+   //if(changeewk==downEWK){
+      //weight_EWKinoPt = *ewk_weightDown;
+   //}
+
+
+   
+   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
+   float tempWeight=*mc_weight;
+   float weight_PDF=1.;
    if(changePDF>150){
       weight_PDF=1.;
    }else{
       weight_PDF=pdf_weights->at(changePDF);
    }
-   
-   if (changeLepSF==normalLEPSF){
-      weight_LepSF=*lepSF_weight;
-   }
-   if (changeLepSF==upLEPSF){
-      weight_LepSF=*lepSF_weightUp;
-   }
-   if (changeLepSF==downLEPSF){
-      weight_LepSF=*lepSF_weightDown;
-   }
-   
-   if (changePhotonSF==normalPHOTONSF){
-      weight_PhotonSF=*photonSF_weight;
-   }
-   if (changePhotonSF==upPHOTONSF){
-      weight_PhotonSF=*photonSF_weightUp;
-   }
-   if (changePhotonSF==downPHOTONSF){
-      weight_PhotonSF=*photonSF_weightDown;
-   }
-   
-   if(changeisr==normalISR){
-      weight_nIsr = *isr_weight;
-   }
-   if(changeisr==upISR){
-      weight_nIsr = *isr_weightUp;
-   }
-   if(changeisr==downISR){
-      weight_nIsr = *isr_weightDown;
-   }
-
-   if(changeewk==normalEWK){
-      weight_EWKinoPt = *ewk_weight;
-   }
-   if(changeewk==upEWK){
-      weight_EWKinoPt = *ewk_weightUp;
-   }
-   if(changeewk==downEWK){
-      weight_EWKinoPt = *ewk_weightDown;
-   }
-
+   tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
    
-   tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
    
-   m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
+   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
    //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   m.at(WEIGHT_NISR).Fill(weight_nIsr);
-   m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
+   m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
+   m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
+   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
 
    
@@ -2401,82 +2494,96 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
 
 void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& le1, selLepton& le2, selLepton& le3,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
    
-   float tempWeight=*mc_weight * *pu_weight;
+   //float tempWeight=*mc_weight * *pu_weight;
    
    
-   if(changePU==normalPU){
-      tempWeight = *mc_weight**pu_weight;
-   }
-   if(changePU==upPU){
-      tempWeight = *mc_weight**pu_weightUp;
-   }
-   if(changePU==downPU){
-      tempWeight = *mc_weight**pu_weightDown;
-   }
+   //if(changePU==normalPU){
+      //tempWeight = *mc_weight**pu_weight;
+   //}
+   //if(changePU==upPU){
+      //tempWeight = *mc_weight**pu_weightUp;
+   //}
+   //if(changePU==downPU){
+      //tempWeight = *mc_weight**pu_weightDown;
+   //}
    
    
-   float weight_TopPt=*topPt_weight;
-   float weight_nIsr=*isr_weight;
-   float weight_EWKinoPt=*ewk_weight;
-   float weight_LepSF = *lepSF_weight;
-   float weight_PhotonSF = *photonSF_weight;
+   //float weight_TopPt=*topPt_weight;
+   //float weight_nIsr=*isr_weight;
+   //float weight_EWKinoPt=*ewk_weight;
+   //float weight_LepSF = *lepSF_weight;
+   //float weight_PhotonSF = *photonSF_weight;
    
-   float weight_PDF=1.;
+   //float weight_PDF=1.;
 
+   //if(changePDF>150){
+      //weight_PDF=1.;
+   //}else{
+      //weight_PDF=pdf_weights->at(changePDF);
+   //}
+   
+   //if (changeLepSF==normalLEPSF){
+      //weight_LepSF=*lepSF_weight;
+   //}
+   //if (changeLepSF==upLEPSF){
+      //weight_LepSF=*lepSF_weightUp;
+   //}
+   //if (changeLepSF==downLEPSF){
+      //weight_LepSF=*lepSF_weightDown;
+   //}
+   
+   //if (changePhotonSF==normalPHOTONSF){
+      //weight_PhotonSF=*photonSF_weight;
+   //}
+   //if (changePhotonSF==upPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightUp;
+   //}
+   //if (changePhotonSF==downPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightDown;
+   //}
+   
+   //if(changeisr==normalISR){
+      //weight_nIsr = *isr_weight;
+   //}
+   //if(changeisr==upISR){
+      //weight_nIsr = *isr_weightUp;
+   //}
+   //if(changeisr==downISR){
+      //weight_nIsr = *isr_weightDown;
+   //}
+
+   //if(changeewk==normalEWK){
+      //weight_EWKinoPt = *ewk_weight;
+   //}
+   //if(changeewk==upEWK){
+      //weight_EWKinoPt = *ewk_weightUp;
+   //}
+   //if(changeewk==downEWK){
+      //weight_EWKinoPt = *ewk_weightDown;
+   //}
+
+
+   
+   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
+   
+   float tempWeight=*mc_weight;
+   float weight_PDF=1.;
    if(changePDF>150){
       weight_PDF=1.;
    }else{
       weight_PDF=pdf_weights->at(changePDF);
    }
-   
-   if (changeLepSF==normalLEPSF){
-      weight_LepSF=*lepSF_weight;
-   }
-   if (changeLepSF==upLEPSF){
-      weight_LepSF=*lepSF_weightUp;
-   }
-   if (changeLepSF==downLEPSF){
-      weight_LepSF=*lepSF_weightDown;
-   }
-   
-   if (changePhotonSF==normalPHOTONSF){
-      weight_PhotonSF=*photonSF_weight;
-   }
-   if (changePhotonSF==upPHOTONSF){
-      weight_PhotonSF=*photonSF_weightUp;
-   }
-   if (changePhotonSF==downPHOTONSF){
-      weight_PhotonSF=*photonSF_weightDown;
-   }
-   
-   if(changeisr==normalISR){
-      weight_nIsr = *isr_weight;
-   }
-   if(changeisr==upISR){
-      weight_nIsr = *isr_weightUp;
-   }
-   if(changeisr==downISR){
-      weight_nIsr = *isr_weightDown;
-   }
-
-   if(changeewk==normalEWK){
-      weight_EWKinoPt = *ewk_weight;
-   }
-   if(changeewk==upEWK){
-      weight_EWKinoPt = *ewk_weightUp;
-   }
-   if(changeewk==downEWK){
-      weight_EWKinoPt = *ewk_weightDown;
-   }
-
+   tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
    
-   tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
    
-   m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
+   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
    //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   m.at(WEIGHT_NISR).Fill(weight_nIsr);
-   m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
+   m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
+   m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
+   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
    
    if(changeMET==normal){
@@ -2694,98 +2801,91 @@ void myAnalyzer::FillerTrigger(map<Histograms1D,TEfficiency>& m,bool withPhoton,
 
 //void myAnalyzer::FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m, float divideFactor=1.){
 void myAnalyzer::FillerSignal(map<Histograms1D,TH1F>& m, float divideFactor,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
-//cout<<"fill 1"<<endl;
-   float tempWeight=*mc_weight * *pu_weight;
+   //float tempWeight=*mc_weight * *pu_weight;
+   float tempWeight=*mc_weight;
    
-   if(changePU==normalPU){
-      tempWeight = *mc_weight**pu_weight;
-   }
-   if(changePU==upPU){
-      tempWeight = *mc_weight**pu_weightUp;
-   }
-   if(changePU==downPU){
-      tempWeight = *mc_weight**pu_weightDown;
-   }
-   //cout<<"fill 2"<<endl;
-
+   //if(changePU==normalPU){
+      //tempWeight = *mc_weight**pu_weight;
+   //}
+   //if(changePU==upPU){
+      //tempWeight = *mc_weight**pu_weightUp;
+   //}
+   //if(changePU==downPU){
+      //tempWeight = *mc_weight**pu_weightDown;
+   //}
    
-   float weight_TopPt=*topPt_weight;
-   float weight_nIsr=*isr_weight;
-      //cout<<"fill 21"<<endl;
+   
+   //float weight_TopPt=*topPt_weight;
+   //float weight_nIsr=*isr_weight;
 
-   float weight_EWKinoPt=*ewk_weight;
-   float weight_LepSF = *lepSF_weight;
-      //cout<<"fill 22"<<endl;
+   //float weight_EWKinoPt=*ewk_weight;
+   //float weight_LepSF = *lepSF_weight;
 
-   float weight_PhotonSF = *photonSF_weight;
-      //cout<<"fill 23"<<endl;
+   //float weight_PhotonSF = *photonSF_weight;
 
    float weight_PDF=1.;
-   //cout<<"fill 24"<<endl;
-   //cout<<pdf_weights->size()<<endl;
    if(changePDF>150){
       weight_PDF=1.;
    }else{
       weight_PDF=pdf_weights->at(changePDF);
    }
-   //cout<<"fill 3"<<endl;
 
-   if (changeLepSF==normalLEPSF){
-      weight_LepSF=*lepSF_weight;
-   }
-   if (changeLepSF==upLEPSF){
-      weight_LepSF=*lepSF_weightUp;
-   }
-   if (changeLepSF==downLEPSF){
-      weight_LepSF=*lepSF_weightDown;
-   }
+   //if (changeLepSF==normalLEPSF){
+      //weight_LepSF=*lepSF_weight;
+   //}
+   //if (changeLepSF==upLEPSF){
+      //weight_LepSF=*lepSF_weightUp;
+   //}
+   //if (changeLepSF==downLEPSF){
+      //weight_LepSF=*lepSF_weightDown;
+   //}
    
-   if (changePhotonSF==normalPHOTONSF){
-      weight_PhotonSF=*photonSF_weight;
-   }
-   if (changePhotonSF==upPHOTONSF){
-      weight_PhotonSF=*photonSF_weightUp;
-   }
-   if (changePhotonSF==downPHOTONSF){
-      weight_PhotonSF=*photonSF_weightDown;
-   }
+   //if (changePhotonSF==normalPHOTONSF){
+      //weight_PhotonSF=*photonSF_weight;
+   //}
+   //if (changePhotonSF==upPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightUp;
+   //}
+   //if (changePhotonSF==downPHOTONSF){
+      //weight_PhotonSF=*photonSF_weightDown;
+   //}
    
-   if(changeisr==normalISR){
-      weight_nIsr = *isr_weight;
-   }
-   if(changeisr==upISR){
-      weight_nIsr = *isr_weightUp;
-   }
-   if(changeisr==downISR){
-      weight_nIsr = *isr_weightDown;
-   }
+   //if(changeisr==normalISR){
+      //weight_nIsr = *isr_weight;
+   //}
+   //if(changeisr==upISR){
+      //weight_nIsr = *isr_weightUp;
+   //}
+   //if(changeisr==downISR){
+      //weight_nIsr = *isr_weightDown;
+   //}
 
-   if(changeewk==normalEWK){
-      weight_EWKinoPt = *ewk_weight;
-   }
-   if(changeewk==upEWK){
-      weight_EWKinoPt = *ewk_weightUp;
-   }
-   if(changeewk==downEWK){
-      weight_EWKinoPt = *ewk_weightDown;
-   }
+   //if(changeewk==normalEWK){
+      //weight_EWKinoPt = *ewk_weight;
+   //}
+   //if(changeewk==upEWK){
+      //weight_EWKinoPt = *ewk_weightUp;
+   //}
+   //if(changeewk==downEWK){
+      //weight_EWKinoPt = *ewk_weightDown;
+   //}
 
-//cout<<"fill 4"<<endl;
 
    
-   tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
+   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
+   tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
    
-   //cout<<"fill 4.5"<<endl;
 
    
-   m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
-   //cout<<"fill 4.55"<<endl;
+   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
 
    //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   m.at(WEIGHT_NISR).Fill(weight_nIsr);
-   m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
+   m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
+   m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
+   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
+   m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
-   //cout<<"fill 5"<<endl;
 
    if(changeMET==normal){
       m.at(ETMISS).Fill(*ETmiss, tempWeight*1./(nGen/divideFactor));
@@ -3012,117 +3112,117 @@ void myAnalyzer::InitCutFlowHistos_Fine(){
 map<Histograms1D,TH1F> myAnalyzer::InitHistograms(const selectionType selection_){
    map<Histograms1D,TH1F> hMap;
 
-   hMap[ETMISS] = TH1F("", ";#it{p}_{T}^{miss} (GeV)", 5000, 0, 5000);
-   hMap[PT1] = TH1F("", ";#it{p}_{T}^{leading} (GeV)", 5000, 0, 5000);
-   hMap[PT2] = TH1F("", ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
-   hMap[MLL] = TH1F("", ";#it{m}_{ll} (GeV)", 5000, 0, 5000);
-   hMap[NPHOTONS] = TH1F("","n_#gamma",10,0,10);
-   hMap[NVTX] = TH1F("","n_{Vtx}",60,0,60);
-   hMap[HT] = TH1F("","#it{H}_{T} (GeV)",5000,0,5000);
-   hMap[GENHT] = TH1F("","#it{H}_{T}^{gen} (GeV)",5000,0,5000);
-   hMap[NJETS] = TH1F("","n_{Jets}",20,0,20);
-   hMap[NBJETS] = TH1F("","n_{BJets}",20,0,20);
-   hMap[ETA1] = TH1F("", ";|#eta_{trailing}|", 260, 0, 2.6);
-   hMap[ETA2] = TH1F("", ";|#eta_{leading}|", 260, 0, 2.6);
-   hMap[PHI1] = TH1F("", ";|#phi_{trailing}|", 350, 0, 3.5);
-   hMap[PHI2] = TH1F("", ";|#phi_{leading}|", 350, 0, 3.5);
-   hMap[ZPT] = TH1F("", ";Z_{p_T}", 5000, 0, 5000);
-   hMap[ST] = TH1F("", ";S_T", 5000, 0, 5000.);
-   hMap[MT2] = TH1F("", ";M_{T2}", 50000, 0, 5000.);
-   hMap[VetoCompare] = TH1F("", "", 2, 0, 2);
-   hMap[NElectrons] = TH1F("","nElectrons",20,0,20);
-   hMap[NMuons] = TH1F("","nMuons",20,0,20);
+   hMap[ETMISS] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{miss} (GeV)", 5000, 0, 5000);
+   hMap[PT1] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{leading} (GeV)", 5000, 0, 5000);
+   hMap[PT2] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
+   hMap[MLL] = TH1F(emptyLabelPtr, ";#it{m}_{ll} (GeV)", 5000, 0, 5000);
+   hMap[NPHOTONS] = TH1F(emptyLabelPtr,"n_#gamma",10,0,10);
+   hMap[NVTX] = TH1F(emptyLabelPtr,"n_{Vtx}",60,0,60);
+   hMap[HT] = TH1F(emptyLabelPtr,"#it{H}_{T} (GeV)",5000,0,5000);
+   hMap[GENHT] = TH1F(emptyLabelPtr,"#it{H}_{T}^{gen} (GeV)",5000,0,5000);
+   hMap[NJETS] = TH1F(emptyLabelPtr,"n_{Jets}",20,0,20);
+   hMap[NBJETS] = TH1F(emptyLabelPtr,"n_{BJets}",20,0,20);
+   hMap[ETA1] = TH1F(emptyLabelPtr, ";|#eta_{trailing}|", 260, 0, 2.6);
+   hMap[ETA2] = TH1F(emptyLabelPtr, ";|#eta_{leading}|", 260, 0, 2.6);
+   hMap[PHI1] = TH1F(emptyLabelPtr, ";|#phi_{trailing}|", 350, 0, 3.5);
+   hMap[PHI2] = TH1F(emptyLabelPtr, ";|#phi_{leading}|", 350, 0, 3.5);
+   hMap[ZPT] = TH1F(emptyLabelPtr, ";Z_{p_T}", 5000, 0, 5000);
+   hMap[ST] = TH1F(emptyLabelPtr, ";S_T", 5000, 0, 5000.);
+   hMap[MT2] = TH1F(emptyLabelPtr, ";M_{T2}", 50000, 0, 5000.);
+   hMap[VetoCompare] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
+   hMap[NElectrons] = TH1F(emptyLabelPtr,"nElectrons",20,0,20);
+   hMap[NMuons] = TH1F(emptyLabelPtr,"nMuons",20,0,20);
 
-   hMap[JetPt1] = TH1F("", ";#it{p}_{T}^{Jet 1} (GeV)", 5000, 0, 5000);
-   hMap[JetPt2] = TH1F("", ";#it{p}_{T}^{Jet 2} (GeV)", 5000, 0, 5000);
-   hMap[JetPt3] = TH1F("", ";#it{p}_{T}^{Jet 3} (GeV)", 5000, 0, 5000);
-   hMap[JetPt4] = TH1F("", ";#it{p}_{T}^{Jet 4} (GeV)", 5000, 0, 5000);
-   hMap[JetPhi1] = TH1F("", ";|#phi_{Jet 1}|", 350, 0, 3.5);
-   hMap[JetPhi2] = TH1F("", ";|#phi_{Jet 2}|", 350, 0, 3.5);
-   hMap[JetPhi3] = TH1F("", ";|#phi_{Jet 3}|", 350, 0, 3.5);
-   hMap[JetPhi4] = TH1F("", ";|#phi_{Jet 4}|", 350, 0, 3.5);
-   hMap[JetEta1] = TH1F("", ";|#eta_{Jet 1}|", 260, 0, 2.6);
-   hMap[JetEta2] = TH1F("", ";|#eta_{Jet 2}|", 260, 0, 2.6);
-   hMap[JetEta3] = TH1F("", ";|#eta_{Jet 3}|", 260, 0, 2.6);
-   hMap[JetEta4] = TH1F("", ";|#eta_{Jet 4}|", 260, 0, 2.6);
+   hMap[JetPt1] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{Jet 1} (GeV)", 5000, 0, 5000);
+   hMap[JetPt2] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{Jet 2} (GeV)", 5000, 0, 5000);
+   hMap[JetPt3] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{Jet 3} (GeV)", 5000, 0, 5000);
+   hMap[JetPt4] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{Jet 4} (GeV)", 5000, 0, 5000);
+   hMap[JetPhi1] = TH1F(emptyLabelPtr, ";|#phi_{Jet 1}|", 350, 0, 3.5);
+   hMap[JetPhi2] = TH1F(emptyLabelPtr, ";|#phi_{Jet 2}|", 350, 0, 3.5);
+   hMap[JetPhi3] = TH1F(emptyLabelPtr, ";|#phi_{Jet 3}|", 350, 0, 3.5);
+   hMap[JetPhi4] = TH1F(emptyLabelPtr, ";|#phi_{Jet 4}|", 350, 0, 3.5);
+   hMap[JetEta1] = TH1F(emptyLabelPtr, ";|#eta_{Jet 1}|", 260, 0, 2.6);
+   hMap[JetEta2] = TH1F(emptyLabelPtr, ";|#eta_{Jet 2}|", 260, 0, 2.6);
+   hMap[JetEta3] = TH1F(emptyLabelPtr, ";|#eta_{Jet 3}|", 260, 0, 2.6);
+   hMap[JetEta4] = TH1F(emptyLabelPtr, ";|#eta_{Jet 4}|", 260, 0, 2.6);
 
-   hMap[WEIGHT_NISR] = TH1F("","weight",10000,0,10);
-   hMap[WEIGHT_TOPPT] = TH1F("","weight",10000,0,10);
-   hMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
-   //hMap[WEIGHT_LEPTONPAIRPT] = TH1F("","weight",10000,0,10);
-   hMap[WEIGHT_PDF]=TH1F("","weight",10000,0,10);
+   hMap[WEIGHT_NISR] = TH1F(emptyLabelPtr,"weight",10000,0,10);
+   hMap[WEIGHT_TOPPT] = TH1F(emptyLabelPtr,"weight",10000,0,10);
+   hMap[WEIGHT_EWKINOPAIRPT] = TH1F(emptyLabelPtr,"weight",10000,0,10);
+   //hMap[WEIGHT_LEPTONPAIRPT] = TH1F(emptyLabelPtr,"weight",10000,0,10);
+   hMap[WEIGHT_PDF]=TH1F(emptyLabelPtr,"weight",10000,0,10);
 
 
-   hMap[DeltaEtaLL] = TH1F("", ";#Delta#Eta_{ll}", 24000, -12., 12.);
-   hMap[DeltaPhiLL] = TH1F("", ";#Delta#Phi_{ll}", 24000, -12., 12.);
-   hMap[DeltaRLL] = TH1F("", ";#DeltaR_{ll}", 24000, -12, 12.);
+   hMap[DeltaEtaLL] = TH1F(emptyLabelPtr, ";#Delta#Eta_{ll}", 24000, -12., 12.);
+   hMap[DeltaPhiLL] = TH1F(emptyLabelPtr, ";#Delta#Phi_{ll}", 24000, -12., 12.);
+   hMap[DeltaRLL] = TH1F(emptyLabelPtr, ";#DeltaR_{ll}", 24000, -12, 12.);
 
-   hMap[DeltaEtaLL_neg] = TH1F("", ";#Delta#Eta_{ll}", 24000, -12., 12.);
-   hMap[DeltaPhiLL_neg] = TH1F("", ";#Delta#Phi_{ll}", 24000, -12., 12.);
-   hMap[DeltaRLL_neg] = TH1F("", ";#DeltaR_{ll}", 24000, -12., 12.);
+   hMap[DeltaEtaLL_neg] = TH1F(emptyLabelPtr, ";#Delta#Eta_{ll}", 24000, -12., 12.);
+   hMap[DeltaPhiLL_neg] = TH1F(emptyLabelPtr, ";#Delta#Phi_{ll}", 24000, -12., 12.);
+   hMap[DeltaRLL_neg] = TH1F(emptyLabelPtr, ";#DeltaR_{ll}", 24000, -12., 12.);
          //
    if(selection_!=ControlRegionZZ){
-   hMap[DeltaPhiLLMet] = TH1F("", "#Delta#Phi_{ll,MET}", 24000, -12., 12.);
-   hMap[DeltaEtaLLMet] = TH1F("", ";#Delta#Eta_{ll,MET}", 24000, -12., 12.);
-   hMap[DeltaRLLMet] = TH1F("", "#DeltaR_{ll,MET}", 24000, -12., 12.);
-   hMap[MTLL] = TH1F("", ";m_{T}^{ll}", 5000, 0, 5000); 
+   hMap[DeltaPhiLLMet] = TH1F(emptyLabelPtr, "#Delta#Phi_{ll,MET}", 24000, -12., 12.);
+   hMap[DeltaEtaLLMet] = TH1F(emptyLabelPtr, ";#Delta#Eta_{ll,MET}", 24000, -12., 12.);
+   hMap[DeltaRLLMet] = TH1F(emptyLabelPtr, "#DeltaR_{ll,MET}", 24000, -12., 12.);
+   hMap[MTLL] = TH1F(emptyLabelPtr, ";m_{T}^{ll}", 5000, 0, 5000); 
    }
 
    if(selection_==ControlRegionZZ){
-      hMap[PT3] = TH1F("", ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
-      hMap[PT4] = TH1F("", ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
-      hMap[ETA3] = TH1F("", ";|#eta_{leading}|", 260, 0, 2.6);
-      hMap[ETA4] = TH1F("", ";|#eta_{leading}|", 260, 0, 2.6);
-      hMap[PHI3] = TH1F("", ";|#phi_{leading}|", 350, 0, 3.5);
-      hMap[PHI4] = TH1F("", ";|#phi_{leading}|", 350, 0, 3.5);
-      hMap[ZPT2] = TH1F("", ";Z_{p_T}", 5000, 0, 5000);
-      hMap[MLL2] = TH1F("", ";#it{m}_{ll} (GeV)", 5000, 0, 5000);
-      hMap[MTL3MET] = TH1F("", ";#it{m}_{T}^{l2,Met} (GeV)", 5000, 0, 5000);
-      hMap[MLLLL] = TH1F("", ";#it{m}_{llll} (GeV)", 5000, 0, 5000);
+      hMap[PT3] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
+      hMap[PT4] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{trailing} (GeV)", 5000, 0, 5000);
+      hMap[ETA3] = TH1F(emptyLabelPtr, ";|#eta_{leading}|", 260, 0, 2.6);
+      hMap[ETA4] = TH1F(emptyLabelPtr, ";|#eta_{leading}|", 260, 0, 2.6);
+      hMap[PHI3] = TH1F(emptyLabelPtr, ";|#phi_{leading}|", 350, 0, 3.5);
+      hMap[PHI4] = TH1F(emptyLabelPtr, ";|#phi_{leading}|", 350, 0, 3.5);
+      hMap[ZPT2] = TH1F(emptyLabelPtr, ";Z_{p_T}", 5000, 0, 5000);
+      hMap[MLL2] = TH1F(emptyLabelPtr, ";#it{m}_{ll} (GeV)", 5000, 0, 5000);
+      hMap[MTL3MET] = TH1F(emptyLabelPtr, ";#it{m}_{T}^{l2,Met} (GeV)", 5000, 0, 5000);
+      hMap[MLLLL] = TH1F(emptyLabelPtr, ";#it{m}_{llll} (GeV)", 5000, 0, 5000);
       
    }
    
    if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)){
       
-      //hMap[FakeElectron] = TH1F("", "", 2, 0, 2);
-      //hMap[FakeJet] = TH1F("", "", 2, 0, 2);
-      //hMap[FakePhoton] = TH1F("", "", 2, 0, 2);
-      hMap[Fakes] = TH1F("", "", 5, 0, 5);
+      //hMap[FakeElectron] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
+      //hMap[FakeJet] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
+      //hMap[FakePhoton] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
+      hMap[Fakes] = TH1F(emptyLabelPtr, emptyLabelPtr, 5, 0, 5);
       
       
-      hMap[PTG1] = TH1F("", ";#it{p}_{T}^{#gamma 1} (GeV)", 5000, 0, 5000);
-      hMap[ETAG1] = TH1F("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
-      hMap[PHIG1] = TH1F("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
-      hMap[SIGMAIETAIETAG1] = TH1F("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
-      hMap[SIGMAIPHIIPHIG1] = TH1F("", ";#sigma_{i#phii#phi}^{#gamma 1}", 2000, 0, 0.2);
-      hMap[R9] = TH1F("", ";r9", 1500, 0, 1.5);
-      hMap[HOVERE] = TH1F("", ";H/E", 1000, 0, 0.1);
-      hMap[DELTARGL1] = TH1F("", ";#DeltaR_{l1,#gamma}", 24000, -12., 12.);
-      hMap[DELTARGL2] = TH1F("", ";#DeltaR_{l2,#gamma}", 24000, -12., 12.);
-      hMap[DeltaRLLG] = TH1F("", ";#DeltaR_{ll,#gamma}", 24000, -12., 12.);
-      hMap[DeltaEtaLLG] = TH1F("", ";#Delta#Eta_{ll,#gamma}", 2400, -12., 12.);
-      hMap[DeltaPhiLLG] = TH1F("", ";#Delta#Phi_{ll,#gamma}", 2400, -12., 12.);
-      hMap[DeltaPhiGMet] = TH1F("", ";#Delta#Phi_{met,#gamma}", 2400, -12., 6.);
-      hMap[DeltaRGMet] = TH1F("", ";#DeltaR_{met,#gamma}", 2400, -12., 6.);
-      hMap[STG] = TH1F("", ";S_T", 5000, 0, 5000.);
-      hMap[STMET] = TH1F("", ";S_T + #it{p}_{T}^{miss} (GeV)", 5000, 0, 5000.);   
-      hMap[MTLLG] = TH1F("", ";m_{T}^{ll#gamma}", 5000, 0, 5000);
-      hMap[MTL1MET] = TH1F("", ";m_{T}^{l1,met}", 5000, 0, 5000);
-      hMap[MTL2MET] = TH1F("", ";m_{T}^{l2,met}", 5000, 0, 5000);
-      hMap[MTGMET] = TH1F("", ";m_{T}^{#gamma,met}", 5000, 0, 5000);
-      hMap[MTLLMET] = TH1F("", ";m_{T}^{ll,met}", 5000, 0, 5000);
-      hMap[MTLLGMET] = TH1F("", ";m_{T}^{ll#gamma,met}", 5000, 0, 5000);
-      hMap[MOTHERID] = TH1F("", ";ID_{mother}", 200, 0, 200);
-      hMap[MLLG] = TH1F("", ";ID_{ll#gamma}", 5000, 0, 5000);
-      hMap[PT_llg] = TH1F("", ";p_{T}^{ll#gamma}", 5000, 0, 5000);
-      hMap[MZG_exo] = TH1F("", ";m_{Z#gamma}", 5000, 0, 5000);
-      hMap[gammaMotherID] = TH1F("", ";motherID_{#gamma}", 5000, 0, 5000);
-      hMap[genPhotonPT] = TH1F("", ";gen p_T^{#gamma,matched}", 5000, 0, 5000);
-      hMap[genPhotonPT_Veto] = TH1F("", ";gen p_T^{#gamma,matched,veto}", 5000, 0, 5000);
-      hMap[PTG1_Veto] = TH1F("", ";gen p_T^{#gamma,veto}", 5000, 0, 5000);
-      hMap[genPhotonPT_NoVeto] = TH1F("", ";gen p_T^{#gamma,matched,Noveto}", 5000, 0, 5000);
-      hMap[PTG1_NoVeto] = TH1F("", ";gen p_T^{#gamma,Noveto}", 5000, 0, 5000);
-      //hMap[VetoCompare] = TH1F("", "", 2, 0, 2);
+      hMap[PTG1] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{#gamma 1} (GeV)", 5000, 0, 5000);
+      hMap[ETAG1] = TH1F(emptyLabelPtr, ";|#eta_{#gamma 1}|", 260, 0, 2.6);
+      hMap[PHIG1] = TH1F(emptyLabelPtr, ";|#phi_{#gamma 1}|", 350, 0, 3.5);
+      hMap[SIGMAIETAIETAG1] = TH1F(emptyLabelPtr, ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
+      hMap[SIGMAIPHIIPHIG1] = TH1F(emptyLabelPtr, ";#sigma_{i#phii#phi}^{#gamma 1}", 2000, 0, 0.2);
+      hMap[R9] = TH1F(emptyLabelPtr, ";r9", 1500, 0, 1.5);
+      hMap[HOVERE] = TH1F(emptyLabelPtr, ";H/E", 1000, 0, 0.1);
+      hMap[DELTARGL1] = TH1F(emptyLabelPtr, ";#DeltaR_{l1,#gamma}", 24000, -12., 12.);
+      hMap[DELTARGL2] = TH1F(emptyLabelPtr, ";#DeltaR_{l2,#gamma}", 24000, -12., 12.);
+      hMap[DeltaRLLG] = TH1F(emptyLabelPtr, ";#DeltaR_{ll,#gamma}", 24000, -12., 12.);
+      hMap[DeltaEtaLLG] = TH1F(emptyLabelPtr, ";#Delta#Eta_{ll,#gamma}", 2400, -12., 12.);
+      hMap[DeltaPhiLLG] = TH1F(emptyLabelPtr, ";#Delta#Phi_{ll,#gamma}", 2400, -12., 12.);
+      hMap[DeltaPhiGMet] = TH1F(emptyLabelPtr, ";#Delta#Phi_{met,#gamma}", 2400, -12., 6.);
+      hMap[DeltaRGMet] = TH1F(emptyLabelPtr, ";#DeltaR_{met,#gamma}", 2400, -12., 6.);
+      hMap[STG] = TH1F(emptyLabelPtr, ";S_T", 5000, 0, 5000.);
+      hMap[STMET] = TH1F(emptyLabelPtr, ";S_T + #it{p}_{T}^{miss} (GeV)", 5000, 0, 5000.);   
+      hMap[MTLLG] = TH1F(emptyLabelPtr, ";m_{T}^{ll#gamma}", 5000, 0, 5000);
+      hMap[MTL1MET] = TH1F(emptyLabelPtr, ";m_{T}^{l1,met}", 5000, 0, 5000);
+      hMap[MTL2MET] = TH1F(emptyLabelPtr, ";m_{T}^{l2,met}", 5000, 0, 5000);
+      hMap[MTGMET] = TH1F(emptyLabelPtr, ";m_{T}^{#gamma,met}", 5000, 0, 5000);
+      hMap[MTLLMET] = TH1F(emptyLabelPtr, ";m_{T}^{ll,met}", 5000, 0, 5000);
+      hMap[MTLLGMET] = TH1F(emptyLabelPtr, ";m_{T}^{ll#gamma,met}", 5000, 0, 5000);
+      hMap[MOTHERID] = TH1F(emptyLabelPtr, ";ID_{mother}", 200, 0, 200);
+      hMap[MLLG] = TH1F(emptyLabelPtr, ";ID_{ll#gamma}", 5000, 0, 5000);
+      hMap[PT_llg] = TH1F(emptyLabelPtr, ";p_{T}^{ll#gamma}", 5000, 0, 5000);
+      hMap[MZG_exo] = TH1F(emptyLabelPtr, ";m_{Z#gamma}", 5000, 0, 5000);
+      hMap[gammaMotherID] = TH1F(emptyLabelPtr, ";motherID_{#gamma}", 5000, 0, 5000);
+      hMap[genPhotonPT] = TH1F(emptyLabelPtr, ";gen p_T^{#gamma,matched}", 5000, 0, 5000);
+      hMap[genPhotonPT_Veto] = TH1F(emptyLabelPtr, ";gen p_T^{#gamma,matched,veto}", 5000, 0, 5000);
+      hMap[PTG1_Veto] = TH1F(emptyLabelPtr, ";gen p_T^{#gamma,veto}", 5000, 0, 5000);
+      hMap[genPhotonPT_NoVeto] = TH1F(emptyLabelPtr, ";gen p_T^{#gamma,matched,Noveto}", 5000, 0, 5000);
+      hMap[PTG1_NoVeto] = TH1F(emptyLabelPtr, ";gen p_T^{#gamma,Noveto}", 5000, 0, 5000);
+      //hMap[VetoCompare] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
    }
    return hMap;
 }
@@ -3261,14 +3361,20 @@ map<Histograms2D,TH2F> myAnalyzer::Init2DHistograms(const selectionType selectio
 map<Histograms1D,TH1F> myAnalyzer::InitSignalScanHistograms(const selectionType selection_){
    map<Histograms1D,TH1F> sMap;
    
-   sMap[WEIGHT_NISR] = TH1F("","weight",10000,0,10);
-   sMap[WEIGHT_TOPPT] = TH1F("","weight",10000,0,10);
-   sMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
-   sMap[WEIGHT_PDF] = TH1F("","weight",10000,0,10);
-   //sMap[WEIGHT_LEPTONPAIRPT] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_NISR] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_TOPPT] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_PDF] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_NISR] = TH1F("","weight",100,0,10);
+   //sMap[WEIGHT_TOPPT] = TH1F("","weight",100,0,10);
+   //sMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
+   //sMap[WEIGHT_PDF] = TH1F("","weight",100,0,10);
+   sMap[WEIGHT_NISR] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
+   sMap[WEIGHT_TOPPT] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
+   sMap[WEIGHT_EWKINOPAIRPT] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
+   sMap[WEIGHT_PDF] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
    
-   
-   sMap[ETMISS] = TH1F("", ";#it{p}_{T}^{miss} (GeV)", 5000, 0, 5000);
+   sMap[ETMISS] = TH1F(emptyLabelPtr, metLabelPtr, 5000, 0, 5000);
    
    return sMap;
 }
@@ -3534,45 +3640,26 @@ void myAnalyzer::InitWeightHistos(map<selectionFolderName,map<selectionFolderNam
 map<Histograms1D,TEfficiency> myAnalyzer::InitTriggerStudies(const selectionType selection_){
     
    map<Histograms1D,TEfficiency> hMap;
-    
-    //cout<<"initTriggerHistos"<<endl;
-    
-   hMap[ETMISS] = TEfficiency("", ";#it{p}_{T}^{miss} (GeV)", 200, 0, 1000);
-   //hMap[ETMISS].SetUseWeightedEvents();
-   hMap[PT1] = TEfficiency("", ";#it{p}_{T}^{leading} (GeV)", 1000, 0, 1000);
-   //hMap[PT1].SetUseWeightedEvents();
-   hMap[PT2] = TEfficiency("", ";#it{p}_{T}^{trailing} (GeV)", 1000, 0, 1000);
-   //hMap[PT2].SetUseWeightedEvents();
-   hMap[MLL] = TEfficiency("", ";#it{m}_{ll} (GeV)", 200, 0, 1000);
-   //hMap[MLL].SetUseWeightedEvents();
-   hMap[NPHOTONS] = TEfficiency("","n_#gamma",10,0,10);
-   //hMap[NPHOTONS].SetUseWeightedEvents();
-   hMap[NVTX] = TEfficiency("","n_{Vtx}",60,0,60);
-   //hMap[NVTX].SetUseWeightedEvents();
-   hMap[HT] = TEfficiency("","#it{H}_{T} (GeV)",200,0,1000);
-   //hMap[HT].SetUseWeightedEvents();
-   hMap[GENHT] = TEfficiency("","#it{H}_{T}^{gen} (GeV)",200,0,1000);
-   //hMap[GENHT].SetUseWeightedEvents();
-   hMap[NJETS] = TEfficiency("","n_{Jets}",20,0,20);
-   //hMap[NJETS].SetUseWeightedEvents();
-   hMap[ETA1] = TEfficiency("", ";|#eta_{leading}|", 260, 0, 2.6);
-   //hMap[ETA1].SetUseWeightedEvents();
-   hMap[ETA2] = TEfficiency("", ";|#eta_{trailing}|", 260, 0, 2.6);
-   //hMap[ETA2].SetUseWeightedEvents();
-   hMap[PHI1] = TEfficiency("", ";|#phi_{leading}|", 350, 0, 3.5);
-   //hMap[PHI1].SetUseWeightedEvents();
-   hMap[PHI2] = TEfficiency("", ";|#phi_{trailing}|", 350, 0, 3.5);
-   //hMap[PHI2].SetUseWeightedEvents();
+        
+   hMap[ETMISS] = TEfficiency(emptyLabelPtr, ";#it{p}_{T}^{miss} (GeV)", 200, 0, 1000);
+   hMap[PT1] = TEfficiency(emptyLabelPtr, ";#it{p}_{T}^{leading} (GeV)", 1000, 0, 1000);
+   hMap[PT2] = TEfficiency(emptyLabelPtr, ";#it{p}_{T}^{trailing} (GeV)", 1000, 0, 1000);
+   hMap[MLL] = TEfficiency(emptyLabelPtr, ";#it{m}_{ll} (GeV)", 200, 0, 1000);
+   hMap[NPHOTONS] = TEfficiency(emptyLabelPtr,"n_#gamma",10,0,10);
+   hMap[NVTX] = TEfficiency(emptyLabelPtr,"n_{Vtx}",60,0,60);
+   hMap[HT] = TEfficiency(emptyLabelPtr,"#it{H}_{T} (GeV)",200,0,1000);
+   hMap[GENHT] = TEfficiency(emptyLabelPtr,"#it{H}_{T}^{gen} (GeV)",200,0,1000);
+   hMap[NJETS] = TEfficiency(emptyLabelPtr,"n_{Jets}",20,0,20);
+   hMap[ETA1] = TEfficiency(emptyLabelPtr, ";|#eta_{leading}|", 260, 0, 2.6);
+   hMap[ETA2] = TEfficiency(emptyLabelPtr, ";|#eta_{trailing}|", 260, 0, 2.6);
+   hMap[PHI1] = TEfficiency(emptyLabelPtr, ";|#phi_{leading}|", 350, 0, 3.5);
+   hMap[PHI2] = TEfficiency(emptyLabelPtr, ";|#phi_{trailing}|", 350, 0, 3.5);
 
    if ((selection_==TRIGONZ)||(selection_==TRIGSEL)||(selection_==TRIGSEL_ptcuts)||(selection_==TRIGSEL_ptcuts)){
-      hMap[PTG1] = TEfficiency("", ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
-      //hMap[PTG1].SetUseWeightedEvents();
-      hMap[ETAG1] = TEfficiency("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
-      //hMap[ETAG1].SetUseWeightedEvents();
-      hMap[PHIG1] = TEfficiency("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
-      //hMap[PHIG1].SetUseWeightedEvents();
-      hMap[SIGMAIETAIETAG1] = TEfficiency("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
-      //hMap[SIGMAIETAIETAG1].SetUseWeightedEvents();
+      hMap[PTG1] = TEfficiency(emptyLabelPtr, ";#it{p}_{T}^{#gamma 1} (GeV)", 200, 0, 1000);
+      hMap[ETAG1] = TEfficiency(emptyLabelPtr, ";|#eta_{#gamma 1}|", 260, 0, 2.6);
+      hMap[PHIG1] = TEfficiency(emptyLabelPtr, ";|#phi_{#gamma 1}|", 350, 0, 3.5);
+      hMap[SIGMAIETAIETAG1] = TEfficiency(emptyLabelPtr, ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
    }
 
    return hMap;
@@ -3582,46 +3669,12 @@ map<Histograms1D,TEfficiency> myAnalyzer::InitTriggerStudies(const selectionType
 
 
 void myAnalyzer::InitTriggerStudiesHistos(){
-   //eff1Maps["trigDilepEE"]=InitTriggerStudies(TRIGDILEP);
-   //eff1Maps["trigDilepMM"]=InitTriggerStudies(TRIGDILEP);
-   //eff1Maps["trigDilepEM"]=InitTriggerStudies(TRIGDILEP);
-   //eff1Maps["trigSelEE"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigSelMM"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigSelEM"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigOnZEE"]=InitTriggerStudies(TRIGONZ);
-   //eff1Maps["trigOnZMM"]=InitTriggerStudies(TRIGONZ);
-   //eff1Maps["trigOnZEM"]=InitTriggerStudies(TRIGONZ);
-   //eff1Maps["trigDilepEE_ptcuts"]=InitTriggerStudies(TRIGDILEP_ptcuts);
-   //eff1Maps["trigDilepMM_ptcuts"]=InitTriggerStudies(TRIGDILEP_ptcuts);
-   //eff1Maps["trigDilepEM_ptcuts"]=InitTriggerStudies(TRIGDILEP_ptcuts);
-   //eff1Maps["trigSelEE_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigSelMM_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigSelEM_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigOnZEE_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-   //eff1Maps["trigOnZMM_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-   //eff1Maps["trigOnZEM_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-   
-   //cout<<"initTriggerStudies"<<endl;
-   
    eff1Maps[trigdilep][EE]=InitTriggerStudies(TRIGDILEP);
    eff1Maps[trigdilep][MM]=InitTriggerStudies(TRIGDILEP);
    eff1Maps[trigdilep][EM]=InitTriggerStudies(TRIGDILEP);
-   //eff1Maps["trigSelEE"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigSelMM"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigSelEM"]=InitTriggerStudies(TRIGSEL);
-   //eff1Maps["trigOnZEE"]=InitTriggerStudies(TRIGONZ);
-   //eff1Maps["trigOnZMM"]=InitTriggerStudies(TRIGONZ);
-   //eff1Maps["trigOnZEM"]=InitTriggerStudies(TRIGONZ);
    eff1Maps[trigdilep_ptcuts][EE]=InitTriggerStudies(TRIGDILEP_ptcuts);
    eff1Maps[trigdilep_ptcuts][MM]=InitTriggerStudies(TRIGDILEP_ptcuts);
    eff1Maps[trigdilep_ptcuts][EM]=InitTriggerStudies(TRIGDILEP_ptcuts);
-   //eff1Maps["trigSelEE_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigSelMM_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigSelEM_ptcuts"]=InitTriggerStudies(TRIGSEL_ptcuts);
-   //eff1Maps["trigOnZEE_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-   //eff1Maps["trigOnZMM_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-   //eff1Maps["trigOnZEM_ptcuts"]=InitTriggerStudies(TRIGONZ_ptcuts);
-
 }
 
 
@@ -3871,18 +3924,16 @@ bool myAnalyzer::testSelection(const selJet& pa){
 
 bool myAnalyzer::SelectEvent(selectionType selection){
    clearCutFlowMap();
-   
    if(*selLeptonSize>1){
-      //cout<<"selLep>1"<<endl;
-   
-   float totalWeightCalc=totalWeight;
+      float totalWeightCalc=totalWeight;
          //fill cutflowInfo DiEle or DiMu?
-         cutflowDiEle=*isDiElectron;
-         cutflowDiMu=*isDiMuon;
-         decisionMapCutFlowFine[DIMUON]=*isDiMuon;
-         decisionMapCutFlowFine[DIELECTRON]=*isDiElectron;
-         decisionMapCutFlowFine[EMUON]=*isMuonElectron||*isElectronMuon;
-         
+         if((selection==ONZ) && (!isTotalSignal)){
+            cutflowDiEle=*isDiElectron;
+            cutflowDiMu=*isDiMuon;
+            decisionMapCutFlowFine[DIMUON]=*isDiMuon;
+            decisionMapCutFlowFine[DIELECTRON]=*isDiElectron;
+            decisionMapCutFlowFine[EMUON]=*isMuonElectron||*isElectronMuon;
+         }
          int genNNToZ=0;
          int genNNToG=0;
          //int genNNToH=0;
@@ -3908,13 +3959,12 @@ bool myAnalyzer::SelectEvent(selectionType selection){
             }
          }
          
-         //cout<<*isDiElectron<<*isDiMuon<<*isMuonElectron<<*isElectronMuon<<endl;
          
          
          if ((*isDiElectron)&&(*selElectronSize>1)){
             //Fill cutflow triggered bool
-            if(selection==ONZ) cutflowIsTriggered=true;
-            if(selection==ONZ){
+            if((selection==ONZ) && (!isTotalSignal)){
+               cutflowIsTriggered=true;
                if(isSignal){
                   decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
                   decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
@@ -3922,9 +3972,9 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                   decisionMapCutFlowFine[TRIGGERED]=*trigDiEle;
                   decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigDiEleMatch;
                }
+               decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
+               decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
             }
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
             
             auto e1 = selElectrons->at(0);
             auto e2 = selElectrons->at(1);
@@ -3932,8 +3982,10 @@ bool myAnalyzer::SelectEvent(selectionType selection){
             
             if(*trigDiEleMatch){
                if(! *evtHasGenPhotonVeto){
-                  if(selection==ONZ) decisionMapCutFlowFine[GENVETO]=true;
-                  if(selection==ONZ) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  if((selection==ONZ) && (!isTotalSignal)){
+                     decisionMapCutFlowFine[GENVETO]=true;
+                     decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  }
          
                   if(testSelection(e1,selection,true) && testSelection(e2,selection,false) && (*chargeProduct < 0.) ){
 
@@ -3941,44 +3993,46 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                      totalWeightCalc=totalWeight* *lepSF_weight;
 
                      //Fill cutflow 2 leptons bool
-                     if(selection==ONZ) cutflow2Leptons=true;
+                     if((selection==ONZ) && (!isTotalSignal)) cutflow2Leptons=true;
                      if((selection==UNCUT)? true : (*mll>50.)){
                         //Fill cutflow mll>50 bool
-                        if(selection==ONZ) cutflowMll50=true;
-                        if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
-                   
-                        if((selection==ONZ)&&(photons->size()!=0)) decisionMapCutFlowFine[PHOTON1]=true;
-                        if((selection==ONZ)&&(photons->size()!=0)) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
-                        
+                        if((selection==ONZ) && (!isTotalSignal)){
+                           cutflowMll50=true;
+                           decisionMapCutFlowFine[M50]=true;
+                           decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
+                      
+                           if((photons->size()!=0)) decisionMapCutFlowFine[PHOTON1]=true;
+                           if((photons->size()!=0)) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                        }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
-                        
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
-                        
-                        if(*selPhotonSize!=0){
-                           if(selection==ONZ) cutflow1Photon=true;
-                           if((*mll>81.) && (*mll<101.)){
-                              if(selection==ONZ) cutflowOnZ=true;
-                              if(selection==ONZ) decisionMapCutFlowFine[ZMASS]=true;
-                              if(selection==ONZ) decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                        if((selection==ONZ) && (!isTotalSignal)){
+                           decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
+                           idecisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
+                           
+                           if(*selPhotonSize!=0){
+                              if(selection==ONZ) cutflow1Photon=true;
+                              if((*mll>81.) && (*mll<101.)){
+                                 cutflowOnZ=true;
+                                 decisionMapCutFlowFine[ZMASS]=true;
+                                 decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                              }
                            }
                         }
                         return true;
@@ -3989,21 +4043,21 @@ bool myAnalyzer::SelectEvent(selectionType selection){
          }
          if((*isDiMuon)&&(*selMuonSize>1)){
 
-            if(selection==ONZ) decisionMapCutFlowFine_weight[genZLL]=totalWeight;
+            if((selection==ONZ) && (!isTotalSignal))if(selection==ONZ) decisionMapCutFlowFine_weight[genZLL]=totalWeight;
             
             
-            if(selection==ONZ) cutflowIsTriggered=true;
+            if((selection==ONZ) && (!isTotalSignal))if(selection==ONZ) cutflowIsTriggered=true;
             if(selection==ONZ){
                if(isSignal){
-                  decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-                  decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
                }else{
-                  decisionMapCutFlowFine[TRIGGERED]=*trigDiMu;
-                  decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigDiMuMatch;
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=*trigDiMu;
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigDiMuMatch;
                }
             }
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
+            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
+            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
 
             auto m1 = selMuons->at(0); 
             auto m2 = selMuons->at(1);
@@ -4011,38 +4065,40 @@ bool myAnalyzer::SelectEvent(selectionType selection){
             if(*trigDiMuMatch){
                if(! *evtHasGenPhotonVeto){
                   
-                  if(selection==ONZ) decisionMapCutFlowFine[GENVETO]=true;
-                  if(selection==ONZ) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine[GENVETO]=true;
+                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
 
 
                   if(testSelection(m1,selection,true) && testSelection(m2,selection,false) && (*chargeProduct < 0.)){
 
                      totalWeightCalc=totalWeight* *lepSF_weight;
 
-                     if(selection==ONZ) cutflow2Leptons=true;
+                     if((selection==ONZ) && (!isTotalSignal)) cutflow2Leptons=true;
                      if((selection==UNCUT)? true : (*mll>50.)){
-                        if(selection==ONZ) {cutflowMll50=true;}
-                        if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
+                        if((selection==ONZ) && (!isTotalSignal)){
+                           if(selection==ONZ) {cutflowMll50=true;}
+                           if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
+                           if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
 
-                        if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine[PHOTON1]=true;
-                        if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                           if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine[PHOTON1]=true;
+                           if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                        }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
-                        
+                        if((selection==ONZ) && (!isTotalSignal)){
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
@@ -4057,6 +4113,7 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                               if(selection==ONZ) decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
                            }
                         }
+                     }
                         return true;
                      }
                   }
@@ -4070,16 +4127,16 @@ bool myAnalyzer::SelectEvent(selectionType selection){
             if(selection==ONZ) cutflowIsTriggered=true;
             if(selection==ONZ){
                if(isSignal){
-                  decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-                  decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
                }else{
-                  decisionMapCutFlowFine[TRIGGERED]=*trigMuEle;
-                  decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigMuEleMatch;
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=*trigMuEle;
+                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigMuEleMatch;
                }
             }
             //cout<<"a1"<<endl;
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
-            if(selection==ONZ) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
+            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
+            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
             //cout<<"a2"<<endl;
 
             auto e0 = selElectrons->at(0); 
@@ -4091,14 +4148,14 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                if(! *evtHasGenPhotonVeto){
                                  //cout<<"c"<<endl;
 
-                  if(selection==ONZ) decisionMapCutFlowFine[GENVETO]=true;
-                  if(selection==ONZ) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine[GENVETO]=true;
+                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
 
                   if(testSelection(m0,selection,*isMuonElectron) && testSelection(e0,selection,*isElectronMuon) && (*chargeProduct < 0.)){
                      
                      totalWeightCalc=totalWeight* *lepSF_weight;
                      
-                     if(selection==ONZ) cutflow2Leptons=true;
+                     if((selection==ONZ) && (!isTotalSignal)) cutflow2Leptons=true;
                      if((selection==UNCUT)? true : (*mll>50.)){
                         //if(selection==ONZ) cutflowMll50=true;
                         //if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
@@ -4107,6 +4164,7 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                         //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONID_trailing]=totalWeightCalc;
                         //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
                         //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
+                        if((selection==ONZ) && (!isTotalSignal)){
                         if(selection==ONZ) {cutflowMll50=true;}
                         if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
                         if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
@@ -4126,14 +4184,15 @@ bool myAnalyzer::SelectEvent(selectionType selection){
 
                         if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine[PHOTON1]=true;
                         if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                     }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
-                        
+                        if((selection==ONZ) && (!isTotalSignal)){
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
                         if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
-                           
+                        
                         if(*selPhotonSize>0){
                            if(selection==ONZ) cutflow1Photon=true;
                            if(*mll<101. && *mll>81.){
@@ -4142,6 +4201,7 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                               if(selection==ONZ) decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
                            }
                         }
+                     }
                         return true;
                      }
                   }
