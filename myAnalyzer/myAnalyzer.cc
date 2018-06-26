@@ -482,6 +482,7 @@ Bool_t myAnalyzer::Process(Long64_t entry){
 //}
 
 void myAnalyzer::FillSignalHistograms(){
+   auto signalPoint=sp_;
    if(SelectEvent(ONZ)){
       if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
          if((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)&&(*ETmiss>=150.)){
@@ -502,7 +503,7 @@ void myAnalyzer::FillSignalHistograms(){
                //InitSignalScanHistos(signalPoint);
                //InitSignalScanHistos(sp_);
             //}
-            auto signalPoint=sp_;
+            //auto signalPoint=sp_;
             if(*isDiMuon || *isDiElectron){
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -657,8 +658,553 @@ void myAnalyzer::FillSignalHistograms(){
                }
             }
          }
+         if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)){//&&(selectedEvent.ETmiss<100.)){ //ONZ+MET<100 ~ CR DY/Z(+gamma)
+            if(*ETmiss<100.){
+               if(*isDiMuon || *isDiElectron){
+                  FillerSignal(s1Maps.at(signalPoint).at(controlregionDY).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+               }
+            }
+         }
+         if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)&&(*ETmiss>=100.)&&(*ETmiss<150.)){ //ONZ+MET<150>100 ~ VR
+            if(*isDiMuon || *isDiElectron){
+               FillerSignal(s1Maps.at(signalPoint).at(validationregion).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+            }
+         }
+         if ((*selPhotonSize!=0)){ //Different Flavor + 1Photon ~ CR TT(+gamma)
+            if (*isElectronMuon || *isMuonElectron){
+               FillerSignal(s1Maps.at(signalPoint).at(controlregionTT).at(EM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+            }
+         }
       }
    }
+   if(SelectEvent(ControlRegionZZ)){
+         if((*selLeptonSize==4)&&(*matchedLeptonSize==2)){
+            if((*selMuonSize==4)||(*selElectronSize==4)||(*selMuonSize==2 && *selElectronSize==2)){
+
+               float ZMass = 91.1876;
+
+               if(*countNegCharge==2 && *countPosCharge==2){
+               
+                  selLepton lep1,lep2,lep3,lep4;
+               
+                  if(*selMuonSize==4){
+                     
+                     if((negMuons->size()==2)&&(posMuons->size()==2)){
+                        selMuon neg1 = negMuons->at(0);
+                        selMuon neg2 = negMuons->at(1);
+                        selMuon pos1 = posMuons->at(0);
+                        selMuon pos2 = posMuons->at(1);                  
+                        
+                        //there are 2 combinations n1p1/n2p2 - n1p2/n2p1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n1p2 = abs((neg1.vec+pos2.vec).M()-ZMass);
+                        float n2p1 = abs((neg2.vec+pos1.vec).M()-ZMass);
+                        float n2p2 = abs((neg2.vec+pos2.vec).M()-ZMass);
+                        
+                        if((n1p1<n1p2)&&(n1p1<n2p1)&&(n1p1<n2p2)){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           if(neg2.p.Pt()>pos2.p.Pt()){
+                              lep3.setAll(neg2);
+                              lep4.setAll(pos2);
+                           }else{
+                              lep3.setAll(pos2);
+                              lep4.setAll(neg2);
+                           }
+                        }else{
+                           if((n1p2<n1p1)&&(n1p2<n2p1)&&(n1p2<n2p2)){
+                              if(neg1.p.Pt()>pos2.p.Pt()){
+                                 lep1.setAll(neg1);
+                                 lep2.setAll(pos2);
+                              }else{
+                                 lep1.setAll(pos2);
+                                 lep2.setAll(neg1);
+                              }
+                              if(neg2.p.Pt()>pos1.p.Pt()){
+                                 lep3.setAll(neg2);
+                                 lep4.setAll(pos1);
+                              }else{
+                                 lep3.setAll(pos1);
+                                 lep4.setAll(neg2);
+                              }
+                           }else{
+                              if((n2p1<n1p1)&&(n2p1<n1p2)&&(n2p1<n2p2)){
+                                 if(neg2.p.Pt()>pos1.p.Pt()){
+                                    lep1.setAll(neg2);
+                                    lep2.setAll(pos1);
+                                 }else{
+                                    lep1.setAll(pos1);
+                                    lep2.setAll(neg2);
+                                 }
+                                 if(neg1.p.Pt()>pos2.p.Pt()){
+                                    lep3.setAll(neg1);
+                                    lep4.setAll(pos2);
+                                 }else{
+                                    lep3.setAll(pos2);
+                                    lep4.setAll(neg1);
+                                 }
+                              }else{
+                                 if(neg2.p.Pt()>pos2.p.Pt()){
+                                    lep1.setAll(neg2);
+                                    lep2.setAll(pos2);
+                                 }else{
+                                    lep1.setAll(pos2);
+                                    lep2.setAll(neg2);
+                                 }
+                                 if(neg1.p.Pt()>pos1.p.Pt()){
+                                    lep3.setAll(neg1);
+                                    lep4.setAll(pos1);
+                                 }else{
+                                    lep3.setAll(pos1);
+                                    lep4.setAll(neg1);
+                                 }
+                              }
+                           }
+                        }
+                    }
+                    
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     float mll2=(lep3.vec+lep4.vec).M();
+                     if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                        //FillerZZ(cr1Maps[controlregionZZ][MM][nom],false,lep1,lep2,lep3,lep4,true);
+                        FillerSignal(s1Maps.at(signalPoint).at(controlregionZZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                     }
+                  }
+                  
+                  if(*selElectronSize==4){
+                     
+                     if((negElectrons->size()==2)&&(posElectrons->size()==2)){
+                        selElectron neg1 = negElectrons->at(0);
+                        selElectron neg2 = negElectrons->at(1);
+                        selElectron pos1 = posElectrons->at(0);
+                        selElectron pos2 = posElectrons->at(1);                  
+                        
+                        //there are 2 combinations n1p1/n2p2 - n1p2/n2p1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n1p2 = abs((neg1.vec+pos2.vec).M()-ZMass);
+                        float n2p1 = abs((neg2.vec+pos1.vec).M()-ZMass);
+                        float n2p2 = abs((neg2.vec+pos2.vec).M()-ZMass);
+                        
+                        
+                        if((n1p1<n1p2)&&(n1p1<n2p1)&&(n1p1<n2p2)){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           if(neg2.p.Pt()>pos2.p.Pt()){
+                              lep3.setAll(neg2);
+                              lep4.setAll(pos2);
+                           }else{
+                              lep3.setAll(pos2);
+                              lep4.setAll(neg2);
+                           }
+                        }else{
+                           if((n1p2<n1p1)&&(n1p2<n2p1)&&(n1p2<n2p2)){
+                              if(neg1.p.Pt()>pos2.p.Pt()){
+                                 lep1.setAll(neg1);
+                                 lep2.setAll(pos2);
+                              }else{
+                                 lep1.setAll(pos2);
+                                 lep2.setAll(neg1);
+                              }
+                              if(neg2.p.Pt()>pos1.p.Pt()){
+                                 lep3.setAll(neg2);
+                                 lep4.setAll(pos1);
+                              }else{
+                                 lep3.setAll(pos1);
+                                 lep4.setAll(neg2);
+                              }
+                           }else{
+                              if((n2p1<n1p1)&&(n2p1<n1p2)&&(n2p1<n2p2)){
+                                 if(neg2.p.Pt()>pos1.p.Pt()){
+                                    lep1.setAll(neg2);
+                                    lep2.setAll(pos1);
+                                 }else{
+                                    lep1.setAll(pos1);
+                                    lep2.setAll(neg2);
+                                 }
+                                 if(neg1.p.Pt()>pos2.p.Pt()){
+                                    lep3.setAll(neg1);
+                                    lep4.setAll(pos2);
+                                 }else{
+                                    lep3.setAll(pos2);
+                                    lep4.setAll(neg1);
+                                 }
+                              }else{
+                                 if(neg2.p.Pt()>pos2.p.Pt()){
+                                    lep1.setAll(neg2);
+                                    lep2.setAll(pos2);
+                                 }else{
+                                    lep1.setAll(pos2);
+                                    lep2.setAll(neg2);
+                                 }
+                                 if(neg1.p.Pt()>pos1.p.Pt()){
+                                    lep3.setAll(neg1);
+                                    lep4.setAll(pos1);
+                                 }else{
+                                    lep3.setAll(pos1);
+                                    lep4.setAll(neg1);
+                                 }
+                              }
+                           }
+                        }
+                     }
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     float mll2=(lep3.vec+lep4.vec).M();
+                     if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                        //FillerZZ(cr1Maps[controlregionZZ][EE][nom],false,lep1,lep2,lep3,lep4,true);
+                        FillerSignal(s1Maps.at(signalPoint).at(controlregionZZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                     }
+                     
+                  }
+                  
+                  if(*selMuonSize==2 && *selElectronSize==2){
+                     
+                     if((negMuons->size()==1)&&(posMuons->size()==1)&&(negElectrons->size()==1)&&(posElectrons->size()==1)){
+                     
+                        selMuon m1 = negMuons->at(0);
+                        selMuon m2 = posMuons->at(0);
+                        selElectron e1 = negElectrons->at(0);
+                        selElectron e2 = posElectrons->at(0);                  
+                        
+                        float m1m2 = abs((m1.vec+m2.vec).M()-ZMass);
+                        float e1e2 = abs((e1.vec+e2.vec).M()-ZMass);
+                        
+                        if(m1m2<e1e2){
+                           if(m1.p.Pt()>m2.p.Pt()){
+                              lep1.setAll(m1);
+                              lep2.setAll(m2);
+                           }else{
+                              lep1.setAll(m2);
+                              lep2.setAll(m1);
+                           }
+                           if(e1.p.Pt()>e2.p.Pt()){
+                              lep3.setAll(e1);
+                              lep4.setAll(e2);
+                           }else{
+                              lep3.setAll(e2);
+                              lep4.setAll(e1);
+                           }
+                           
+                           float mll1=(lep1.vec+lep2.vec).M();
+                           float mll2=(lep3.vec+lep4.vec).M();
+                           if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                              //FillerZZ(cr1Maps[controlregionZZ][MM][nom],false,lep1,lep2,lep3,lep4,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionZZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                           
+                        }else{
+                           if(m1.p.Pt()>m2.p.Pt()){
+                              lep3.setAll(m1);
+                              lep4.setAll(m2);
+                           }else{
+                              lep3.setAll(m2);
+                              lep4.setAll(m1);
+                           }
+                           if(e1.p.Pt()>e2.p.Pt()){
+                              lep1.setAll(e1);
+                              lep2.setAll(e2);
+                           }else{
+                              lep1.setAll(e2);
+                              lep2.setAll(e1);
+                           }
+                           
+                           float mll1=(lep1.vec+lep2.vec).M();
+                           float mll2=(lep3.vec+lep4.vec).M();
+                           if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                              //FillerZZ(cr1Maps[controlregionZZ][EE][nom],false,lep1,lep2,lep3,lep4,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionZZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                        }
+                     }
+                  }
+                  //float mll1=(lep1.vec+lep2.vec).M();
+                  //float mll2=(lep3.vec+lep4.vec).M();
+                  //if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                     //FillerSignal(s1Maps.at(signalPoint).at(controlregionZZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                  //}
+               }
+            }
+         }
+      }
+      if(SelectEvent(ControlRegionZZ)){
+         if((*selLeptonSize==3)&&(*matchedLeptonSize==2)){
+            if((*selMuonSize==3)||(*selElectronSize==3)||(*selMuonSize==1 && *selElectronSize==2)||(*selMuonSize==2 && *selElectronSize==1)){
+
+               float ZMass = 91.1876;
+
+               
+               if((*countNegCharge==1 && *countPosCharge==2)||(*countNegCharge==2 && *countPosCharge==1)){
+                  //find lepton combinations
+               
+               selLepton lep1,lep2,lep3;
+               TLorentzVector temp_JESu(0.,0.,0.,0.);
+               temp_JESu.SetPtEtaPhiM(met_JESu->p.Pt(),met_JESu->p.Eta(),met_JESu->p.Phi(),0.);
+               TLorentzVector temp_JESd(0.,0.,0.,0.);
+               temp_JESd.SetPtEtaPhiM(met_JESd->p.Pt(),met_JESd->p.Eta(),met_JESd->p.Phi(),0.);
+               TLorentzVector temp_JERu(0.,0.,0.,0.);
+               temp_JERu.SetPtEtaPhiM(met_JERu->p.Pt(),met_JERu->p.Eta(),met_JERu->p.Phi(),0.);
+               TLorentzVector temp_JERd(0.,0.,0.,0.);
+               temp_JERd.SetPtEtaPhiM(met_JERd->p.Pt(),met_JERd->p.Eta(),met_JERd->p.Phi(),0.);
+
+               
+                  if(*selMuonSize==3){
+                     
+                     if((negMuons->size()==2)&&(posMuons->size()==1)){
+                     
+                        selMuon neg1 = negMuons->at(0);
+                        selMuon neg2 = negMuons->at(1);
+                        selMuon pos1 = posMuons->at(0);
+                        
+                        //there are 2 combinations n1p1/n2 - n2p1/n1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n2p1 = abs((neg2.vec+pos1.vec).M()-ZMass);
+
+                        if(n1p1<n2p1){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           lep3.setAll(neg2);
+                        }else{
+                           if(n2p1<n1p1){
+                              if(neg2.p.Pt()>pos1.p.Pt()){
+                                 lep1.setAll(neg2);
+                                 lep2.setAll(pos1);
+                              }else{
+                                 lep1.setAll(pos1);
+                                 lep2.setAll(neg2);
+                              }
+                              lep3.setAll(neg1);
+                           }
+                        }
+                     }
+                     if((negMuons->size()==1)&&(posMuons->size()==2)){
+                     
+                        selMuon neg1 = negMuons->at(0);
+                        selMuon pos1 = posMuons->at(0);
+                        selMuon pos2 = posMuons->at(1);
+                        
+                        //there are 2 combinations n1p1/p2 - n1p2/p1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n1p2 = abs((neg1.vec+pos2.vec).M()-ZMass);
+
+                        if(n1p1<n1p2){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           lep3.setAll(pos2);
+                        }else{
+                           if(n1p2<n1p1){
+                              if(neg1.p.Pt()>pos2.p.Pt()){
+                                 lep1.setAll(neg1);
+                                 lep2.setAll(pos2);
+                              }else{
+                                 lep1.setAll(pos2);
+                                 lep2.setAll(neg1);
+                              }
+                              lep3.setAll(pos1);
+                           }
+                        }
+                     }
+                     
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     if(mll1<106. && mll1>76.){
+                        if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
+                           if(*ETmiss>70.){
+                              //FillerWZ(cr1Maps[controlregionWZ][MM][nom],false,lep1,lep2,lep3,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionWZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                        }
+                     }
+                     
+                  }
+                  
+                  
+                  if(*selElectronSize==3){
+                     
+                     if((negElectrons->size()==2)&&(posElectrons->size()==1)){
+                     
+                        selElectron neg1 = negElectrons->at(0);
+                        selElectron neg2 = negElectrons->at(1);
+                        selElectron pos1 = posElectrons->at(0);
+                        
+                        //there are 2 combinations n1p1/n2 - n2p1/n1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n2p1 = abs((neg2.vec+pos1.vec).M()-ZMass);
+
+                        if(n1p1<n2p1){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           lep3.setAll(neg2);
+                        }else{
+                           if(n2p1<n1p1){
+                              if(neg2.p.Pt()>pos1.p.Pt()){
+                                 lep1.setAll(neg2);
+                                 lep2.setAll(pos1);
+                              }else{
+                                 lep1.setAll(pos1);
+                                 lep2.setAll(neg2);
+                              }
+                              lep3.setAll(neg1);
+                           }
+                        }
+                     }
+                     if((negElectrons->size()==1)&&(posElectrons->size()==2)){
+                     
+                        selElectron neg1 = negElectrons->at(0);
+                        selElectron pos1 = posElectrons->at(0);
+                        selElectron pos2 = posElectrons->at(1);
+                        
+                        //there are 2 combinations n1p1/p2 - n1p2/p1
+                        float n1p1 = abs((neg1.vec+pos1.vec).M()-ZMass);
+                        float n1p2 = abs((neg1.vec+pos2.vec).M()-ZMass);
+
+                        if(n1p1<n1p2){
+                           if(neg1.p.Pt()>pos1.p.Pt()){
+                              lep1.setAll(neg1);
+                              lep2.setAll(pos1);
+                           }else{
+                              lep1.setAll(pos1);
+                              lep2.setAll(neg1);
+                           }
+                           lep3.setAll(pos2);
+                        }else{
+                           if(n1p2<n1p1){
+                              if(neg1.p.Pt()>pos2.p.Pt()){
+                                 lep1.setAll(neg1);
+                                 lep2.setAll(pos2);
+                              }else{
+                                 lep1.setAll(pos2);
+                                 lep2.setAll(neg1);
+                              }
+                              lep3.setAll(pos1);
+                           }
+                        }
+                     }
+                     
+                     
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     if(mll1<106. && mll1>76.){
+                        if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
+                           if(*ETmiss>70.){
+                              //FillerWZ(cr1Maps[controlregionWZ][EE][nom],false,lep1,lep2,lep3,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionWZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                        }
+                     }
+                  }
+                  
+                  if((*selElectronSize==2)&&(*selMuonSize==1)){
+                  
+                     if(negElectrons->size()==1 && posElectrons->size()==1 && posMuons->size()==1){
+                        selElectron neg1 = negElectrons->at(0);
+                        selElectron pos1 = posElectrons->at(0);
+                        selMuon pos2 = posMuons->at(0);
+                        
+                        if(neg1.p.Pt()>pos1.p.Pt()){
+                           lep1.setAll(neg1);
+                           lep2.setAll(pos1);
+                        }else{
+                           lep1.setAll(pos1);
+                           lep2.setAll(neg1);
+                        }
+                        lep3.setAll(pos2);
+                     }
+                     if(negElectrons->size()==1 && posElectrons->size()==1 && negMuons->size()==1){
+                        selElectron neg1 = negElectrons->at(0);
+                        selElectron pos1 = posElectrons->at(0);
+                        selMuon neg2 = negMuons->at(0);
+                        
+                        if(neg1.p.Pt()>pos1.p.Pt()){
+                           lep1.setAll(neg1);
+                           lep2.setAll(pos1);
+                        }else{
+                           lep1.setAll(pos1);
+                           lep2.setAll(neg1);
+                        }
+                        lep3.setAll(neg2);
+                     }    
+                     
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     if(mll1<106. && mll1>76.){
+                        if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
+                           if(*ETmiss>70.){
+                              //FillerWZ(cr1Maps[controlregionWZ][EE][nom],false,lep1,lep2,lep3,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionWZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                        }
+                     }
+                     
+                  }
+                  
+                  if((*selElectronSize==1)&&(*selMuonSize==2)){
+                  
+                     if(negMuons->size()==1 && posMuons->size()==1 && posElectrons->size()==1){
+                        selMuon neg1 = negMuons->at(0);
+                        selMuon pos1 = posMuons->at(0);
+                        selElectron pos2 = posElectrons->at(0);
+                        
+                        if(neg1.p.Pt()>pos1.p.Pt()){
+                           lep1.setAll(neg1);
+                           lep2.setAll(pos1);
+                        }else{
+                           lep1.setAll(pos1);
+                           lep2.setAll(neg1);
+                        }
+                        lep3.setAll(pos2);
+                     }
+                     if(negMuons->size()==1 && posMuons->size()==1 && negElectrons->size()==1){
+                        selMuon neg1 = negMuons->at(0);
+                        selMuon pos1 = posMuons->at(0);
+                        selElectron neg2 = negElectrons->at(0);
+                        
+                        if(neg1.p.Pt()>pos1.p.Pt()){
+                           lep1.setAll(neg1);
+                           lep2.setAll(pos1);
+                        }else{
+                           lep1.setAll(pos1);
+                           lep2.setAll(neg1);
+                        }
+                        lep3.setAll(neg2);
+                     }   
+                     
+                     float mll1=(lep1.vec+lep2.vec).M();
+                     if(mll1<106. && mll1>76.){
+                        if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
+                           if(*ETmiss>70.){
+                              //FillerWZ(cr1Maps[controlregionWZ][MM][nom],false,lep1,lep2,lep3,true);
+                              FillerSignal(s1Maps.at(signalPoint).at(controlregionWZ).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                           }
+                        }
+                     }                  
+                  }
+            }
+            }
+            
+         }
+      }
 }
 
 
@@ -1084,8 +1630,18 @@ void myAnalyzer::FillHistograms(){
                         FillerZZ(cr1Maps[controlregionZZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][MM][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][MM][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                         for(int i=0; i<nWeights; i++){
                            FillerZZ(cr1Maps[controlregionZZ][MM][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
+                           FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
                         }
                      }
                   }
@@ -1183,8 +1739,18 @@ void myAnalyzer::FillHistograms(){
                         FillerZZ(cr1Maps[controlregionZZ][EE][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][EE][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][EE][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                        FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                         for(int i=0; i<nWeights; i++){
                            FillerZZ(cr1Maps[controlregionZZ][EE][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
+                           FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
                         }
                      }
                      
@@ -1230,8 +1796,18 @@ void myAnalyzer::FillHistograms(){
                               FillerZZ(cr1Maps[controlregionZZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerZZ(cr1Maps[controlregionZZ][MM][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                               FillerZZ(cr1Maps[controlregionZZ][MM][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerZZ(cr1Maps[controlregionZZ][MM][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
+                                 FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
                               }
                            }
                            
@@ -1265,27 +1841,37 @@ void myAnalyzer::FillHistograms(){
                               FillerZZ(cr1Maps[controlregionZZ][EE][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerZZ(cr1Maps[controlregionZZ][EE][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
+                                 FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
                               }
+                              FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                            }
                         }
                      }
                   }
-                  float mll1=(lep1.vec+lep2.vec).M();
-                  float mll2=(lep3.vec+lep4.vec).M();
-                  if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                     FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
-                     FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
-                     for(int i=0; i<nWeights; i++){
-                        FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
-                     }
-                  }
+                  //float mll1=(lep1.vec+lep2.vec).M();
+                  //float mll2=(lep3.vec+lep4.vec).M();
+                  //if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                     //FillerZZ(cr1Maps[controlregionZZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                     //for(int i=0; i<nWeights; i++){
+                        //FillerZZ(cr1Maps[controlregionZZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,lep4,true,i);
+                     //}
+                  //}
                }
             }
          }
@@ -1392,21 +1978,31 @@ void myAnalyzer::FillHistograms(){
                               FillerWZ(cr1Maps[controlregionWZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][MM][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][MM][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerWZ(cr1Maps[controlregionWZ][MM][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
+                                 FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
                               }
                            }
                            if(met_JESu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
                            }
                            if(met_JESd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
                            }
                            if(met_JERu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
                            }
                            if(met_JERd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
                            }
                         }
                      }
@@ -1491,8 +2087,14 @@ void myAnalyzer::FillHistograms(){
                               FillerWZ(cr1Maps[controlregionWZ][EE][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][EE][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][EE][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerWZ(cr1Maps[controlregionWZ][EE][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
+                                 FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
                               }
                            }
                         }
@@ -1500,21 +2102,25 @@ void myAnalyzer::FillHistograms(){
                         if( (lep1.vec+temp_JESu).Mt() > 50. ){
                            if(met_JESu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
                            }
                         }
                         if( (lep1.vec+temp_JESd).Mt() > 50. ){
                            if(met_JESd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
                            }
                         }
                         if( (lep1.vec+temp_JERu).Mt() > 50. ){
                            if(met_JERu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
                            }
                         }
                         if( (lep1.vec+temp_JERd).Mt() > 50. ){
                            if(met_JERd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
                            }
                         }
                      
@@ -1561,29 +2167,39 @@ void myAnalyzer::FillHistograms(){
                               FillerWZ(cr1Maps[controlregionWZ][EE][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][EE][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][EE][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerWZ(cr1Maps[controlregionWZ][EE][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
+                                 FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
                               }
                            }
                         }
                         if( (lep1.vec+temp_JESu).Mt() > 50. ){
                            if(met_JESu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
                            }
                         }
                         if( (lep1.vec+temp_JESd).Mt() > 50. ){
                            if(met_JESd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
                            }
                         }
                         if( (lep1.vec+temp_JERu).Mt() > 50. ){
                            if(met_JERu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
                            }
                         }
                         if( (lep1.vec+temp_JERd).Mt() > 50. ){
                            if(met_JERd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
                            }                        
                         }
                      }
@@ -1630,29 +2246,39 @@ void myAnalyzer::FillHistograms(){
                               FillerWZ(cr1Maps[controlregionWZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][MM][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][MM][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                               for(int i=0; i<nWeights; i++){
                                  FillerWZ(cr1Maps[controlregionWZ][MM][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
+                                 FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
                               }
                            }
                         }
                         if( (lep1.vec+temp_JESu).Mt() > 50. ){
                            if(met_JESu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
                            }
                         }
                         if( (lep1.vec+temp_JESd).Mt() > 50. ){
                            if(met_JESd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
                            }
                         }
                         if( (lep1.vec+temp_JERu).Mt() > 50. ){
                            if(met_JERu->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
                            }
                         }
                         if( (lep1.vec+temp_JERd).Mt() > 50. ){
                            if(met_JERd->p.Pt()>70.){
                               FillerWZ(cr1Maps[controlregionWZ][MM][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
+                              FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
                            }                        
                         }
                      }                  
@@ -1660,41 +2286,41 @@ void myAnalyzer::FillHistograms(){
                   
                                
                   
-               float mll1=(lep1.vec+lep2.vec).M();
-               if(mll1<106. && mll1>76.){
-                  if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
-                     if(*ETmiss>70.){
-                        FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
-                        FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                        FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
-                        FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
-                        FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
-                        for(int i=0; i<nWeights; i++){
-                           FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
-                        }
-                     }
-                  }
-                  if( (lep1.vec+temp_JESu).Mt() > 50. ){
-                     if(met_JESu->p.Pt()>70.){
-                        FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
-                     }
-                  }
-                  if( (lep1.vec+temp_JESd).Mt() > 50. ){
-                     if(met_JESd->p.Pt()>70.){
-                        FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
-                     }
-                  }
-                  if( (lep1.vec+temp_JERu).Mt() > 50. ){
-                     if(met_JERu->p.Pt()>70.){
-                        FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
-                     }
-                  }
-                  if( (lep1.vec+temp_JERd).Mt() > 50. ){
-                     if(met_JERd->p.Pt()>70.){
-                        FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
-                     }                     
-                  }
-               }
+               //float mll1=(lep1.vec+lep2.vec).M();
+               //if(mll1<106. && mll1>76.){
+                  //if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
+                     //if(*ETmiss>70.){
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][nom],false,lep1,lep2,lep3,true);
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][PHOTONSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
+                        //for(int i=0; i<nWeights; i++){
+                           //FillerWZ(cr1Maps[controlregionWZ][LL][PDFNAMES[i]],false,lep1,lep2,lep3,true,i);
+                        //}
+                     //}
+                  //}
+                  //if( (lep1.vec+temp_JESu).Mt() > 50. ){
+                     //if(met_JESu->p.Pt()>70.){
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][JESu],false,lep1,lep2,lep3,true,9999,JESUP);
+                     //}
+                  //}
+                  //if( (lep1.vec+temp_JESd).Mt() > 50. ){
+                     //if(met_JESd->p.Pt()>70.){
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][JESd],false,lep1,lep2,lep3,true,9999,JESDOWN);
+                     //}
+                  //}
+                  //if( (lep1.vec+temp_JERu).Mt() > 50. ){
+                     //if(met_JERu->p.Pt()>70.){
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][JERu],false,lep1,lep2,lep3,true,9999,JERUP);
+                     //}
+                  //}
+                  //if( (lep1.vec+temp_JERd).Mt() > 50. ){
+                     //if(met_JERd->p.Pt()>70.){
+                        //FillerWZ(cr1Maps[controlregionWZ][LL][JERd],false,lep1,lep2,lep3,true,9999,JERDOWN);
+                     //}                     
+                  //}
+               //}
             }
             }
             
@@ -2676,6 +3302,16 @@ void myAnalyzer::InitSignalScanHistos(SignalPoint masspoint){
    s1Maps[masspoint][sig][EE][nom]=InitSignalScanHistograms(ONZ);
    s1Maps[masspoint][sig][MM][nom]=InitSignalScanHistograms(ONZ);
    s1Maps[masspoint][sig][EM][nom]=InitSignalScanHistograms(ONZ);
+
+   s1Maps[masspoint][validationregion][LL][nom]=InitSignalScanHistograms(ONZ);
+   s1Maps[masspoint][controlregionTT][EM][nom]=InitSignalScanHistograms(ONZ);
+   s1Maps[masspoint][controlregionDY][LL][nom]=InitSignalScanHistograms(ONZ);
+   s1Maps[masspoint][controlregionWZ][LL][nom]=InitSignalScanHistograms(ControlRegionZZ);
+   s1Maps[masspoint][controlregionZZ][LL][nom]=InitSignalScanHistograms(ControlRegionZZ);
+   //s1Maps[masspoint][validationregion][LL][nom]=InitSignalScanHistograms(ONZ);
+   
+   
+   
    s1Maps[masspoint][sig080][LL][nom]=InitSignalScanHistograms(ONZ);
    s1Maps[masspoint][sig080][EE][nom]=InitSignalScanHistograms(ONZ);
    s1Maps[masspoint][sig080][MM][nom]=InitSignalScanHistograms(ONZ);
@@ -3899,9 +4535,16 @@ void save2File(const map<SignalPoint,map<selectionFolderName,map<selectionFolder
       //file.cd(hMapIt.first.c_str());
       file.cd(dir.c_str());
       for(auto& hMapIt2 : hMapIt.second){
-         if (!file.Get(selectionFolderNameString[hMapIt2.first].c_str())) {
+         //cout<<selectionFolderNameString[hMapIt2.first]<<endl;
+         //if(selectionFolderNameString[hMapIt2.first]=="VR"){
+            //file.ls();
+         //}
+         //if (!file.Get(selectionFolderNameString[hMapIt2.first].c_str())) {
+         if (!file.Get((dir+"/"+selectionFolderNameString[hMapIt2.first]).c_str())) {
+            //cout<<"here"<<endl;
             //file.mkdir((hMapIt.first+"/"+selectionFolderNameString[hMapIt2.first]).c_str());
             file.mkdir((dir+"/"+selectionFolderNameString[hMapIt2.first]).c_str());
+            //cout<<"created"<<endl;
          }
          //file.cd((hMapIt.first+"/"+selectionFolderNameString[hMapIt2.first]).c_str());
          file.cd((dir+"/"+selectionFolderNameString[hMapIt2.first]).c_str());
@@ -3997,13 +4640,20 @@ void myAnalyzer::Terminate()
    }
    
    TFile file(outputName.c_str(), "RECREATE");
+   //cout<<"1"<<endl;
    save2File(h1Maps, file);
+   //cout<<"2"<<endl;
    save2File(eff1Maps, file);
+   //cout<<"3"<<endl;
    save2File(h2Maps, file);
+   //cout<<"4"<<endl;
    save2File(c1Maps, file);
    //save2File(s1Maps, file);
+   //cout<<"5"<<endl;
    save2File(s1Maps, file,*nBinos,inputName);
+   //cout<<"6"<<endl;
    save2File(cr1Maps, file);
+   //cout<<"7"<<endl;
    if(! isTotalSignal){
       cutFlow.Write("hCutFlow");
    }
