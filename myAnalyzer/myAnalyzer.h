@@ -148,15 +148,12 @@ class myAnalyzer : public TSelector {
   virtual void Terminate();
   virtual Int_t Version() const { return 2; }
   
-  //bool Cleaning();
-  //void CalculateVariables(const tree::Lepton& l1, const tree::Lepton& l2,const particleType particle);
-  //void ClearVariables();
+
   bool CheckParticles();
   bool Check2Ele();
   bool Check2Mu();
   bool CheckEMu();
   
-  //bool matchGenParticle(const tree::Particle& pa);
   
   bool FindGenPhotonMatch(const selPhoton& pa);
   tree::GenParticle& GetGenPhotonMatch(const selPhoton& pa);
@@ -166,7 +163,6 @@ class myAnalyzer : public TSelector {
 
   bool matchSelMuon(const selMuon& pa);
   bool matchSelElectron(const selElectron& pa);
-  //bool matchLepton(const tree::Lepton& pa, selEvent& ev, bool isEle);
   bool matchLepton(const selElectron& pa);
   bool matchLepton(const selMuon& pa);
   
@@ -176,8 +172,6 @@ class myAnalyzer : public TSelector {
   bool SelectEventTriggerStudies(selectionType selection);
   bool SelectEventZZ(selectionType selection);
 
-  //bool testSelection(const tree::Electron& pa, selectionType,bool leading);
-  //bool testSelection(const tree::Muon& pa, selectionType,bool leading);
   bool testSelection(const selElectron& pa, selectionType,bool leading);
   bool testSelection(const selMuon& pa, selectionType,bool leading);
   bool testSelection(const selPhoton& pa, selectionType);
@@ -186,22 +180,12 @@ class myAnalyzer : public TSelector {
   bool testSelection(const selJet& pa);
   
   
-  
-  //void Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton);
-  //tuple<int,string>
-  //void Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed=false,int changePDF=9999,string changeMET="N");
   void Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed=false,int changePDF=9999,changemet changeMET=normal,
     changepu changePU=normalPU,
     changeLEPSF changeLepSF=normalLEPSF,
     changePHOTONSF changePhotonSF=normalPHOTONSF,
     changeISR changeisr=normalISR,
     changeEWK changeewk=normalEWK);
-  //void FillerZZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3, selLepton& l4);
-  //void FillerWZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3);
-  //void FillerZZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3, selLepton& l4,bool slimmed=false,int changePDF=9999,string changeMET="N");
-  //void FillerWZ(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l1, selLepton& l2, selLepton& l3,bool slimmed=false,int changePDF=9999,string changeMET="N");
-  //void Filler2D(selEvent& ev, map<Histograms2D,TH2F>& m,bool withPhoton);
-  //void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m,float divideFactor=1.);
   void FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& le1, selLepton& le2, selLepton& le3, selLepton& le4,bool slimmed=false,int changePDF=9999,changemet changeMET=normal,
     changepu changePU=normalPU,
     changeLEPSF changeLepSF=normalLEPSF,
@@ -224,21 +208,12 @@ class myAnalyzer : public TSelector {
     changeISR changeisr=normalISR,
     changeEWK changeewk=normalEWK);
     
-    
-    //Weighter puWeighterUp;
-    //Weighter puWeighterDown;
-    
-    
-    
-  //void FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m,float divideFactor);
-  //void FillerTrigger(selEvent& ev, map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool);
   void FillerTrigger(map<Histograms1D,TEfficiency>& m,bool withPhoton,bool TriggerBool);
   
   void InitAllHistos();
   void InitTriggerStudiesHistos();
   void InitCutFlowHistos();
   void InitCutFlowHistos_Fine();
-  //void InitSignalScanHistos(string masspoint);
   void InitSignalScanHistos(SignalPoint masspoint);
   
 
@@ -252,7 +227,6 @@ class myAnalyzer : public TSelector {
   map<Histograms1D,TH1F> InitCutFlowHistograms(const selectionType selection);
   map<Histograms1D,TH1F> InitCutFlowHistograms_Fine(const selectionType selection);
   map<Histograms1D,TH1F> InitSignalScanHistograms(const selectionType selection);
-  //void InitWeightHistos(map<string,map<string,map<Histograms1D,TH1F>>>& map_,const selectionType selection_, string name_);
   void InitWeightHistos(map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>& map_,const selectionType selection_, selectionFolderName name_);
   
   
@@ -296,7 +270,6 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<float> miniIso1;
   TTreeReaderValue<float> miniIso2;
   TTreeReaderValue<float> ETmiss;
-  //TTreeReaderValue<TLorentzVector> ETmiss_vec;
   TTreeReaderValue<tree::Particle4Vector> ETmiss_vec;
   
   TTreeReaderValue<float> pt1;
@@ -305,8 +278,6 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<float> phi2;
   TTreeReaderValue<float> eta1;
   TTreeReaderValue<float> eta2;
-  //TTreeReaderValue<TLorentzVector> l1;
-  //TTreeReaderValue<TLorentzVector> l2;
   TTreeReaderValue<tree::Particle4Vector> l1;
   TTreeReaderValue<tree::Particle4Vector> l2;
   
@@ -402,7 +373,6 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<vector<selMuon>> posMuons;
 
 
-  //int nEntries;
   long nEntries;
   SignalPoint sp_;
 
@@ -412,42 +382,23 @@ class myAnalyzer : public TSelector {
   float ewkWeights[3];
   float isrWeights[3];
 
-  char *emptyLabelPtr;
-  char *weightLabelPtr;
-  char *metLabelPtr;
+  const char *emptyLabelPtr="";
+  const char *weightLabelPtr="weight";
+  const char *metLabelPtr=";#it{p}_{T}^{miss} (GeV)";
 
 
 
-  //map<string,map<Histograms1D,TH1F>> h1Maps;
-  //map<string,map<Histograms2D,TH2F>> h2Maps;
-  
-  //map<string,map<Histograms1D,TEfficiency>> eff1Maps;
-  //map<string,map<Histograms2D,TEfficiency>> eff2Maps;
-  
-  //map<string,map<Histograms1D,TH1F>> c1Maps;
-
-
-  //map<string,map<string,map<Histograms1D,TH1F>>> s1Maps;
-
-  //CR
-  //map<string,map<string,map<Histograms1D,TH1F>>> cr1Maps;
   map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>> h1Maps;
   map<selectionFolderName,map<selectionFolderName,map<Histograms2D,TH2F>>> h2Maps;
   
   map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TEfficiency>>> eff1Maps;
   map<selectionFolderName,map<selectionFolderName,map<Histograms2D,TEfficiency>>> eff2Maps;
   
-  //map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>> c1Maps;
-  map<string,map<Histograms1D,TH1F>> c1Maps;
 
+  map<cutFlowMapName,map<Histograms1D,TH1F>> c1Maps;
 
-
-  //map<selectionFolderName,map<selectionFolderName,map<string,map<Histograms1D,TH1F>>>> s1Maps;
-  //map<string,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>> s1Maps;
-  //map<string,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>> s1Maps;
   map<SignalPoint,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>> s1Maps;
 
-  //CR
   map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>> cr1Maps;
 
 

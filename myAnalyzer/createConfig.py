@@ -8,8 +8,8 @@ generalSettings = {
     "doSignalScan" : 1,
     "doSignalScanTChiNGSplit" : 1,
     "veto" : 6,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None
-    "doCutFlow" : 0,
-    "doCutFlowFine" : 0,
+    "doCutFlow" : 1,
+    "doCutFlowFine" : 1,
     "htStudies": 0
 }
 #outputFolder = "standard"

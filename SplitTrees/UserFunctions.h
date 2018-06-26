@@ -507,6 +507,25 @@ string getSignalPointName(unsigned short nBinos, unsigned short m1, unsigned sho
   return out;
 }
 
+string getSignalPointNameShort(unsigned short nBinos) {
+  string out = "";
+  switch (nBinos) {
+    //case 0: out += "WW"; break;
+    //case 1: out += "Wg"; break;
+    //case 2: out += "gg"; break;
+    //case 0: out += "NG"; break;
+    case 1: out += "Ng"; break;
+    case 2: out += "Zg"; break;
+    case 10: out += "GGM"; break;
+    case 11: out += "GMSB"; break;
+    //case 2: out += "gg"; break;
+    default: out += "xx";
+  }
+  //out += "_"+to_string(m1);
+  //out += "_"+to_string(m2);
+  return out;
+}
+
 
 //float M_T2(TVector3 const &v1, TVector3 const &v2)
 //{

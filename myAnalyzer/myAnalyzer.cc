@@ -183,12 +183,8 @@ void myAnalyzer::Init(TTree *tree)
    }
    
    
-     emptyLabelPtr="";
-     weightLabelPtr = "weight";
-     metLabelPtr=";#it{p}_{T}^{miss} (GeV)";
    
    
-   //cout<<"a"<<endl;
    
    //map<unsigned short,unsigned short> massPointsForMaps;
    vector<SignalPoint> massPointsForMaps;
@@ -211,7 +207,6 @@ void myAnalyzer::Init(TTree *tree)
      while ( (key = ((TKey*)next())) ) {
        obj = key->ReadObj() ;
        if (    (strcmp(obj->IsA()->GetName(),"TProfile")!=0)
-            //&& (!obj->InheritsFrom("TH2"))
             && (!obj->InheritsFrom("TH1"))
        && (!obj->InheritsFrom("TH1")) 
           ) {
@@ -236,7 +231,6 @@ void myAnalyzer::Init(TTree *tree)
                toFillM1=atoi(results.at(1).c_str());
             }
          }
-         //massPointsForMaps[toFillM1]=toFillM2;
          sp_.first=toFillM1;
          sp_.second=toFillM2;
          massPointsForMaps.push_back(sp_);
@@ -264,28 +258,20 @@ void myAnalyzer::Init(TTree *tree)
    if(isSignal){
       nWeights=((inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
    }else{
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos))? 0 : 110;
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos))? 0 : 9;
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 110;
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : pdf_weights->size();
-         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 50;
-         nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
+         nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 110;
+         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 9;
    }
   
-   //noPromptPhotons = inputName.find("DYJets") != string::npos;
-   //isZGammaInclusive = (inputName.find("ZGTo2LG_ext") != string::npos) || (inputName.find("ZGTo2LG_Total") != string::npos);
    if(!config_doTrigger){
    if (config_docutflow) InitCutFlowHistos();
    if (config_docutflowfine) InitCutFlowHistos_Fine();
    }
    if(!isTotalSignal){
-      //InitAllHistos();
       if(config_doTrigger){
          InitTriggerStudiesHistos();
       }else{
          InitAllHistos();
          for(vector<SignalPoint>::iterator it = massPointsForMaps.begin(); it != massPointsForMaps.end(); it++){
-            //cout<<it->first<<" "<<it->second;
             InitSignalScanHistos(*it);
          }
       }
@@ -294,15 +280,12 @@ void myAnalyzer::Init(TTree *tree)
       float maxCounter=massPointsForMaps.size();
       float initProgress= counter/maxCounter;
       for(vector<SignalPoint>::iterator it = massPointsForMaps.begin(); it != massPointsForMaps.end(); it++){
-         //cout<<it->first<<" "<<it->second;
          initProgress= counter/maxCounter;
-         //cout<<counter<<"/"<<maxCounter<<" ["<<initProgress*100.<<"%] in "<<(time(NULL) - startTime)/60 << " min" <<endl;
          InitSignalScanHistos(*it);
          cout<<counter<<"/"<<maxCounter<<" ["<<initProgress*100.<<"%] in "<<(time(NULL) - startTime)/60 << " min" <<endl;
          counter+=1.;
       }
    }
-      //cout<<"d"<<endl;
 
 }
 
@@ -326,36 +309,31 @@ Bool_t myAnalyzer::Process(Long64_t entry){
 
    fReader.SetLocalEntry(entry);
 
-   //cout<<"1"<<endl;
-   //cout<<entry<<endl;
+
    
 
    sp_.first=*signal_m1;
    sp_.second=*signal_m2;
-   //sp_.first=100;
-   //sp_.second=0;
-//cout<<"2"<<endl;
+
    totalWeight = *mc_weight * *pu_weight;
    
    
-   //puWeights={*pu_weight,*pu_weightUp,*pu_weightDown};
    puWeights[normalPU]=*pu_weight;
    puWeights[upPU]=*pu_weightUp;
    puWeights[downPU]=*pu_weightDown;
 
-   //lepSfWeights={*lepSF_weight,*lepSF_weightUp,*lepSF_weightDown};
    lepSfWeights[normalLEPSF]=*lepSF_weight;
    lepSfWeights[upLEPSF]=*lepSF_weightUp;
    lepSfWeights[downLEPSF]=*lepSF_weightDown;
-   //photonSfWeights={*photonSF_weight,*photonSF_weightUp,*photonSF_weightDown};
+   
    photonSfWeights[normalPHOTONSF]=*photonSF_weight;
    photonSfWeights[upPHOTONSF]=*photonSF_weightUp;
    photonSfWeights[downPHOTONSF]=*photonSF_weightDown;
-   //ewkWeights={*ewk_weight,*ewk_weightUp,*ewk_weightDown};
+   
    ewkWeights[normalEWK]=*ewk_weight;
    ewkWeights[upEWK]=*ewk_weightUp;
    ewkWeights[downEWK]=*ewk_weightDown;
-   //isrWeights={*isr_weight,*isr_weightUp,*isr_weightDown};
+   
    isrWeights[normalISR]=*isr_weight;
    isrWeights[upISR]=*isr_weightUp;
    isrWeights[downISR]=*isr_weightDown;
@@ -367,7 +345,6 @@ Bool_t myAnalyzer::Process(Long64_t entry){
    if(entry%100==0){
    
 		std::cout<<"[";
-		//for(int i=0;i<100;i++)
 		for(long i=0;i<100;i++)
 			if(i<progress)
 				std::cout<<'=';
@@ -382,7 +359,6 @@ Bool_t myAnalyzer::Process(Long64_t entry){
    }
 
 
-   //string cutFlowName = "TreeWriter/hCutFlow";
    string cutFlowName = "hCutFlow";
    
    if(isTotalSignal){
@@ -427,7 +403,6 @@ Bool_t myAnalyzer::Process(Long64_t entry){
       }
    }
 
-   //cout<<"2"<<endl;
 
    if (!isTotalSignal){
       if(!config_doTrigger){
@@ -435,14 +410,12 @@ Bool_t myAnalyzer::Process(Long64_t entry){
       }
       
    }
-   //cout<<"3"<<endl;
 
    if (!isTotalSignal){
       if(!config_doTrigger){
          FillHistograms();
       }
    }
-   //cout<<"4"<<endl;
    if(!config_doTrigger){
       if (config_docutflow) FillCutFlowHistograms();
       if (config_docutflowfine) FillCutFlowHistograms_Fine();
@@ -450,9 +423,7 @@ Bool_t myAnalyzer::Process(Long64_t entry){
          clearCutFlowMap();
       }
    }
-   //cout<<"5"<<endl;
 
-   //FillHistograms2D();
    
    
    if((inputName.find("JetHT")!= string::npos)||(!isData && !isTotalSignal)){
@@ -466,14 +437,12 @@ Bool_t myAnalyzer::Process(Long64_t entry){
        FillSignalHistograms();
     }
    }
-      //cout<<"6"<<endl;
 
    if (!isTotalSignal){
       if(!config_doTrigger){
       clearCutFlowMap();
    }
    }
-   //cout<<"7"<<endl;
 
    return kTRUE;
 }
@@ -513,7 +482,6 @@ Bool_t myAnalyzer::Process(Long64_t entry){
 //}
 
 void myAnalyzer::FillSignalHistograms(){
-   //cout<<"Fillsignal"<<endl;
    if(SelectEvent(ONZ)){
       if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
          if((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)&&(*ETmiss>=150.)){
@@ -535,11 +503,8 @@ void myAnalyzer::FillSignalHistograms(){
                //InitSignalScanHistos(sp_);
             //}
             auto signalPoint=sp_;
-            //cout<<"a"<<endl;
             if(*isDiMuon || *isDiElectron){
-                  //cout<<"a1"<<endl;
 
-               //FillerSignal(float divideFactor,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
 
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(LL).at(JESu),1.,9999,JESUP,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -570,16 +535,13 @@ void myAnalyzer::FillSignalHistograms(){
                
 
                if(tempPhotonLeadingPt>=80.){
-                  //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(LL).at(nom));
                   FillerSignal(s1Maps.at(signalPoint).at(sig80).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                }else{
-                  //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(LL).at(nom));
                   FillerSignal(s1Maps.at(signalPoint).at(sig080).at(LL).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                }
 
-            //}
+
                if (*isDiElectron){
-                  //FillerSignal(s1Maps.at(signalPoint).at(sig).at(EE).at(nom));
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(EE).at(JESu),1.,9999,JESUP,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(EE).at(JESd),1.,9999,JESDOWN,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -600,15 +562,12 @@ void myAnalyzer::FillSignalHistograms(){
                   }
                   
                   if(tempPhotonLeadingPt>=80.){
-                     //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(EE).at(nom));
                      FillerSignal(s1Maps.at(signalPoint).at(sig80).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }else{
-                     //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(EE).at(nom));
                      FillerSignal(s1Maps.at(signalPoint).at(sig080).at(EE).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }
                }
                if (*isDiMuon){
-                  //FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM));
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM).at(JESu),1.,9999,JESUP,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   FillerSignal(s1Maps.at(signalPoint).at(sig).at(MM).at(JESd),1.,9999,JESDOWN,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -629,22 +588,14 @@ void myAnalyzer::FillSignalHistograms(){
                   }
                   
                   if(tempPhotonLeadingPt>=80.){
-                     //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(MM).at(nom));
                      FillerSignal(s1Maps.at(signalPoint).at(sig80).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }else{
-                     //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(MM).at(nom));
                      FillerSignal(s1Maps.at(signalPoint).at(sig080).at(MM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   }
                }
             }
             if(*isElectronMuon || *isMuonElectron){
-               //FillerSignal(s1Maps.at(signalPoint).at(sig).at(EM));
                FillerSignal(s1Maps.at(signalPoint).at(sig).at(EM).at(nom),1.,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
-               //if(tempPhotonLeadingPt>=80.){
-                  //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig80).at(EM).at(nom));
-               //}else{
-                  //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at(sig080).at(EM).at(nom));
-               //}
             }
             
             if(config_dosignalscanSplit){
@@ -653,37 +604,16 @@ void myAnalyzer::FillSignalHistograms(){
                   if (fabs((*intermediateGenParticles)[0].daughters[0].pdgId) == 22 || fabs((*intermediateGenParticles)[0].daughters[1].pdgId) == 22) {
                      if (fabs((*intermediateGenParticles)[1].daughters[0].pdgId) == 22 || fabs((*intermediateGenParticles)[1].daughters[1].pdgId) == 22) {
                         if(*isDiMuon || *isDiElectron){
-                           //FillerSignal(s1Maps.at(signalPoint).at(sig_gg).at(LL),4.0);
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gg).at(LL).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg80"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg080"),4.0);
-                           //}
                         }
                         if (*isDiElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gg).at(EE).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg80EE"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg080EE"),4.0);
-                           //}
                         }
                         if (*isDiMuon){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gg).at(MM).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg80MM"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg080MM"),4.0);
-                           //}
                         }
                         if(*isElectronMuon || *isMuonElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gg).at(EM).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg80EM"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gg080EM"),4.0);
-                           //}
                         }
                      }
                   }
@@ -693,35 +623,15 @@ void myAnalyzer::FillSignalHistograms(){
                      if (fabs((*intermediateGenParticles)[1].daughters[0].pdgId) == 23 || fabs((*intermediateGenParticles)[1].daughters[1].pdgId) == 23) {
                         if(*isDiMuon || *isDiElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_zz).at(LL).at(nom),16.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz80"),16.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz080"),16.0);
-                           //}
                         }
                         if (*isDiElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_zz).at(EE).at(nom),16.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz80EE"),16.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz080EE"),16.0);
-                           //}
                         }
                         if (*isDiMuon){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_zz).at(MM).at(nom),16.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz80MM"),16.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz080MM"),16.0);
-                           //}
                         }
                         if(*isElectronMuon || *isMuonElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_zz).at(EM).at(nom),16.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz80EM"),16.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_zz080EM"),16.0);
-                           //}
                         }
                      }
                   }
@@ -731,35 +641,16 @@ void myAnalyzer::FillSignalHistograms(){
                      if (fabs((*intermediateGenParticles)[0].daughters[0].pdgId) == 22 || fabs((*intermediateGenParticles)[0].daughters[1].pdgId) == 22 || fabs((*intermediateGenParticles)[1].daughters[0].pdgId) == 22 || fabs((*intermediateGenParticles)[1].daughters[1].pdgId) == 22) {
                         if(*isDiMuon || *isDiElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gz).at(LL).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz80"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz080"),4.0);
-                           //}
                         }
                         if (*isDiElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gz).at(EE).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz80EE"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz080EE"),4.0);
-                           //}
                         }
                         if (*isDiMuon){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gz).at(MM).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz80MM"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz080MM"),4.0);
-                           //}
                         }
                         if(*isElectronMuon || *isMuonElectron){
                            FillerSignal(s1Maps.at(signalPoint).at(sig_gz).at(EM).at(nom),4.0);
-                           //if(tempPhotonLeadingPt>=80.){
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz80EM"),4.0);
-                           //}else{
-                              //FillerSignal(selectedEvent,s1Maps.at(signalPoint).at("sig_gz080EM"),4.0);
-                           //}
+
                         }
                      }
                   }
@@ -772,7 +663,6 @@ void myAnalyzer::FillSignalHistograms(){
 
 
 void myAnalyzer::FillTriggerStudies(){
-   //cout<<"filltrigger"<<endl;
    if(SelectEventTriggerStudies(TRIGDILEP)){
       if (*trigHt){//baselineTrigger
          if(*isDiElectron && !(*isDiMuon || *isMuonElectron || *isMuonElectron)){
@@ -806,12 +696,10 @@ void myAnalyzer::FillTriggerStudies(){
 
 void myAnalyzer::FillHistograms(){
    
-//cout<<"fillHistos"<<endl;
    if(config_selectionsToProcessMap[DILEP]){
       if(SelectEvent(DILEP)){
          if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
             if((*isDiMuon || *isDiElectron) && (!(*isElectronMuon || *isMuonElectron))){
-               //Filler(h1Maps["dilep"],false);
                Filler(h1Maps[dilep][LL],false);
             }
             if (*isDiElectron && (!*isDiMuon) && (!(*isElectronMuon || *isMuonElectron))){
@@ -823,30 +711,6 @@ void myAnalyzer::FillHistograms(){
          }
       }
    }
-
-   
-   //if(config_selectionsToProcessMap[PHOTON]){
-
-      //if(SelectEvent(PHOTON)){
-         //if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
-            //if (*selPhotonSize!=0){
-               //if(*isDiMuon || *isDiElectron){
-                  //Filler(h1Maps["1photon"],true);
-               //}   
-               //if (*isDiElectron){ 
-                  //Filler(h1Maps["1photonEE"],true);
-               //}else{
-                  //if (*isDiMuon){
-                     //Filler(h1Maps["1photonMM"],true);
-                  //}
-                  //if(*isElectronMuon || *isMuonElectron){
-                     //Filler(h1Maps["1photonEM"],true);
-                  //}
-               //}
-            //}
-         //}
-      //}
-   //}
    
    if(config_selectionsToProcessMap[SEL]){
       if(SelectEvent(SEL)){
@@ -874,7 +738,6 @@ void myAnalyzer::FillHistograms(){
 
 
    if(config_selectionsToProcessMap[ONZMET]){
-            //cout<<"onzmet"<<endl;
 
       if(SelectEvent(ONZ)){ 
          if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
@@ -894,21 +757,6 @@ void myAnalyzer::FillHistograms(){
                   }
                }
             }
-            
-            //if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)&&(*ETmiss>=100.)){
-               //if(*isDiMuon || *isDiElectron){
-                  //Filler(h1Maps["onZMet100"],true);
-                  //if (*isDiElectron){
-                     //Filler(h1Maps["onZMet100EE"],true);
-                  //}
-                  //if (*isDiMuon){
-                        //Filler(h1Maps["onZMet100MM"],true);
-                  //}
-               //}
-               //if (*isElectronMuon || *isMuonElectron){
-                   //Filler(h1Maps["onZMet100EM"],true);
-               //}
-            //}
             
             if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)&&(*ETmiss>=150.)){ //ONZ+MET>150
                if(*isDiMuon || *isDiElectron){
@@ -943,56 +791,7 @@ void myAnalyzer::FillHistograms(){
          }
       }
    }
-      //
 
-   //if(config_selectionsToProcessMap[ONZG]){
-      //if(SelectEvent(ONZG)){ //ONZG
-           
-         //if ((*selPhotonSize!=0)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons->at(0).vec).M()>81.)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons->at(0).vec).M()<101.)){
-            //if(selectedEvent.isDiMuon || selectedEvent.isDiElectron) Filler(selectedEvent,h1Maps["onZG"],true);
-            //if (selectedEvent.isDiElectron){ 
-               //Filler(selectedEvent,h1Maps["onZGEE"],true);
-            //}else{
-               //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["onZGMM"],true);
-               //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron) Filler(selectedEvent,h1Maps["onZGEM"],true);
-            //}
-         //}
-      //}
-   //}
-      //
-
-   //if(config_selectionsToProcessMap[ABOVEZG]){
-      //if(SelectEvent(ONZ)){//MLLG>110
-           
-         //if ((selectedEvent.selPhotons.size()!=0)&&((selectedEvent.l1+selectedEvent.l2+selectedEvent.selPhotons->at(0).vec).M()>110.)){
-            //if(selectedEvent.isDiMuon || selectedEvent.isDiElectron) Filler(selectedEvent,h1Maps["mllG110"],true);
-            //if (selectedEvent.isDiElectron){ 
-               //Filler(selectedEvent,h1Maps["mllG110EE"],true);
-            //}else{
-               //if (selectedEvent.isDiMuon) Filler(selectedEvent,h1Maps["mllG110MM"],true);
-               //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron) Filler(selectedEvent,h1Maps["mllG110EM"],true);
-            //}
-         //}
-      //}
-   //}
-   
-   //
-   //clearCutFlowMap();
-   //if(config_selectionsToProcessMap[ControlRegionDY]){
-      //if(SelectEvent(ONZ)){
-         //if(selectedEvent.selLeptonSize==selectedEvent.matchedLeptonSize){
-            //if ((selectedEvent.selPhotons.size()!=0)&&(selectedEvent.mll>81. && selectedEvent.mll<101.)&&(selectedEvent.ETmiss<100.)){ //ONZ+MET<100 ~ CR DY/Z(+gamma)
-               //if(selectedEvent.isDiMuon || selectedEvent.isDiElectron) Filler(selectedEvent,h1Maps["CRDY"],true);
-               //if (selectedEvent.isDiElectron){
-                  //Filler(selectedEvent,h1Maps["CRDYEE"],true);
-               //}else{                          
-                  //if (selectedEvent.isDiMuon){Filler(selectedEvent,h1Maps["CRDYMM"],true);}
-                  //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron) Filler(selectedEvent,h1Maps["CRDYEM"],true);
-               //}
-            //}
-         //}
-      //}
-   //}
    
    clearCutFlowMap();
    if(config_selectionsToProcessMap[ControlRegionDY]){
@@ -1000,7 +799,6 @@ void myAnalyzer::FillHistograms(){
          if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
             if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)){//&&(selectedEvent.ETmiss<100.)){ //ONZ+MET<100 ~ CR DY/Z(+gamma)
                if(*ETmiss<100.){
-                  //if(*isDiMuon || *isDiElectron) Filler(cr1Maps["CRDY"]["nom"],true,true);
                   if(*isDiMuon || *isDiElectron){
                      Filler(cr1Maps[controlregionDY][LL][nom],true,true,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                      Filler(cr1Maps[controlregionDY][LL][LEPSFUP],true,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1009,7 +807,6 @@ void myAnalyzer::FillHistograms(){
                      Filler(cr1Maps[controlregionDY][LL][PHOTONSFDOWN],true,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                   }
                   if (*isDiElectron){
-                     //Filler(cr1Maps[controlregionDY][EE][nom],true,true);
                      Filler(cr1Maps[controlregionDY][EE][nom],true,true,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                      Filler(cr1Maps[controlregionDY][EE][LEPSFUP],true,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
                      Filler(cr1Maps[controlregionDY][EE][LEPSFDOWN],true,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1017,7 +814,6 @@ void myAnalyzer::FillHistograms(){
                      Filler(cr1Maps[controlregionDY][EE][PHOTONSFDOWN],true,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                   }else{                          
                      if (*isDiMuon){
-                        //Filler(cr1Maps[controlregionDY][MM][nom],true,true);
                         Filler(cr1Maps[controlregionDY][MM][nom],true,true,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         Filler(cr1Maps[controlregionDY][MM][LEPSFUP],true,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         Filler(cr1Maps[controlregionDY][MM][LEPSFDOWN],true,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1109,32 +905,6 @@ void myAnalyzer::FillHistograms(){
          }
       }
    }
-   //if(config_selectionsToProcessMap[ControlRegionWW]){
-      //if(SelectEvent(DILEP)){
-         //if(*selLeptonSize==*matchedLeptonSize && selLeptonSize==2){
-            //if ((*mll<81. || *mll>101.)&&(*ETmiss<100. && *ETmiss>20.)){ //ONZ+MET<100 ~ CR DY/Z(+gamma)
-               //if((*selJetSize==0)&&((selectedEvent.l1+selectedEvent.l2).Pt()>45.)){
-               
-                  //if(selectedEvent.isDiMuon || selectedEvent.isDiElectron || selectedEvent.isElectronMuon || selectedEvent.isMuonElectron){
-                     //Filler(h1Maps["CRWWLL"],false);
-                   //}
-                  //if(selectedEvent.isDiMuon || selectedEvent.isDiElectron){
-                     //Filler(h1Maps["CRWW"],false);
-                   //}
-                  //if (selectedEvent.isDiElectron){
-                     //Filler(h1Maps["CRWWEE"],false);
-                  //}                      
-                  //if (selectedEvent.isDiMuon){
-                     //Filler(h1Maps["CRWWMM"],false);
-                  //}
-                  //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron){
-                     //Filler(h1Maps["CRWWEM"],false);
-                  //}
-               //}
-            //}
-         //}
-      //}
-   //}
    
    clearCutFlowMap();
    if(config_selectionsToProcessMap[ValidationRegion]){
@@ -1190,36 +960,17 @@ void myAnalyzer::FillHistograms(){
                   Filler(cr1Maps[controlregionTT][EM][JESd],true,true,9999,JESDOWN);
                   Filler(cr1Maps[controlregionTT][EM][JERu],true,true,9999,JERUP);
                   Filler(cr1Maps[controlregionTT][EM][JERd],true,true,9999,JERDOWN);
-                  //Filler(cr1Maps[controlregionTT][EM][nom],true,true,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   Filler(cr1Maps[controlregionTT][EM][LEPSFUP],true,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   Filler(cr1Maps[controlregionTT][EM][LEPSFDOWN],true,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                   Filler(cr1Maps[controlregionTT][EM][PHOTONSFUP],true,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
                   Filler(cr1Maps[controlregionTT][EM][PHOTONSFDOWN],true,true,9999,normal,normalPU,normalLEPSF,downPHOTONSF,normalISR,normalEWK);
                   for(int i=0; i<nWeights; i++){
-                     //if (*isElectronMuon || *isMuonElectron){
                         Filler(cr1Maps[controlregionTT][EM][PDFNAMES[i]],true,true,i);
-                     //}
                   }
                   if(selPhotons->at(0).p.Pt()>=80.){
                      Filler(cr1Maps[controlregionTT80][EM][nom],true,true);
-                     //Filler(selectedEvent,cr1Maps["CRTT80EM"]["JESup"],true,9999,"JESup");
-                     //Filler(selectedEvent,cr1Maps["CRTT80EM"]["JESup"],true,9999,"JESdn");
-                     //Filler(selectedEvent,cr1Maps["CRTT80EM"]["JERup"],true,9999,"JERup");
-                     //Filler(selectedEvent,cr1Maps["CRTT80EM"]["JERup"],true,9999,"JERdn");
-                  //for(int i=0; i<nWeights; i++){
-                     //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron) Filler(selectedEvent,cr1Maps["CRTTEM"][to_string(i)],true,i);
-                  //}
                   }else{
                      Filler(cr1Maps[controlregionTT080][EM][nom],true,true);
-                     //Filler(selectedEvent,cr1Maps["CRTT080EM"]["JESup"],true,9999,"JESup");
-                     //Filler(selectedEvent,cr1Maps["CRTT080EM"]["JESup"],true,9999,"JESdn");
-                     //Filler(selectedEvent,cr1Maps["CRTT080EM"]["JERup"],true,9999,"JERup");
-                     //Filler(selectedEvent,cr1Maps["CRTT080EM"]["JERup"],true,9999,"JERdn");
-                  //}
-               
-                     //for(int i=0; i<nWeights; i++){
-                        //if (selectedEvent.isElectronMuon || selectedEvent.isMuonElectron) Filler(selectedEvent,cr1Maps["CRTTEM"][to_string(i)],true,i);
-                     //}
                   }
                }
             }
@@ -1235,15 +986,7 @@ void myAnalyzer::FillHistograms(){
 
                
                float ZMass = 91.1876;
-               
-               //float tempTotalWeight=totalWeight;
-               
-               //float addWeight=1.;
-               
 
-               
-               //selectedEvent.totalWeight=tempTotalWeight;
-               
                if(*countNegCharge==2 && *countPosCharge==2){
                
                   selLepton lep1,lep2,lep3,lep4;
@@ -1332,14 +1075,11 @@ void myAnalyzer::FillHistograms(){
                      float mll1=(lep1.vec+lep2.vec).M();
                      float mll2=(lep3.vec+lep4.vec).M();
                      if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                        //FillerZZ(selectedEvent,h1Maps["CRZZMM"],false,lep1,lep2,lep3,lep4);
-                        //FillerZZ(cr1Maps["CRZZMM"]["nom"],false,lep1,lep2,lep3,lep4,true);
                         FillerZZ(cr1Maps[controlregionZZ][MM][nom],false,lep1,lep2,lep3,lep4,true);
                         FillerZZ(cr1Maps[controlregionZZ][MM][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
                         FillerZZ(cr1Maps[controlregionZZ][MM][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
                         FillerZZ(cr1Maps[controlregionZZ][MM][JERu],false,lep1,lep2,lep3,lep4,true,9999,JERUP);
                         FillerZZ(cr1Maps[controlregionZZ][MM][JERd],false,lep1,lep2,lep3,lep4,true,9999,JERDOWN);
-                        //FillerZZ(cr1Maps[controlregionZZ][MM][nom],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][MM][LEPSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
                         FillerZZ(cr1Maps[controlregionZZ][MM][PHOTONSFUP],false,lep1,lep2,lep3,lep4,true,9999,normal,normalPU,normalLEPSF,upPHOTONSF,normalISR,normalEWK);
@@ -1434,7 +1174,6 @@ void myAnalyzer::FillHistograms(){
                      float mll1=(lep1.vec+lep2.vec).M();
                      float mll2=(lep3.vec+lep4.vec).M();
                      if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                        //FillerZZ(selectedEvent,h1Maps["CRZZEE"],false,lep1,lep2,lep3,lep4);
                         FillerZZ(cr1Maps[controlregionZZ][EE][nom],false,lep1,lep2,lep3,lep4,true);
                         FillerZZ(cr1Maps[controlregionZZ][EE][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
                         FillerZZ(cr1Maps[controlregionZZ][EE][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
@@ -1482,7 +1221,6 @@ void myAnalyzer::FillHistograms(){
                            float mll1=(lep1.vec+lep2.vec).M();
                            float mll2=(lep3.vec+lep4.vec).M();
                            if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                              //FillerZZ(selectedEvent,h1Maps["CRZZMM"],false,lep1,lep2,lep3,lep4);
                               FillerZZ(cr1Maps[controlregionZZ][MM][nom],false,lep1,lep2,lep3,lep4,true);
                               FillerZZ(cr1Maps[controlregionZZ][MM][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
                               FillerZZ(cr1Maps[controlregionZZ][MM][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
@@ -1516,7 +1254,6 @@ void myAnalyzer::FillHistograms(){
                            float mll1=(lep1.vec+lep2.vec).M();
                            float mll2=(lep3.vec+lep4.vec).M();
                            if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                              //FillerZZ(selectedEvent,h1Maps["CRZZEE"],false,lep1,lep2,lep3,lep4);
                               FillerZZ(cr1Maps[controlregionZZ][EE][nom],false,lep1,lep2,lep3,lep4,true);
                               FillerZZ(cr1Maps[controlregionZZ][EE][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
                               FillerZZ(cr1Maps[controlregionZZ][EE][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
@@ -1536,7 +1273,6 @@ void myAnalyzer::FillHistograms(){
                   float mll1=(lep1.vec+lep2.vec).M();
                   float mll2=(lep3.vec+lep4.vec).M();
                   if(mll1<106. && mll1>76. && mll2<130. && mll2>50.){
-                     //FillerZZ(selectedEvent,h1Maps["CRZZ"],false,lep1,lep2,lep3,lep4);
                      FillerZZ(cr1Maps[controlregionZZ][LL][nom],false,lep1,lep2,lep3,lep4,true);
                      FillerZZ(cr1Maps[controlregionZZ][LL][JESu],false,lep1,lep2,lep3,lep4,true,9999,JESUP);
                      FillerZZ(cr1Maps[controlregionZZ][LL][JESd],false,lep1,lep2,lep3,lep4,true,9999,JESDOWN);
@@ -1563,17 +1299,8 @@ void myAnalyzer::FillHistograms(){
          if((*selLeptonSize==3)&&(*matchedLeptonSize==2)){
             if((*selMuonSize==3)||(*selElectronSize==3)||(*selMuonSize==1 && *selElectronSize==2)||(*selMuonSize==2 && *selElectronSize==1)){
 
-               
-               
-               
-               
                float ZMass = 91.1876;
-               
-               //float tempTotalWeight=selectedEvent.totalWeight;
 
-
-               
-               //selectedEvent.totalWeight=tempTotalWeight;
                
                if((*countNegCharge==1 && *countPosCharge==2)||(*countNegCharge==2 && *countPosCharge==1)){
                   //find lepton combinations
@@ -1660,8 +1387,6 @@ void myAnalyzer::FillHistograms(){
                      if(mll1<106. && mll1>76.){
                         if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
                            if(*ETmiss>70.){
-                              //FillerWZ(selectedEvent,h1Maps["CRWZMM"],false,lep1,lep2,lep3);
-                              //FillerWZ(cr1Maps["CRWZMM"]["nom"],false,lep1,lep2,lep3,true);
                               FillerWZ(cr1Maps[controlregionWZ][MM][nom],false,lep1,lep2,lep3,true);
                               FillerWZ(cr1Maps[controlregionWZ][MM][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
                               FillerWZ(cr1Maps[controlregionWZ][MM][LEPSFDOWN],false,lep1,lep2,lep3,true,9999,normal,normalPU,downLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1760,9 +1485,6 @@ void myAnalyzer::FillHistograms(){
                      float mll1=(lep1.vec+lep2.vec).M();
                      if(mll1<106. && mll1>76.){
                         if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
-                           //if(selectedEvent.ETmiss>70.){
-                              //FillerWZ(selectedEvent,h1Maps["CRWZEE"],false,lep1,lep2,lep3);
-                           //}
                            if(*ETmiss>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][nom],false,lep1,lep2,lep3,true);
                               FillerWZ(cr1Maps[controlregionWZ][EE][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1833,9 +1555,6 @@ void myAnalyzer::FillHistograms(){
                      float mll1=(lep1.vec+lep2.vec).M();
                      if(mll1<106. && mll1>76.){
                         if( (lep1.vec+ETmiss_vec->vec).Mt() > 50. ){
-                           //if(selectedEvent.ETmiss>70.){
-                              //FillerWZ(selectedEvent,h1Maps["CRWZEE"],false,lep1,lep2,lep3);
-                           //}
                            if(*ETmiss>70.){
                               FillerWZ(cr1Maps[controlregionWZ][EE][nom],false,lep1,lep2,lep3,true);
                               FillerWZ(cr1Maps[controlregionWZ][EE][LEPSFUP],false,lep1,lep2,lep3,true,9999,normal,normalPU,upLEPSF,normalPHOTONSF,normalISR,normalEWK);
@@ -1986,8 +1705,6 @@ void myAnalyzer::FillHistograms(){
    
    clearCutFlowMap();
    if(config_selectionsToProcessMap[ONZ]){
-            //cout<<"onz"<<endl;
-
       if(SelectEvent(ONZ)){
             if(*selLeptonSize==*matchedLeptonSize && *selLeptonSize==2){
             if ((*selPhotonSize!=0)&&(*mll>81. && *mll<101.)){
@@ -2013,77 +1730,8 @@ void myAnalyzer::FillHistograms(){
 }
 
 
-//void myAnalyzer::Filler(selEvent& ev, map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,int changePDF,string changeMET){
 void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
-   //float tempWeight=*mc_weight * *pu_weight;
-   
-   //if(changePU==normalPU){
-      //tempWeight = *mc_weight**pu_weight;
-   //}
-   //if(changePU==upPU){
-      //tempWeight = *mc_weight**pu_weightUp;
-   //}
-   //if(changePU==downPU){
-      //tempWeight = *mc_weight**pu_weightDown;
-   //}
-   
-   
-   //float weight_TopPt=*topPt_weight;
-   //float weight_nIsr=*isr_weight;
-   //float weight_EWKinoPt=*ewk_weight;
-   //float weight_LepSF = *lepSF_weight;
-   //float weight_PhotonSF = *photonSF_weight;
-   
-   //float weight_PDF=1.;
 
-   //if(changePDF>150){
-      //weight_PDF=1.;
-   //}else{
-      //weight_PDF=pdf_weights->at(changePDF);
-   //}
-   
-   //if (changeLepSF==normalLEPSF){
-      //weight_LepSF=*lepSF_weight;
-   //}
-   //if (changeLepSF==upLEPSF){
-      //weight_LepSF=*lepSF_weightUp;
-   //}
-   //if (changeLepSF==downLEPSF){
-      //weight_LepSF=*lepSF_weightDown;
-   //}
-   
-   //if (changePhotonSF==normalPHOTONSF){
-      //weight_PhotonSF=*photonSF_weight;
-   //}
-   //if (changePhotonSF==upPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightUp;
-   //}
-   //if (changePhotonSF==downPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightDown;
-   //}
-   
-   //if(changeisr==normalISR){
-      //weight_nIsr = *isr_weight;
-   //}
-   //if(changeisr==upISR){
-      //weight_nIsr = *isr_weightUp;
-   //}
-   //if(changeisr==downISR){
-      //weight_nIsr = *isr_weightDown;
-   //}
-
-   //if(changeewk==normalEWK){
-      //weight_EWKinoPt = *ewk_weight;
-   //}
-   //if(changeewk==upEWK){
-      //weight_EWKinoPt = *ewk_weightUp;
-   //}
-   //if(changeewk==downEWK){
-      //weight_EWKinoPt = *ewk_weightDown;
-   //}
-
-
-   
    //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
    float tempWeight=*mc_weight;
    float weight_PDF=1.;
@@ -2095,12 +1743,8 @@ void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,i
    tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
    
-   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
-   //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
    m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
    m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
-   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
    m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
    
@@ -2137,15 +1781,6 @@ void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,i
    m.at(PHI1).Fill(fabs(*phi2),tempWeight);
    m.at(PHI2).Fill(fabs(*phi2),tempWeight);
 
-   //m.at(MT2).Fill(ev.MT2_val,tempWeight);
-
-   
-   //int jetSize=ev.selJets.size();
-
-
-
-   
-   
    if(!slimmed){
       if(*selJetSize>0){
          m.at(JetPt1).Fill(selJets->at(0).p.Pt(),tempWeight);
@@ -2259,78 +1894,6 @@ void myAnalyzer::Filler(map<Histograms1D,TH1F>& m,bool withPhoton,bool slimmed,i
 }
 void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& le1, selLepton& le2, selLepton& le3, selLepton& le4,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
    
-   //float tempWeight=*mc_weight * *pu_weight;
-   
-   
-   //if(changePU==normalPU){
-      //tempWeight = *mc_weight**pu_weight;
-   //}
-   //if(changePU==upPU){
-      //tempWeight = *mc_weight**pu_weightUp;
-   //}
-   //if(changePU==downPU){
-      //tempWeight = *mc_weight**pu_weightDown;
-   //}
-   
-   
-   
-   //float weight_TopPt=*topPt_weight;
-   //float weight_nIsr=*isr_weight;
-   //float weight_EWKinoPt=*ewk_weight;
-   //float weight_LepSF = *lepSF_weight;
-   //float weight_PhotonSF = *photonSF_weight;
-   
-   //float weight_PDF=1.;
-
-   //if(changePDF>150){
-      //weight_PDF=1.;
-   //}else{
-      //weight_PDF=pdf_weights->at(changePDF);
-   //}
-   
-   //if (changeLepSF==normalLEPSF){
-      //weight_LepSF=*lepSF_weight;
-   //}
-   //if (changeLepSF==upLEPSF){
-      //weight_LepSF=*lepSF_weightUp;
-   //}
-   //if (changeLepSF==downLEPSF){
-      //weight_LepSF=*lepSF_weightDown;
-   //}
-   
-   //if (changePhotonSF==normalPHOTONSF){
-      //weight_PhotonSF=*photonSF_weight;
-   //}
-   //if (changePhotonSF==upPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightUp;
-   //}
-   //if (changePhotonSF==downPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightDown;
-   //}
-   
-   //if(changeisr==normalISR){
-      //weight_nIsr = *isr_weight;
-   //}
-   //if(changeisr==upISR){
-      //weight_nIsr = *isr_weightUp;
-   //}
-   //if(changeisr==downISR){
-      //weight_nIsr = *isr_weightDown;
-   //}
-
-   //if(changeewk==normalEWK){
-      //weight_EWKinoPt = *ewk_weight;
-   //}
-   //if(changeewk==upEWK){
-      //weight_EWKinoPt = *ewk_weightUp;
-   //}
-   //if(changeewk==downEWK){
-      //weight_EWKinoPt = *ewk_weightDown;
-   //}
-
-
-   
-   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
    float tempWeight=*mc_weight;
    float weight_PDF=1.;
    if(changePDF>150){
@@ -2340,14 +1903,8 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
    }
    tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
-   
-   
-   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
-   //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
    m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
    m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
-   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
    m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
 
@@ -2374,7 +1931,6 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
    }
    
    
-   //m.at(ETMISS).Fill(ev.ETmiss, tempWeight);
    m.at(PT1).Fill(le1.p.Pt(), tempWeight);
    m.at(PT2).Fill(le2.p.Pt(), tempWeight);
    m.at(PT3).Fill(le3.p.Pt(), tempWeight);
@@ -2392,18 +1948,6 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
    m.at(PHI2).Fill(fabs(le2.p.Phi()),tempWeight);
    m.at(PHI3).Fill(fabs(le3.p.Phi()),tempWeight);
    m.at(PHI4).Fill(fabs(le4.p.Phi()),tempWeight);
-
-
-
-
-   //int jetSize=ev.selJets.size();
-
-
-
-
-
-
-
 
 
    if(!slimmed){
@@ -2433,7 +1977,6 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
       m.at(ZPT).Fill((le1.vec+le2.vec).Pt(),tempWeight);
       m.at(ZPT2).Fill((le3.vec+le4.vec).Pt(),tempWeight);
       m.at(ST).Fill(le1.p.Pt()+le2.p.Pt(),tempWeight);
-      //m.at(MT2).Fill(ev.MT2_val,tempWeight);
       m.at(NElectrons).Fill(*selElectronSize,tempWeight);
       m.at(NMuons).Fill(*selMuonSize,tempWeight);
    }
@@ -2446,19 +1989,18 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
       
       
       if(selPhotons->at(0).matchedToPhoton){
-         m.at(Fakes).Fill(0.,tempWeight);
-      }else{
-         if(selPhotons->at(0).matchedToElectron){
-            m.at(Fakes).Fill(1.,tempWeight);
-         }else{
-            if(selPhotons->at(0).matchedToJet){
-               m.at(Fakes).Fill(2.,tempWeight);
-            }else{
-               m.at(Fakes).Fill(3.,tempWeight);
-            }
-         }
+         m.at(Fakes).Fill(1.,tempWeight);
       }
-      
+      if(selPhotons->at(0).matchedToElectron){
+            m.at(Fakes).Fill(2.,tempWeight);
+      }
+      if(selPhotons->at(0).matchedToJet){
+               m.at(Fakes).Fill(3.,tempWeight);
+      }
+      if(!(selPhotons->at(0).matchedToPhoton)||(selPhotons->at(0).matchedToJet)||(selPhotons->at(0).matchedToJet)){
+               m.at(Fakes).Fill(4.,tempWeight);
+      }
+      m.at(Fakes).Fill(0.,tempWeight);
       
       //if(FindGenPhotonMatch(ev.selPhotons->at(0))) m.at(genPhotonPT).Fill(GetGenPhotonMatch(ev.selPhotons->at(0)).p.Pt(),tempWeight);
       //
@@ -2494,78 +2036,6 @@ void myAnalyzer::FillerZZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
 
 void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& le1, selLepton& le2, selLepton& le3,bool slimmed,int changePDF,changemet changeMET,changepu changePU,changeLEPSF changeLepSF,changePHOTONSF changePhotonSF,changeISR changeisr,changeEWK changeewk){
    
-   //float tempWeight=*mc_weight * *pu_weight;
-   
-   
-   //if(changePU==normalPU){
-      //tempWeight = *mc_weight**pu_weight;
-   //}
-   //if(changePU==upPU){
-      //tempWeight = *mc_weight**pu_weightUp;
-   //}
-   //if(changePU==downPU){
-      //tempWeight = *mc_weight**pu_weightDown;
-   //}
-   
-   
-   //float weight_TopPt=*topPt_weight;
-   //float weight_nIsr=*isr_weight;
-   //float weight_EWKinoPt=*ewk_weight;
-   //float weight_LepSF = *lepSF_weight;
-   //float weight_PhotonSF = *photonSF_weight;
-   
-   //float weight_PDF=1.;
-
-   //if(changePDF>150){
-      //weight_PDF=1.;
-   //}else{
-      //weight_PDF=pdf_weights->at(changePDF);
-   //}
-   
-   //if (changeLepSF==normalLEPSF){
-      //weight_LepSF=*lepSF_weight;
-   //}
-   //if (changeLepSF==upLEPSF){
-      //weight_LepSF=*lepSF_weightUp;
-   //}
-   //if (changeLepSF==downLEPSF){
-      //weight_LepSF=*lepSF_weightDown;
-   //}
-   
-   //if (changePhotonSF==normalPHOTONSF){
-      //weight_PhotonSF=*photonSF_weight;
-   //}
-   //if (changePhotonSF==upPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightUp;
-   //}
-   //if (changePhotonSF==downPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightDown;
-   //}
-   
-   //if(changeisr==normalISR){
-      //weight_nIsr = *isr_weight;
-   //}
-   //if(changeisr==upISR){
-      //weight_nIsr = *isr_weightUp;
-   //}
-   //if(changeisr==downISR){
-      //weight_nIsr = *isr_weightDown;
-   //}
-
-   //if(changeewk==normalEWK){
-      //weight_EWKinoPt = *ewk_weight;
-   //}
-   //if(changeewk==upEWK){
-      //weight_EWKinoPt = *ewk_weightUp;
-   //}
-   //if(changeewk==downEWK){
-      //weight_EWKinoPt = *ewk_weightDown;
-   //}
-
-
-   
-   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
-   
    float tempWeight=*mc_weight;
    float weight_PDF=1.;
    if(changePDF>150){
@@ -2575,14 +2045,8 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
    }
    tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
 
-   
-   
-   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
-   //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
    m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
    m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
-   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
    m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
    
@@ -2607,9 +2071,6 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
       }
    }
    
-   
-   
-   //m.at(ETMISS).Fill(ev.ETmiss, tempWeight);
    m.at(PT1).Fill(le1.p.Pt(), tempWeight);
    m.at(PT2).Fill(le2.p.Pt(), tempWeight);
    m.at(PT3).Fill(le3.p.Pt(), tempWeight);
@@ -2623,16 +2084,6 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
    m.at(PHI1).Fill(fabs(le1.p.Phi()),tempWeight);
    m.at(PHI2).Fill(fabs(le2.p.Phi()),tempWeight);
    m.at(PHI3).Fill(fabs(le3.p.Phi()),tempWeight);
-
-
-   //int jetSize=ev.selJets.size();
-
-
-
-
-
-
-
 
    if(!slimmed){
       if(*selJetSize>0){
@@ -2659,7 +2110,6 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
       m.at(GENHT).Fill(*genHt,tempWeight);
       m.at(ZPT).Fill((le1.vec+le2.vec).Pt(),tempWeight);
       m.at(ST).Fill(le1.vec.Pt()+le2.vec.Pt(),tempWeight);
-      //m.at(MT2).Fill(ev.MT2_val,tempWeight);
 
       m.at(DeltaEtaLL).Fill(fabs(le1.p.Eta()-le2.p.Eta()),tempWeight);
       m.at(DeltaPhiLL).Fill(fabs(le1.p.Phi()-le2.p.Phi()),tempWeight);
@@ -2682,18 +2132,18 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
       m.at(ETAG1).Fill(selPhotons->at(0).p.Eta(),tempWeight);
       
       if(selPhotons->at(0).matchedToPhoton){
-         m.at(Fakes).Fill(0.,tempWeight);
-      }else{
-         if(selPhotons->at(0).matchedToElectron){
-            m.at(Fakes).Fill(1.,tempWeight);
-         }else{
-            if(selPhotons->at(0).matchedToJet){
-               m.at(Fakes).Fill(2.,tempWeight);
-            }else{
-               m.at(Fakes).Fill(3.,tempWeight);
-            }
-         }
+         m.at(Fakes).Fill(1.,tempWeight);
       }
+      if(selPhotons->at(0).matchedToElectron){
+            m.at(Fakes).Fill(2.,tempWeight);
+      }
+      if(selPhotons->at(0).matchedToJet){
+               m.at(Fakes).Fill(3.,tempWeight);
+      }
+      if(!(selPhotons->at(0).matchedToPhoton)||(selPhotons->at(0).matchedToJet)||(selPhotons->at(0).matchedToJet)){
+               m.at(Fakes).Fill(4.,tempWeight);
+      }
+      m.at(Fakes).Fill(0.,tempWeight);
       
       
       if(!slimmed){
@@ -2717,9 +2167,7 @@ void myAnalyzer::FillerWZ(map<Histograms1D,TH1F>& m,bool withPhoton,selLepton& l
          m.at(MLLG).Fill((le1.vec+le2.vec+selPhotons->at(0).vec).M(),tempWeight);      
       
       }
-      
-      
-      
+
       //if(FindGenPhotonMatch(ev.selPhotons->at(0))) m.at(genPhotonPT).Fill(GetGenPhotonMatch(ev.selPhotons->at(0)).p.Pt(),tempWeight);
       //
       //if(ev.evtHasGenPhotonVeto) if(FindGenPhotonMatch(ev.selPhotons->at(0))) m.at(genPhotonPT_Veto).Fill(GetGenPhotonMatch(ev.selPhotons->at(0)).p.Pt(),tempWeight);
@@ -2764,39 +2212,6 @@ void myAnalyzer::FillerTrigger(map<Histograms1D,TEfficiency>& m,bool withPhoton,
    //m.at(ETA2).Fill(TriggerBool,fabs(ev.eta2));
    //m.at(PHI1).Fill(TriggerBool,fabs(ev.phi2));
    //m.at(PHI2).Fill(TriggerBool,fabs(ev.phi2));
-   
-   //float tempWeight=*mc_weight * *pu_weight;
-
-   
-   //float weight_TopPt=*topPt_weight;
-   //float weight_nIsr=*isr_weight;
-   //float weight_EWKinoPt=*ewk_weight;
-   //float weight_LepSF = *lepSF_weight;
-   //float weight_PhotonSF = *photonSF_weight;
-   
-   //float weight_PDF=1.;
-   
-   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
-   
-   //m.at(ETMISS).FillWeighted(TriggerBool,tempWeight,*ETmiss);
-   //m.at(PT1).FillWeighted(TriggerBool,tempWeight,*pt1);
-   //m.at(PT2).FillWeighted(TriggerBool,tempWeight,*pt2);
-   //m.at(MLL).FillWeighted(TriggerBool,tempWeight,*mll);   
-   //m.at(NPHOTONS).FillWeighted(TriggerBool,tempWeight,*selPhotonSize);
-   //m.at(NVTX).FillWeighted(TriggerBool,tempWeight,*nGoodVertices);
-   //m.at(HT).FillWeighted(TriggerBool,tempWeight,*calcHt);
-   //m.at(GENHT).FillWeighted(TriggerBool,tempWeight,*genHt);
-   //m.at(NJETS).FillWeighted(TriggerBool,tempWeight,*selJetSize);
-   //m.at(ETA1).FillWeighted(TriggerBool,tempWeight,fabs(*eta1));
-   //m.at(ETA2).FillWeighted(TriggerBool,tempWeight,fabs(*eta2));
-   //m.at(PHI1).FillWeighted(TriggerBool,tempWeight,fabs(*phi2));
-   //m.at(PHI2).FillWeighted(TriggerBool,tempWeight,fabs(*phi2));
-   //if(withPhoton){
-      //m.at(PTG1).Fill(TriggerBool,selPhotons->at(0).p.Pt());
-      //m.at(PHIG1).Fill(TriggerBool,fabs(selPhotons->at(0).p.Phi()));
-      //m.at(ETAG1).Fill(TriggerBool,fabs(selPhotons->at(0).p.Eta()));
-      //m.at(SIGMAIETAIETAG1).Fill(TriggerBool,selPhotons->at(0).sigmaIetaIeta);
-   //}
 }
 
 //void myAnalyzer::FillerSignal(selEvent& ev, map<Histograms1D,TH1F>& m, float divideFactor=1.){
@@ -2804,86 +2219,17 @@ void myAnalyzer::FillerSignal(map<Histograms1D,TH1F>& m, float divideFactor,int 
    //float tempWeight=*mc_weight * *pu_weight;
    float tempWeight=*mc_weight;
    
-   //if(changePU==normalPU){
-      //tempWeight = *mc_weight**pu_weight;
-   //}
-   //if(changePU==upPU){
-      //tempWeight = *mc_weight**pu_weightUp;
-   //}
-   //if(changePU==downPU){
-      //tempWeight = *mc_weight**pu_weightDown;
-   //}
    
-   
-   //float weight_TopPt=*topPt_weight;
-   //float weight_nIsr=*isr_weight;
-
-   //float weight_EWKinoPt=*ewk_weight;
-   //float weight_LepSF = *lepSF_weight;
-
-   //float weight_PhotonSF = *photonSF_weight;
-
    float weight_PDF=1.;
    if(changePDF>150){
       weight_PDF=1.;
    }else{
       weight_PDF=pdf_weights->at(changePDF);
    }
-
-   //if (changeLepSF==normalLEPSF){
-      //weight_LepSF=*lepSF_weight;
-   //}
-   //if (changeLepSF==upLEPSF){
-      //weight_LepSF=*lepSF_weightUp;
-   //}
-   //if (changeLepSF==downLEPSF){
-      //weight_LepSF=*lepSF_weightDown;
-   //}
-   
-   //if (changePhotonSF==normalPHOTONSF){
-      //weight_PhotonSF=*photonSF_weight;
-   //}
-   //if (changePhotonSF==upPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightUp;
-   //}
-   //if (changePhotonSF==downPHOTONSF){
-      //weight_PhotonSF=*photonSF_weightDown;
-   //}
-   
-   //if(changeisr==normalISR){
-      //weight_nIsr = *isr_weight;
-   //}
-   //if(changeisr==upISR){
-      //weight_nIsr = *isr_weightUp;
-   //}
-   //if(changeisr==downISR){
-      //weight_nIsr = *isr_weightDown;
-   //}
-
-   //if(changeewk==normalEWK){
-      //weight_EWKinoPt = *ewk_weight;
-   //}
-   //if(changeewk==upEWK){
-      //weight_EWKinoPt = *ewk_weightUp;
-   //}
-   //if(changeewk==downEWK){
-      //weight_EWKinoPt = *ewk_weightDown;
-   //}
-
-
-   
-   //tempWeight = tempWeight*weight_LepSF *weight_PhotonSF *weight_TopPt*weight_nIsr*weight_EWKinoPt*weight_PDF;
    tempWeight = tempWeight*puWeights[(int)changePU]*lepSfWeights[(int)changeLepSF] *photonSfWeights[(int)changePhotonSF] **topPt_weight*isrWeights[(int)changeisr]*ewkWeights[(int)changeewk]*weight_PDF;
-   
 
-   
-   //m.at(WEIGHT_EWKINOPAIRPT).Fill(weight_EWKinoPt);
-
-   //m.at(WEIGHT_LEPTONPAIRPT).Fill(weight_LeptonPt);
-   //m.at(WEIGHT_NISR).Fill(weight_nIsr);
    m.at(WEIGHT_EWKINOPAIRPT).Fill(ewkWeights[(int)changeewk]);
    m.at(WEIGHT_NISR).Fill(isrWeights[(int)changeisr]);
-   //m.at(WEIGHT_TOPPT).Fill(weight_TopPt);
    m.at(WEIGHT_TOPPT).Fill(*topPt_weight);
    m.at(WEIGHT_PDF).Fill(weight_PDF);
 
@@ -2907,8 +2253,6 @@ void myAnalyzer::FillerSignal(map<Histograms1D,TH1F>& m, float divideFactor,int 
          }
       }
    }
-   
-   //m.at(ETMISS).Fill(*ETmiss, tempWeight*1./(nGen/divideFactor));
 }
 
 
@@ -2916,10 +2260,6 @@ void myAnalyzer::FillerSignal(map<Histograms1D,TH1F>& m, float divideFactor,int 
 
 void myAnalyzer::InitAllHistos(){
    if (config_selectionsToProcessMap[DILEP]==true){
-      //h1Maps["dilepEE"]=InitHistograms(DILEP); 
-      //h1Maps["dilepMM"]=InitHistograms(DILEP);
-      //h1Maps["dilepEM"]=InitHistograms(DILEP);
-      //h1Maps["dilep"]=InitHistograms(DILEP);
       h1Maps[dilep][EE]=InitHistograms(DILEP); 
       h1Maps[dilep][MM]=InitHistograms(DILEP);
       h1Maps[dilep][EM]=InitHistograms(DILEP);
@@ -2944,11 +2284,6 @@ void myAnalyzer::InitAllHistos(){
       h1Maps[onzmet0100][EM]=InitHistograms(ONZ); 
       h1Maps[onzmet0100][LL]=InitHistograms(ONZ); 
       
-      //h1Maps[ONZMET100][EE]=InitHistograms(ONZ); //>100
-      //h1Maps[ONZMET100][MM]=InitHistograms(ONZ); 
-      //h1Maps[ONZMET100][EM]=InitHistograms(ONZ); 
-      //h1Maps[ONZMET100][LL]=InitHistograms(ONZ); 
-      
       h1Maps[onzmet150][EE]=InitHistograms(ONZ); //>150
       h1Maps[onzmet150][MM]=InitHistograms(ONZ); 
       h1Maps[onzmet150][EM]=InitHistograms(ONZ); 
@@ -2959,64 +2294,21 @@ void myAnalyzer::InitAllHistos(){
       h1Maps[onzmet100150][EM]=InitHistograms(ONZ); 
       h1Maps[onzmet100150][LL]=InitHistograms(ONZ); 
    }
-   //if (config_selectionsToProcessMap[ControlRegionDY]==true){
-      //h1Maps["CRDYEE"]=InitHistograms(ONZ);
-      //h1Maps["CRDYMM"]=InitHistograms(ONZ); 
-      //h1Maps["CRDYEM"]=InitHistograms(ONZ); 
-      //h1Maps["CRDY"]=InitHistograms(ONZ); 
-   //}
    if (config_selectionsToProcessMap[ControlRegionDY]==true){
       InitWeightHistos(cr1Maps,ONZ,controlregionDY);
    }
-   //if (config_selectionsToProcessMap[ControlRegionTT]==true){
-      //h1Maps["CRTTEE"]=InitHistograms(ONZ);
-      //h1Maps["CRTTMM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTTEM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT080EE"]=InitHistograms(ONZ);
-      //h1Maps["CRTT080MM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT080EM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT080"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT80EE"]=InitHistograms(ONZ);
-      //h1Maps["CRTT80MM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT80EM"]=InitHistograms(ONZ); 
-      //h1Maps["CRTT80"]=InitHistograms(ONZ); 
-   //}
+
    if (config_selectionsToProcessMap[ControlRegionTT]==true){
-      //InitWeightHistos(cr1Maps,ONZ,"CRTT");
-      //InitWeightHistos(cr1Maps,ONZ,"CRTT080");
-      //InitWeightHistos(cr1Maps,ONZ,"CRTT80");
       InitWeightHistos(cr1Maps,ONZ,controlregionTT);
       InitWeightHistos(cr1Maps,ONZ,controlregionTT080);
       InitWeightHistos(cr1Maps,ONZ,controlregionTT80);
    }
-   //if (config_selectionsToProcessMap[ControlRegionZZ]==true){
-      //h1Maps["CRZZEE"]=InitHistograms(ControlRegionZZ);
-      //h1Maps["CRZZMM"]=InitHistograms(ControlRegionZZ); 
-      //h1Maps["CRZZEM"]=InitHistograms(ControlRegionZZ); 
-      //h1Maps["CRZZ"]=InitHistograms(ControlRegionZZ); 
-   //}
    if (config_selectionsToProcessMap[ControlRegionZZ]==true){
-      //InitWeightHistos(cr1Maps,ControlRegionZZ,"CRZZ");
       InitWeightHistos(cr1Maps,ControlRegionZZ,controlregionZZ);
    }
-   //if (config_selectionsToProcessMap[ControlRegionWZ]==true){
-      //h1Maps["CRWZEE"]=InitHistograms(ControlRegionZZ);
-      //h1Maps["CRWZMM"]=InitHistograms(ControlRegionZZ); 
-      //h1Maps["CRWZEM"]=InitHistograms(ControlRegionZZ); 
-      //h1Maps["CRWZ"]=InitHistograms(ControlRegionZZ); 
-   //}
    if (config_selectionsToProcessMap[ControlRegionWZ]==true){
-      //InitWeightHistos(cr1Maps,ControlRegionZZ,"CRWZ"); 
       InitWeightHistos(cr1Maps,ControlRegionZZ,controlregionWZ); 
    }
-   //if (config_selectionsToProcessMap[ControlRegionWW]==true){
-      //h1Maps["CRWWEE"]=InitHistograms(DILEP);
-      //h1Maps["CRWWLL"]=InitHistograms(DILEP);
-      //h1Maps["CRWWMM"]=InitHistograms(DILEP); 
-      //h1Maps["CRWWEM"]=InitHistograms(DILEP); 
-      //h1Maps["CRWW"]=InitHistograms(DILEP); 
-   //}
    if (config_selectionsToProcessMap[ValidationRegion]==true){
       h1Maps[validationregion][EE]=InitHistograms(ONZ);
       h1Maps[validationregion][MM]=InitHistograms(ONZ); 
@@ -3048,12 +2340,6 @@ void myAnalyzer::InitAllHistos(){
       //h2Maps["dilepMM"]=Init2DHistograms(DILEP); 
       //h2Maps["dilepEM"]=Init2DHistograms(DILEP); 
       //h2Maps["dilep"]=Init2DHistograms(DILEP); 
-   //}
-   //if (config_selectionsToProcessMap[EXO]==true){
-      //h2Maps["exoEE"]=Init2DHistograms(EXO);
-      //h2Maps["exoMM"]=Init2DHistograms(EXO); 
-      //h2Maps["exoEM"]=Init2DHistograms(EXO); 
-      //h2Maps["exo"]=Init2DHistograms(EXO); 
    //}
 }
 
@@ -3096,16 +2382,22 @@ map<Histograms1D,TH1F> myAnalyzer::InitCutFlowHistograms_Fine(const selectionTyp
 
 
 void myAnalyzer::InitCutFlowHistos(){
-   c1Maps["cutFlow_onZEE"]=InitCutFlowHistograms(ONZ);
-   c1Maps["cutFlow_onZMM"]=InitCutFlowHistograms(ONZ);
-   c1Maps["cutFlow_onZEM"]=InitCutFlowHistograms(ONZ);
+   //c1Maps["cutFlow_onZEE"]=InitCutFlowHistograms(ONZ);
+   //c1Maps["cutFlow_onZMM"]=InitCutFlowHistograms(ONZ);
+   //c1Maps["cutFlow_onZEM"]=InitCutFlowHistograms(ONZ);
+   c1Maps[cutFlow_onZEE]=InitCutFlowHistograms(ONZ);
+   c1Maps[cutFlow_onZMM]=InitCutFlowHistograms(ONZ);
+   c1Maps[cutFlow_onZEM]=InitCutFlowHistograms(ONZ);
 }
 
 
 void myAnalyzer::InitCutFlowHistos_Fine(){
-   c1Maps["cutFlow_Fine_onZEE"]=InitCutFlowHistograms_Fine(ONZ);
-   c1Maps["cutFlow_Fine_onZMM"]=InitCutFlowHistograms_Fine(ONZ);
-   c1Maps["cutFlow_Fine_onZEM"]=InitCutFlowHistograms_Fine(ONZ);
+   //c1Maps["cutFlow_Fine_onZEE"]=InitCutFlowHistograms_Fine(ONZ);
+   //c1Maps["cutFlow_Fine_onZMM"]=InitCutFlowHistograms_Fine(ONZ);
+   //c1Maps["cutFlow_Fine_onZEM"]=InitCutFlowHistograms_Fine(ONZ);
+   c1Maps[cutFlow_Fine_onZEE]=InitCutFlowHistograms_Fine(ONZ);
+   c1Maps[cutFlow_Fine_onZMM]=InitCutFlowHistograms_Fine(ONZ);
+   c1Maps[cutFlow_Fine_onZEM]=InitCutFlowHistograms_Fine(ONZ);
 }
 
 
@@ -3184,11 +2476,7 @@ map<Histograms1D,TH1F> myAnalyzer::InitHistograms(const selectionType selection_
    
    if ((selection_==PHOTON)||(selection_==SEL)||(selection_==ONZ)){
       
-      //hMap[FakeElectron] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
-      //hMap[FakeJet] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
-      //hMap[FakePhoton] = TH1F(emptyLabelPtr, emptyLabelPtr, 2, 0, 2);
       hMap[Fakes] = TH1F(emptyLabelPtr, emptyLabelPtr, 5, 0, 5);
-      
       
       hMap[PTG1] = TH1F(emptyLabelPtr, ";#it{p}_{T}^{#gamma 1} (GeV)", 5000, 0, 5000);
       hMap[ETAG1] = TH1F(emptyLabelPtr, ";|#eta_{#gamma 1}|", 260, 0, 2.6);
@@ -3268,7 +2556,6 @@ map<Histograms1D,TH1F> myAnalyzer::InitHistogramsSlimmed(const selectionType sel
    hMap[WEIGHT_NISR] = TH1F("","weight",10000,0,10);
    hMap[WEIGHT_TOPPT] = TH1F("","weight",10000,0,10);
    hMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
-   //hMap[WEIGHT_LEPTONPAIRPT] = TH1F("","weight",10000,0,10);
    hMap[WEIGHT_PDF]=TH1F("","weight",10000,0,10);
 
 
@@ -3306,41 +2593,9 @@ map<Histograms1D,TH1F> myAnalyzer::InitHistogramsSlimmed(const selectionType sel
       hMap[ETAG1] = TH1F("", ";|#eta_{#gamma 1}|", 260, 0, 2.6);
       hMap[PHIG1] = TH1F("", ";|#phi_{#gamma 1}|", 350, 0, 3.5);
       
-      //hMap[FakeElectron] = TH1F("", "", 2, 0, 2);
-      //hMap[FakeJet] = TH1F("", "", 2, 0, 2);
-      //hMap[FakePhoton] = TH1F("", "", 2, 0, 2);
-      hMap[Fakes] = TH1F("", "", 3, 0, 3);
+      hMap[Fakes] = TH1F("", "", 5, 0, 5);
       
-      //hMap[SIGMAIETAIETAG1] = TH1F("", ";#sigma_{i#etai#eta}^{#gamma 1}", 400, 0, 0.04);
-      //hMap[SIGMAIPHIIPHIG1] = TH1F("", ";#sigma_{i#phii#phi}^{#gamma 1}", 2000, 0, 0.2);
-      //hMap[R9] = TH1F("", ";r9", 1500, 0, 1.5);
-      //hMap[HOVERE] = TH1F("", ";H/E", 1000, 0, 0.1);
-      //hMap[DELTARGL1] = TH1F("", ";#DeltaR_{l1,#gamma}", 24000, -12., 12.);
-      //hMap[DELTARGL2] = TH1F("", ";#DeltaR_{l2,#gamma}", 24000, -12., 12.);
-      //hMap[DeltaRLLG] = TH1F("", ";#DeltaR_{ll,#gamma}", 24000, -12., 12.);
-      //hMap[DeltaEtaLLG] = TH1F("", ";#Delta#Eta_{ll,#gamma}", 2400, -12., 12.);
-      //hMap[DeltaPhiLLG] = TH1F("", ";#Delta#Phi_{ll,#gamma}", 2400, -12., 12.);
-      //hMap[DeltaPhiGMet] = TH1F("", ";#Delta#Phi_{met,#gamma}", 2400, -12., 6.);
-      //hMap[DeltaRGMet] = TH1F("", ";#DeltaR_{met,#gamma}", 2400, -12., 6.);
-      //hMap[STG] = TH1F("", ";S_T", 5000, 0, 5000.);
-      //hMap[STMET] = TH1F("", ";S_T + #it{p}_{T}^{miss} (GeV)", 5000, 0, 5000.);   
-      //hMap[MTLLG] = TH1F("", ";m_{T}^{ll#gamma}", 5000, 0, 5000);
-      //hMap[MTL1MET] = TH1F("", ";m_{T}^{l1,met}", 5000, 0, 5000);
-      //hMap[MTL2MET] = TH1F("", ";m_{T}^{l2,met}", 5000, 0, 5000);
-      //hMap[MTGMET] = TH1F("", ";m_{T}^{#gamma,met}", 5000, 0, 5000);
-      //hMap[MTLLMET] = TH1F("", ";m_{T}^{ll,met}", 5000, 0, 5000);
-      //hMap[MTLLGMET] = TH1F("", ";m_{T}^{ll#gamma,met}", 5000, 0, 5000);
-      //hMap[MOTHERID] = TH1F("", ";ID_{mother}", 200, 0, 200);
-      //hMap[MLLG] = TH1F("", ";ID_{ll#gamma}", 5000, 0, 5000);
-      //hMap[PT_llg] = TH1F("", ";p_{T}^{ll#gamma}", 5000, 0, 5000);
-      //hMap[MZG_exo] = TH1F("", ";m_{Z#gamma}", 5000, 0, 5000);
-      //hMap[gammaMotherID] = TH1F("", ";motherID_{#gamma}", 5000, 0, 5000);
-      //hMap[genPhotonPT] = TH1F("", ";gen p_T^{#gamma,matched}", 5000, 0, 5000);
-      //hMap[genPhotonPT_Veto] = TH1F("", ";gen p_T^{#gamma,matched,veto}", 5000, 0, 5000);
-      //hMap[PTG1_Veto] = TH1F("", ";gen p_T^{#gamma,veto}", 5000, 0, 5000);
-      //hMap[genPhotonPT_NoVeto] = TH1F("", ";gen p_T^{#gamma,matched,Noveto}", 5000, 0, 5000);
-      //hMap[PTG1_NoVeto] = TH1F("", ";gen p_T^{#gamma,Noveto}", 5000, 0, 5000);
-      //hMap[VetoCompare] = TH1F("", "", 2, 0, 2);
+
    }
    return hMap;
 }
@@ -3369,10 +2624,10 @@ map<Histograms1D,TH1F> myAnalyzer::InitSignalScanHistograms(const selectionType 
    //sMap[WEIGHT_TOPPT] = TH1F("","weight",100,0,10);
    //sMap[WEIGHT_EWKINOPAIRPT] = TH1F("","weight",10000,0,10);
    //sMap[WEIGHT_PDF] = TH1F("","weight",100,0,10);
-   sMap[WEIGHT_NISR] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
-   sMap[WEIGHT_TOPPT] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
-   sMap[WEIGHT_EWKINOPAIRPT] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
-   sMap[WEIGHT_PDF] = TH1F(emptyLabelPtr,weightLabelPtr,100,0,10);
+   sMap[WEIGHT_NISR] = TH1F(emptyLabelPtr,weightLabelPtr,10000,0,10);
+   sMap[WEIGHT_TOPPT] = TH1F(emptyLabelPtr,weightLabelPtr,10000,0,10);
+   sMap[WEIGHT_EWKINOPAIRPT] = TH1F(emptyLabelPtr,weightLabelPtr,10000,0,10);
+   sMap[WEIGHT_PDF] = TH1F(emptyLabelPtr,weightLabelPtr,10000,0,10);
    
    sMap[ETMISS] = TH1F(emptyLabelPtr, metLabelPtr, 5000, 0, 5000);
    
@@ -4013,17 +3268,22 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                            decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
                            decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
                       
-                           if((photons->size()!=0)) decisionMapCutFlowFine[PHOTON1]=true;
-                           if((photons->size()!=0)) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                           if((photons->size()!=0)){
+                              decisionMapCutFlowFine[PHOTON1]=true;
+                              decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                           }
                         }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
                         if((selection==ONZ) && (!isTotalSignal)){
+                           if(*selPhotonSize!=0){
+                              bool bla=testSelection(selPhotons->at(0),selection);
+                           }
                            decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
                            decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
                            decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
-                           idecisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
                            decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
                            
                            if(*selPhotonSize!=0){
@@ -4046,27 +3306,28 @@ bool myAnalyzer::SelectEvent(selectionType selection){
             if((selection==ONZ) && (!isTotalSignal))if(selection==ONZ) decisionMapCutFlowFine_weight[genZLL]=totalWeight;
             
             
-            if((selection==ONZ) && (!isTotalSignal))if(selection==ONZ) cutflowIsTriggered=true;
-            if(selection==ONZ){
-               if(isSignal){
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-               }else{
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=*trigDiMu;
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigDiMuMatch;
-               }
+            if((selection==ONZ) && (!isTotalSignal)){
+                  cutflowIsTriggered=true;
+                  if(isSignal){
+                     decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                     decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  }else{
+                     decisionMapCutFlowFine[TRIGGERED]=*trigDiMu;
+                     decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigDiMuMatch;
+                  }
+               decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
+               decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
             }
-            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
-            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
-
             auto m1 = selMuons->at(0); 
             auto m2 = selMuons->at(1);
             
             if(*trigDiMuMatch){
                if(! *evtHasGenPhotonVeto){
                   
-                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine[GENVETO]=true;
-                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  if((selection==ONZ) && (!isTotalSignal)){
+                     decisionMapCutFlowFine[GENVETO]=true;
+                     decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  }
 
 
                   if(testSelection(m1,selection,true) && testSelection(m2,selection,false) && (*chargeProduct < 0.)){
@@ -4076,43 +3337,48 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                      if((selection==ONZ) && (!isTotalSignal)) cutflow2Leptons=true;
                      if((selection==UNCUT)? true : (*mll>50.)){
                         if((selection==ONZ) && (!isTotalSignal)){
-                           if(selection==ONZ) {cutflowMll50=true;}
-                           if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
-                           if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
+                           cutflowMll50=true;
+                           decisionMapCutFlowFine[M50]=true;
+                           decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
 
-                           if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine[PHOTON1]=true;
-                           if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                           if(photons->size()!=0){
+                              decisionMapCutFlowFine[PHOTON1]=true;
+                              decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                           }
                         }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
                         if((selection==ONZ) && (!isTotalSignal)){
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
-
-                        if(*selPhotonSize>0){
-                           if(selection==ONZ) cutflow1Photon=true;
-                           if(*mll<101. && *mll>81.){
-                              if(selection==ONZ) cutflowOnZ=true;
-                              if(selection==ONZ) decisionMapCutFlowFine[ZMASS]=true;
-                              if(selection==ONZ) decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                           if(*selPhotonSize!=0){
+                              bool bla=testSelection(selPhotons->at(0),selection);
                            }
-                        }
+                           decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
+
+                           if(*selPhotonSize>0){
+                              cutflow1Photon=true;
+                              if(*mll<101. && *mll>81.){
+                                 cutflowOnZ=true;
+                                 decisionMapCutFlowFine[ZMASS]=true;
+                                 decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                              }
+                           }
                      }
                         return true;
                      }
@@ -4122,34 +3388,30 @@ bool myAnalyzer::SelectEvent(selectionType selection){
          }
             
          if((*isElectronMuon || *isMuonElectron)&&(*selElectronSize>0 && *selMuonSize>0)){
-                        //cout<<"a"<<endl;
 
-            if(selection==ONZ) cutflowIsTriggered=true;
-            if(selection==ONZ){
-               if(isSignal){
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
-               }else{
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGERED]=*trigMuEle;
-                  if((selection==ONZ) && (!isTotalSignal))decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigMuEleMatch;
-               }
+            if((selection==ONZ) && (!isTotalSignal)){
+               cutflowIsTriggered=true;
+                  if(isSignal){
+                     decisionMapCutFlowFine[TRIGGERED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                     decisionMapCutFlowFine[TRIGGEREDMATCHED]=((genNNToG==1)&&(genNNToZ==1)&&(genZToLL==2));
+                  }else{
+                     decisionMapCutFlowFine[TRIGGERED]=*trigMuEle;
+                     decisionMapCutFlowFine[TRIGGEREDMATCHED]=*trigMuEleMatch;
+                  }
+               decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
+               decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
             }
-            //cout<<"a1"<<endl;
-            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGERED]=totalWeight;
-            if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[TRIGGEREDMATCHED]=totalWeight;
-            //cout<<"a2"<<endl;
-
+            
             auto e0 = selElectrons->at(0); 
             auto m0 = selMuons->at(0);
-            //cout<<"a3"<<endl;
 
             if(*trigMuEleMatch){
-               //cout<<"b"<<endl;
                if(! *evtHasGenPhotonVeto){
-                                 //cout<<"c"<<endl;
 
-                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine[GENVETO]=true;
-                  if((selection==ONZ) && (!isTotalSignal)) decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  if((selection==ONZ) && (!isTotalSignal)){
+                     decisionMapCutFlowFine[GENVETO]=true;
+                     decisionMapCutFlowFine_weight[GENVETO]=totalWeight;
+                  }
 
                   if(testSelection(m0,selection,*isMuonElectron) && testSelection(e0,selection,*isElectronMuon) && (*chargeProduct < 0.)){
                      
@@ -4157,51 +3419,50 @@ bool myAnalyzer::SelectEvent(selectionType selection){
                      
                      if((selection==ONZ) && (!isTotalSignal)) cutflow2Leptons=true;
                      if((selection==UNCUT)? true : (*mll>50.)){
-                        //if(selection==ONZ) cutflowMll50=true;
-                        //if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
-                        //if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
-                        //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONID_leading]=totalWeightCalc;
-                        //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONID_trailing]=totalWeightCalc;
-                        //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
-                        //if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
                         if((selection==ONZ) && (!isTotalSignal)){
-                        if(selection==ONZ) {cutflowMll50=true;}
-                        if(selection==ONZ) decisionMapCutFlowFine[M50]=true;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
+                        cutflowMll50=true;
+                        decisionMapCutFlowFine[M50]=true;
+                        decisionMapCutFlowFine_weight[LEPTONIDPure_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDPure_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDImpact_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDImpact_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDEta_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDEta_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDIso_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDIso_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDDeltaR_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONIDDeltaR_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONPT_leading]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[LEPTONPT_trailing]=totalWeightCalc;
+                        decisionMapCutFlowFine_weight[M50]=totalWeightCalc;
 
-
-                        if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine[PHOTON1]=true;
-                        if(selection==ONZ) if(photons->size()!=0) decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                        if(photons->size()!=0){
+                           decisionMapCutFlowFine[PHOTON1]=true;
+                           decisionMapCutFlowFine_weight[PHOTON1]=totalWeightCalc;
+                        }
                      }
                         if(!isData){
                               totalWeightCalc=totalWeightCalc* *photonSF_weight;
                         }
                         if((selection==ONZ) && (!isTotalSignal)){
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
-                        if(selection==ONZ) decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
-                        
-                        if(*selPhotonSize>0){
-                           if(selection==ONZ) cutflow1Photon=true;
-                           if(*mll<101. && *mll>81.){
-                              if(selection==ONZ) cutflowOnZ=true;
-                              if(selection==ONZ) decisionMapCutFlowFine[ZMASS]=true;
-                              if(selection==ONZ) decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                           if(*selPhotonSize!=0){
+                              bool bla=testSelection(selPhotons->at(0),selection);
+                           }
+                           decisionMapCutFlowFine_weight[PHOTON1ID]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1SEED]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1ETA]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1PT]=totalWeightCalc;
+                           decisionMapCutFlowFine_weight[PHOTON1DR]=totalWeightCalc;
+                           
+                           if(*selPhotonSize>0){
+                              cutflow1Photon=true;
+                              if(*mll<101. && *mll>81.){
+                                 cutflowOnZ=true;
+                                 decisionMapCutFlowFine[ZMASS]=true;
+                                 decisionMapCutFlowFine_weight[ZMASS]=totalWeightCalc;
+                              }
                            }
                         }
-                     }
                         return true;
                      }
                   }
@@ -4250,18 +3511,18 @@ bool myAnalyzer::SelectEventTriggerStudies(selectionType selection){
 
 void myAnalyzer::FillCutFlowHistograms(){
    if(cutflowDiEle && !(cutflowDiMu)){
-      if (cutflowIsTriggered) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("triggered",totalWeight);
-      if (cutflow2Leptons) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("2leptons",totalWeight);
-      if (cutflowMll50) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("m50",totalWeight);
-      if (cutflow1Photon) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("1photon",totalWeight);
-      if (cutflowOnZ) c1Maps["cutFlow_onZEE"].at(CUTFLOW).Fill("Z",totalWeight);
+      if (cutflowIsTriggered) c1Maps[cutFlow_onZEE].at(CUTFLOW).Fill("triggered",totalWeight);
+      if (cutflow2Leptons) c1Maps[cutFlow_onZEE].at(CUTFLOW).Fill("2leptons",totalWeight);
+      if (cutflowMll50) c1Maps[cutFlow_onZEE].at(CUTFLOW).Fill("m50",totalWeight);
+      if (cutflow1Photon) c1Maps[cutFlow_onZEE].at(CUTFLOW).Fill("1photon",totalWeight);
+      if (cutflowOnZ) c1Maps[cutFlow_onZEE].at(CUTFLOW).Fill("Z",totalWeight);
    }
    if(cutflowDiMu && !(cutflowDiEle)){
-      if (cutflowIsTriggered) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("triggered",totalWeight);
-      if (cutflow2Leptons) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("2leptons",totalWeight);
-      if (cutflowMll50) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("m50",totalWeight);
-      if (cutflow1Photon) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("1photon",totalWeight);
-      if (cutflowOnZ) c1Maps["cutFlow_onZMM"].at(CUTFLOW).Fill("Z",totalWeight);
+      if (cutflowIsTriggered) c1Maps[cutFlow_onZMM].at(CUTFLOW).Fill("triggered",totalWeight);
+      if (cutflow2Leptons) c1Maps[cutFlow_onZMM].at(CUTFLOW).Fill("2leptons",totalWeight);
+      if (cutflowMll50) c1Maps[cutFlow_onZMM].at(CUTFLOW).Fill("m50",totalWeight);
+      if (cutflow1Photon) c1Maps[cutFlow_onZMM].at(CUTFLOW).Fill("1photon",totalWeight);
+      if (cutflowOnZ) c1Maps[cutFlow_onZMM].at(CUTFLOW).Fill("Z",totalWeight);
    }
 
 }
@@ -4280,39 +3541,39 @@ void myAnalyzer::FillCutFlowHistograms_Fine(){
    if(m[DIELECTRON] && !(m[DIMUON]||m[EMUON])){
             
       if (m[TRIGGERED]){
-         c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
+         c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
          if(m[TRIGGEREDMATCHED]){
-            c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
+            c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
             if(m[GENVETO]){
-               c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
+               c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
                if(m[LEPTONIDPure_leading] && m[LEPTONIDPure_trailing]){
-                  c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
+                  c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
                   if(m[LEPTONIDImpact_leading] && m[LEPTONIDImpact_trailing]){
-                     c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
+                     c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
                      if(m[LEPTONIDEta_leading] && m[LEPTONIDEta_trailing]){
-                        c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
+                        c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
                         if(m[LEPTONIDIso_leading] && m[LEPTONIDIso_trailing]){
-                           c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
+                           c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
                            if(m[LEPTONIDDeltaR_leading] && m[LEPTONIDDeltaR_trailing]){
-                              c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
+                              c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
                               if(m[LEPTONPT_leading] && m[LEPTONPT_trailing]){
-                                 c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
+                                 c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
                                  if(m[M50]){
-                                    c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("m50",mW[M50]);
+                                    c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("m50",mW[M50]);
                                     if(m[PHOTON1]){
-                                       c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
+                                       c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
                                        if(m[PHOTON1ID]){
-                                          c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
+                                          c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
                                           if(m[PHOTON1SEED]){
-                                             c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
+                                             c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
                                              if(m[PHOTON1ETA]){
-                                                c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
+                                                c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
                                                 if(m[PHOTON1PT]){
-                                                   c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
+                                                   c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
                                                    if(m[PHOTON1DR]){
-                                                      c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
+                                                      c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
                                                       if(m[ZMASS]){
-                                                         c1Maps["cutFlow_Fine_onZEE"].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
+                                                         c1Maps[cutFlow_Fine_onZEE].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
                                                       }
                                                    }
                                                 }
@@ -4333,39 +3594,39 @@ void myAnalyzer::FillCutFlowHistograms_Fine(){
    }
    if(m[DIMUON] && !(m[DIELECTRON]||m[EMUON])){
       if (m[TRIGGERED]){
-         c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
+         c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
          if(m[TRIGGEREDMATCHED]){
-            c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
+            c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
             if(m[GENVETO]){
-               c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
+               c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
                if(m[LEPTONIDPure_leading] && m[LEPTONIDPure_trailing]){
-                  c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
+                  c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
                   if(m[LEPTONIDImpact_leading] && m[LEPTONIDImpact_trailing]){
-                     c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
+                     c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
                      if(m[LEPTONIDEta_leading] && m[LEPTONIDEta_trailing]){
-                        c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
+                        c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
                         if(m[LEPTONIDIso_leading] && m[LEPTONIDIso_trailing]){
-                           c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
+                           c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
                            if(m[LEPTONIDDeltaR_leading] && m[LEPTONIDDeltaR_trailing]){
-                              c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
+                              c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
                               if(m[LEPTONPT_leading] && m[LEPTONPT_trailing]){
-                                 c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
+                                 c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
                                  if(m[M50]){
-                                    c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("m50",mW[M50]);
+                                    c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("m50",mW[M50]);
                                     if(m[PHOTON1]){
-                                       c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
+                                       c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
                                        if(m[PHOTON1ID]){
-                                          c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
+                                          c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
                                           if(m[PHOTON1SEED]){
-                                             c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
+                                             c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
                                              if(m[PHOTON1ETA]){
-                                                c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
+                                                c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
                                                 if(m[PHOTON1PT]){
-                                                   c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
+                                                   c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
                                                    if(m[PHOTON1DR]){
-                                                      c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
+                                                      c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
                                                       if(m[ZMASS]){
-                                                         c1Maps["cutFlow_Fine_onZMM"].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
+                                                         c1Maps[cutFlow_Fine_onZMM].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
                                                       }
                                                    }
                                                 }
@@ -4386,39 +3647,39 @@ void myAnalyzer::FillCutFlowHistograms_Fine(){
    }
    if(m[EMUON] && !(m[DIELECTRON]||m[DIMUON])){
       if (m[TRIGGERED]){
-         c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
+         c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("triggered",mW[TRIGGERED]);
          if(m[TRIGGEREDMATCHED]){
-            c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
+            c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("triggeredMatched",mW[TRIGGEREDMATCHED]);
             if(m[GENVETO]){
-               c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
+               c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("GenPhotonVeto",mW[GENVETO]);
                if(m[LEPTONIDPure_leading] && m[LEPTONIDPure_trailing]){
-                  c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
+                  c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonIDPure",mW[LEPTONIDPure_leading]);
                   if(m[LEPTONIDImpact_leading] && m[LEPTONIDImpact_trailing]){
-                     c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
+                     c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonIDImpact",mW[LEPTONIDImpact_leading]);
                      if(m[LEPTONIDEta_leading] && m[LEPTONIDEta_trailing]){
-                        c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
+                        c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonIDEta",mW[LEPTONIDEta_leading]);
                         if(m[LEPTONIDIso_leading] && m[LEPTONIDIso_trailing]){
-                           c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
+                           c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonIDIso",mW[LEPTONIDIso_leading]);
                            if(m[LEPTONIDDeltaR_leading] && m[LEPTONIDDeltaR_trailing]){
-                              c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
+                              c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonIDDeltaR",mW[LEPTONIDDeltaR_leading]);
                               if(m[LEPTONPT_leading] && m[LEPTONPT_trailing]){
-                                 c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
+                                 c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("2LeptonPT",mW[LEPTONPT_leading]);
                                  if(m[M50]){
-                                    c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("m50",mW[M50]);
+                                    c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("m50",mW[M50]);
                                     if(m[PHOTON1]){
-                                       c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
+                                       c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1Photon",mW[PHOTON1]);
                                        if(m[PHOTON1ID]){
-                                          c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
+                                          c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1PhotonID",mW[PHOTON1ID]);
                                           if(m[PHOTON1SEED]){
-                                             c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
+                                             c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1PhotonSeed",mW[PHOTON1SEED]);
                                              if(m[PHOTON1ETA]){
-                                                c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
+                                                c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1PhotonEta",mW[PHOTON1ETA]);
                                                 if(m[PHOTON1PT]){
-                                                   c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
+                                                   c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1PhotonPT",mW[PHOTON1PT]);
                                                    if(m[PHOTON1DR]){
-                                                      c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
+                                                      c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("1PhotonDeltaR",mW[PHOTON1DR]);
                                                       if(m[ZMASS]){
-                                                         c1Maps["cutFlow_Fine_onZEM"].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
+                                                         c1Maps[cutFlow_Fine_onZEM].at(CUTFLOW_fine).Fill("Z",mW[ZMASS]);
                                                       }
                                                    }
                                                 }
@@ -4441,22 +3702,8 @@ void myAnalyzer::FillCutFlowHistograms_Fine(){
 
 
 
-template<typename T>
-void save2File(const map<string,map<Histograms1D,T>>& hMaps, TFile& file)
-{
-  for (auto& hMapIt : hMaps) {
-    if (!file.Get(hMapIt.first.c_str())) {
-      file.mkdir(hMapIt.first.c_str());
-    }
-    file.cd(hMapIt.first.c_str());
-    for (auto& h : hMapIt.second) {
-      h.second.Write(histoNames[h.first].c_str(), TObject::kWriteDelete);
-    }
-    file.cd();
-  }
-}
 //template<typename T>
-//void save2File(const map<string,map<Histograms2D,T>>& hMaps, TFile& file)
+//void save2File(const map<string,map<Histograms1D,T>>& hMaps, TFile& file)
 //{
   //for (auto& hMapIt : hMaps) {
     //if (!file.Get(hMapIt.first.c_str())) {
@@ -4464,31 +3711,25 @@ void save2File(const map<string,map<Histograms1D,T>>& hMaps, TFile& file)
     //}
     //file.cd(hMapIt.first.c_str());
     //for (auto& h : hMapIt.second) {
-      //h.second.Write(histoNames2D[h.first].c_str(), TObject::kWriteDelete);
+      //h.second.Write(histoNames[h.first].c_str(), TObject::kWriteDelete);
     //}
     //file.cd();
   //}
 //}
-//template<typename T>
-//void save2File(const map<string,map<string,map<Histograms1D,T>>>& hMaps, TFile& file)
-//{
-   //for (auto& hMapIt : hMaps) {
-      //if (!file.Get(hMapIt.first.c_str())) {
-         //file.mkdir(hMapIt.first.c_str());
-      //}
-      //file.cd(hMapIt.first.c_str());
-      //for(auto& hMapIt2 : hMapIt.second){
-         //if (!file.Get(hMapIt2.first.c_str())) {
-            //file.mkdir((hMapIt.first+"/"+hMapIt2.first).c_str());
-         //}
-         //file.cd((hMapIt.first+"/"+hMapIt2.first).c_str());
-         //for (auto h: hMapIt2.second){
-            //h.second.Write(histoNames[h.first].c_str(), TObject::kWriteDelete);
-         //}
-         //file.cd();
-      //}
-   //}
-//}
+template<typename T>
+void save2File(const map<cutFlowMapName,map<Histograms1D,T>>& hMaps, TFile& file)
+{
+  for (auto& hMapIt : hMaps) {
+    if (!file.Get(cutFlowMapNameString[hMapIt.first].c_str())) {
+      file.mkdir(cutFlowMapNameString[hMapIt.first].c_str());
+    }
+    file.cd(cutFlowMapNameString[hMapIt.first].c_str());
+    for (auto& h : hMapIt.second) {
+      h.second.Write(histoNames[h.first].c_str(), TObject::kWriteDelete);
+    }
+    file.cd();
+  }
+}
 template<typename T>
 void save2File(const map<selectionFolderName,map<Histograms1D,T>>& hMaps, TFile& file)
 {
@@ -4634,13 +3875,24 @@ void save2File(const map<string,map<selectionFolderName,map<selectionFolderName,
       }
    }
 }
-void save2File(const map<SignalPoint,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>>& hMaps, TFile& file)
+void save2File(const map<SignalPoint,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>>& hMaps, TFile& file,int nbinos, string nameOfFile)
 {
    for (auto& hMapIt : hMaps) {
       //if (!file.Get(hMapIt.first.c_str())) {
          //file.mkdir(hMapIt.first.c_str());
       //}
-      auto dir = (to_string(hMapIt.first.first)+"_"+to_string(hMapIt.first.second));
+      string inputStringName = nameOfFile;
+      string dirSignalPoint;
+      if(inputStringName.find("GGM")!=string::npos){
+         dirSignalPoint = getSignalPointNameShort(10);
+      }else{
+         if(inputStringName.find("GMSB")!=string::npos){
+            dirSignalPoint = getSignalPointNameShort(11);
+         }else{
+            dirSignalPoint = getSignalPointNameShort(nbinos);
+         }
+      }
+      auto dir = (dirSignalPoint+"_"+to_string(hMapIt.first.first)+"_"+to_string(hMapIt.first.second));
       if (!file.Get(dir.c_str())) {
          file.mkdir(dir.c_str());
       }
@@ -4749,7 +4001,8 @@ void myAnalyzer::Terminate()
    save2File(eff1Maps, file);
    save2File(h2Maps, file);
    save2File(c1Maps, file);
-   save2File(s1Maps, file);
+   //save2File(s1Maps, file);
+   save2File(s1Maps, file,*nBinos,inputName);
    save2File(cr1Maps, file);
    if(! isTotalSignal){
       cutFlow.Write("hCutFlow");

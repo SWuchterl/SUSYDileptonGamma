@@ -27,6 +27,15 @@ enum cutFlowFlags{TRIGGERED=0,TRIGGEREDMATCHED,LEPTONID_leading,LEPTONPT_leading
     LEPTONIDDeltaR_leading,LEPTONIDDeltaR_trailing,genZLL,PHOTON1SEED,PHOTON1ETA,EMUON};
 
 
+enum cutFlowMapName{
+    cutFlow_Fine_onZEE=0,
+    cutFlow_Fine_onZMM,
+    cutFlow_Fine_onZEM,
+    cutFlow_onZEE,
+    cutFlow_onZMM,
+    cutFlow_onZEM
+    };
+
 enum selectionFolderName{ 
     dilep=0,DILEPEE,DILEPMM,DILEPEM,DILEPLL,
     photon,PHOTONEE,PHOTONMM,PHOTONEM,PHOTONLL,
@@ -100,8 +109,17 @@ enum changePHOTONSF{normalPHOTONSF=0,upPHOTONSF,downPHOTONSF};
 enum changeISR{normalISR=0,upISR,downISR};
 enum changeEWK{normalEWK=0,upEWK,downEWK};
 
+map<cutFlowMapName,string> cutFlowMapNameString;
+
 map<selectionFolderName,string> selectionFolderNameString;
 void setFolderNames(){
+    cutFlowMapNameString[cutFlow_Fine_onZEE]="cutFlow_Fine_onZEE";
+    cutFlowMapNameString[cutFlow_Fine_onZMM]="cutFlow_Fine_onZMM";
+    cutFlowMapNameString[cutFlow_Fine_onZEM]="cutFlow_Fine_onZEM";
+    cutFlowMapNameString[cutFlow_onZEE]="cutFlow_onZEE";
+    cutFlowMapNameString[cutFlow_onZMM]="cutFlow_onZMM";
+    cutFlowMapNameString[cutFlow_onZEM]="cutFlow_onZEM";
+    
 selectionFolderNameString[dilep]="dilep"; selectionFolderNameString[DILEPEE]="dilepEE"; selectionFolderNameString[DILEPMM]="dilepMM"; selectionFolderNameString[DILEPEM]="dilepEM"; selectionFolderNameString[DILEPLL]="dilepLL";    
 //selectionFolderNameString[PHOTON]="Dilep"; selectionFolderNameString[PHOTONEE]="DilepEE"; selectionFolderNameString[PHOTONMM]="DilepMM"; selectionFolderNameString[PHOTONEM]="EM"; selectionFolderNameString[PHOTONLL]="DilepLL";    
 selectionFolderNameString[sel]="sel"; selectionFolderNameString[SELEE]="selEE"; selectionFolderNameString[SELMM]="selMM"; selectionFolderNameString[SELEM]="selEM"; selectionFolderNameString[SELLL]="selLL";    
@@ -254,7 +272,6 @@ selectionFolderNameString[sig080]="sig080";
 selectionFolderNameString[sig_gg]="sig_gg"; 
 selectionFolderNameString[sig_zz]="sig_zz"; 
 selectionFolderNameString[sig_gz]="sig_gz"; 
-
 }
 
 
