@@ -17,7 +17,10 @@ def getPointFromDir(name):
 #Weak SMS TChiNG
 
 #path="../minimal/output_signalScan/"
-path="../minimal/output/"
+#path="../minimal/output/"
+#path="../myAnalyzer/output_noTopPt_noNIsr/"
+#path="../myAnalyzer/output/"
+path="../myAnalyzer/output_2/"
 #path="../minimal/output_noVeto/"
 
 lumi=35867.
@@ -42,50 +45,36 @@ gmsbSampleName = "GMSB_GravitinoLSP_N1decays_hists.root"
 file_weak = ROOT.TFile(path+weakSampleName)
 dirs = [k.GetName() for k in file_weak.GetListOfKeys() if k.GetName().startswith("Ng")]
 
-weak = TGraph();
+#weak = TGraph();
+weak = TGraphErrors();
 
 i=0
 for key in dirs:
-    folder = "sig/"
+    folder = "sig/LL/nom/"
     hName = "met"
     point = getPointFromDir(key)
     #print point
     mNLSP = point[1]
     mDummy = point[2]
     histo = file_weak.Get(key+"/"+folder+hName)
+    topPtWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
+    nIsrWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_nisr")
+    ewkWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_ewk")
+    #Weight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
     
-    avgTopPtWeightHisto = file_weak.Get(key+"/"+folder+"weight_topPt")
-    avgNIsrWeightHisto = file_weak.Get(key+"/"+folder+"weight_nISR")
-    avgEWKinoWeightHisto = file_weak.Get(key+"/"+folder+"weight_EWKinoPairPt")
-    avgleptonWeightHisto = file_weak.Get(key+"/"+folder+"weight_leptonPairPt")
+    histo.Scale(topPtWeight*nIsrWeight*ewkWeight)
     
-    if avgTopPtWeightHisto.Integral()>0.:
-        avgTopPtWeight = avgTopPtWeightHisto.GetMean()
-    else:
-        avgTopPtWeight=1.
-    if avgNIsrWeightHisto.Integral()>0.:
-        avgNIsrWeight = avgNIsrWeightHisto.GetMean()
-    else:
-        avgNIsrWeight=1.
-    if avgEWKinoWeightHisto.Integral()>0.:
-        avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
-    else: avgEWKinoWeight=1.
-    if avgleptonWeightHisto.Integral()>0.:
-        avgleptonWeight = avgleptonWeightHisto.GetMean()
-    else:
-        avgleptonWeight=1.
-#
-    histo.Scale(1./avgTopPtWeight)
-    histo.Scale(1./avgNIsrWeight)
-    histo.Scale(1./avgEWKinoWeight)
-    histo.Scale(1./avgleptonWeight)
+
     
     #print key+"/"+folder+hName
     #acc = histo.Integral(150.,-1)
     #acc = histo.Integral(histo.FindFixBin(150.),-1)*100.
     acc = histo.Integral()*100.
-    
+    entries=histo.GetEntries()
+    errNrel=np.sqrt(entries)/entries
+    print errNrel
     weak.SetPoint(i,mNLSP,acc)
+    weak.SetPointError(i,0.,acc*errNrel)
     i+=1
 
 
@@ -98,38 +87,20 @@ strong = TGraph2D();
 
 i=0
 for key in dirs:
-    folder = "sig/"
+    folder = "sig/LL/nom/"
     hName = "met"
     point = getPointFromDir(key)
     mGluino = point[1]
     mNeutralino = point[2]
     histo = file_strong.Get(key+"/"+folder+hName)
-    #acc = histo.Integral()*100.
-    avgTopPtWeightHisto = file_strong.Get(key+"/"+folder+"weight_topPt")
-    avgNIsrWeightHisto = file_strong.Get(key+"/"+folder+"weight_nISR")
-    avgEWKinoWeightHisto = file_strong.Get(key+"/"+folder+"weight_EWKinoPairPt")
-    avgleptonWeightHisto = file_strong.Get(key+"/"+folder+"weight_leptonPairPt")
+    topPtWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
+    nIsrWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_nisr")
+    ewkWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_ewk")
+    #Weight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
     
-    if avgTopPtWeightHisto.Integral()>0.:
-        avgTopPtWeight = avgTopPtWeightHisto.GetMean()
-    else:
-        avgTopPtWeight=1.
-    if avgNIsrWeightHisto.Integral()>0.:
-        avgNIsrWeight = avgNIsrWeightHisto.GetMean()
-    else:
-        avgNIsrWeight=1.
-    if avgEWKinoWeightHisto.Integral()>0.:
-        avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
-    else: avgEWKinoWeight=1.
-    if avgleptonWeightHisto.Integral()>0.:
-        avgleptonWeight = avgleptonWeightHisto.GetMean()
-    else:
-        avgleptonWeight=1.
-#
-    histo.Scale(1./avgTopPtWeight)
-    histo.Scale(1./avgNIsrWeight)
-    histo.Scale(1./avgEWKinoWeight)
-    histo.Scale(1./avgleptonWeight)
+    histo.Scale(topPtWeight*nIsrWeight*ewkWeight)
+    #acc = histo.Integral()*100.
+
     #acc = histo.Integral(histo.FindFixBin(150.),-1)*100.
     acc = histo.Integral()*100.
     strong.SetPoint(i,mGluino,mNeutralino,acc)
@@ -142,38 +113,20 @@ gmsb = TGraph2D();
 
 k=0
 for key in dirs:
-    folder = "sig/"
+    folder = "sig/LL/nom/"
     hName = "met"
     point = getPointFromDir(key)
     mGluino = point[1]
     mNeutralino = point[2]
     histo = file_gmsb.Get(key+"/"+folder+hName)
-    #acc = histo.Integral()*100.
-    avgTopPtWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_topPt")
-    avgNIsrWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_nISR")
-    avgEWKinoWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_EWKinoPairPt")
-    avgleptonWeightHisto = file_gmsb.Get(key+"/"+folder+"weight_leptonPairPt")
+    topPtWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
+    nIsrWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_nisr")
+    ewkWeight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_ewk")
+    #Weight = aux.getWeightForWeights(path+weakSampleName,histoName="weightHisto_"+str(mNLSP),whichWeight="pu_mc_toppt")
     
-    if avgTopPtWeightHisto.Integral()>0.:
-        avgTopPtWeight = avgTopPtWeightHisto.GetMean()
-    else:
-        avgTopPtWeight=1.
-    if avgNIsrWeightHisto.Integral()>0.:
-        avgNIsrWeight = avgNIsrWeightHisto.GetMean()
-    else:
-        avgNIsrWeight=1.
-    if avgEWKinoWeightHisto.Integral()>0.:
-        avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
-    else: avgEWKinoWeight=1.
-    if avgleptonWeightHisto.Integral()>0.:
-        avgleptonWeight = avgleptonWeightHisto.GetMean()
-    else:
-        avgleptonWeight=1.
-#
-    histo.Scale(1./avgTopPtWeight)
-    histo.Scale(1./avgNIsrWeight)
-    histo.Scale(1./avgEWKinoWeight)
-    histo.Scale(1./avgleptonWeight)
+    histo.Scale(topPtWeight*nIsrWeight*ewkWeight)
+    #acc = histo.Integral()*100.
+
     #acc = histo.Integral(histo.FindFixBin(150.),-1)*100.
     acc = histo.Integral()*100.
     #gmsb.SetPoint(i,mGluino,mNeutralino,acc)
@@ -189,7 +142,7 @@ ggm1m2 = TGraph2D();
 
 i=0
 for key in dirs:
-    folder = "sig/"
+    folder = "sig/LL/nom/"
     hName = "met"
     point = getPointFromDir(key)
     #print point
@@ -208,7 +161,7 @@ ggm1m3 = TGraph2D();
 
 i=0
 for key in dirs:
-    folder = "sig/"
+    folder = "sig/LL/nom/"
     hName = "met"
     point = getPointFromDir(key)
     m1 = point[1]

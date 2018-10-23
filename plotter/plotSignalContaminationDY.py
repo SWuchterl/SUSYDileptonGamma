@@ -15,8 +15,8 @@ def getPointFromDir(name):
 
 # path="../myAnalyzer/output_mediumPOG/"
 # path="../myAnalyzer/output/"
-# path="../myAnalyzer/output_2/"
 path = "../myAnalyzer/output_AN/"
+# path="../myAnalyzer/output_2/"
 
 lumi = 35867.
 xSec_tching = pkl.load(open("../SUSYxSections/xSec_SMS_C1C1_13TeV.pkl", "rb"))
@@ -26,13 +26,14 @@ xSec_tching_total = pkl.load(open("data/xSec_SMS_TChiNG_13TeV.pkl", "rb"))
 xSec_t5zg = pkl.load(open("data/xSec_SMS_Gluino_13TeV.pkl", "rb"))
 
 xSec_gmsb = pkl.load(open("data/xSec_GMSB.pkl", "rb"))
+
 xSec_t6 = pkl.load(open("data/xSec_SMS_Stop_13TeV.pkl"))
 
 xSec_GGM_M1_M2 = pkl.load(open("data/xsec_GGM_M1_M2.pkl"))
 xSec_GGM_M1_M3 = pkl.load(open("data/xsec_GGM_M1_M3.pkl"))
 
-# brZG_tching=0.25
-# brZG_t5zg=0.5
+# brZG_tching = 0.25
+# brZG_t5zg = 0.5
 
 
 weakSampleName = "SMS-TChiNG_BF50N50G_hists.root"
@@ -45,7 +46,7 @@ gmsbSampleName = "GMSB_GravitinoLSP_N1decays_hists.root"
 t6SampleName = "SMS-T6ttZg_hists.root"
 
 
-folder = "CRTT/EM/nom/"
+folder = "CRDY/LL/nom/"
 hName = "met"
 
 style.additionalPoissonUncertainty = False
@@ -73,9 +74,61 @@ zz4lHist = aux.stdHistWithWeights(
 wgHist = aux.stdHistWithWeights(
     wgamma, folder + hName, ["nISR", "topPt", "ewk"])
 
+# Scaling
+#zg_AvgTopPtWeightHisto = zgamma.getHist(folder+"/weight_topPt")
+#zg_AvgNIsrWeightHisto = zgamma.getHist(folder+"/weight_nISR")
+#zg_AvgEWKinoWeightHisto = zgamma.getHist(folder+"/weight_EWKinoPairPt")
+#ttg_AvgTopPtWeightHisto = ttgamma.getHist(folder+"/weight_topPt")
+#ttg_AvgNIsrWeightHisto = ttgamma.getHist(folder+"/weight_nISR")
+#ttg_AvgEWKinoWeightHisto = ttgamma.getHist(folder+"/weight_EWKinoPairPt")
+#zz_AvgTopPtWeightHisto = zz.getHist(folder+"/weight_topPt")
+#zz_AvgNIsrWeightHisto = zz.getHist(folder+"/weight_nISR")
+#zz_AvgEWKinoWeightHisto = zz.getHist(folder+"/weight_EWKinoPairPt")
+#wwg_AvgTopPtWeightHisto = wwgamma.getHist(folder+"/weight_topPt")
+#wwg_AvgNIsrWeightHisto = wwgamma.getHist(folder+"/weight_nISR")
+#wwg_AvgEWKinoWeightHisto = wwgamma.getHist(folder+"/weight_EWKinoPairPt")
+#wzg_AvgTopPtWeightHisto = wzgamma.getHist(folder+"/weight_topPt")
+#wzg_AvgNIsrWeightHisto = wzgamma.getHist(folder+"/weight_nISR")
+#wzg_AvgEWKinoWeightHisto = wzgamma.getHist(folder+"/weight_EWKinoPairPt")
+#dy_AvgTopPtWeightHisto = DYjetsNLO.getHist(folder+"/weight_topPt")
+#dy_AvgNIsrWeightHisto = DYjetsNLO.getHist(folder+"/weight_nISR")
+#dy_AvgEWKinoWeightHisto = DYjetsNLO.getHist(folder+"/weight_EWKinoPairPt")
+#wjets_AvgTopPtWeightHisto = wjets.getHist(folder+"/weight_topPt")
+#wjets_AvgNIsrWeightHisto = wjets.getHist(folder+"/weight_nISR")
+#wjets_AvgEWKinoWeightHisto = wjets.getHist(folder+"/weight_EWKinoPairPt")
+#tt_AvgTopPtWeightHisto = tt.getHist(folder+"/weight_topPt")
+#tt_AvgNIsrWeightHisto = tt.getHist(folder+"/weight_nISR")
+#tt_AvgEWKinoWeightHisto = tt.getHist(folder+"/weight_EWKinoPairPt")
+#singletop_AvgTopPtWeightHisto = singletop.getHist(folder+"/weight_topPt")
+#singletop_AvgNIsrWeightHisto = singletop.getHist(folder+"/weight_nISR")
+#singletop_AvgEWKinoWeightHisto = singletop.getHist(folder+"/weight_EWKinoPairPt")
+#wz_AvgTopPtWeightHisto = wz.getHist(folder+"/weight_topPt")
+#wz_AvgNIsrWeightHisto = wz.getHist(folder+"/weight_nISR")
+#wz_AvgEWKinoWeightHisto = wz.getHist(folder+"/weight_EWKinoPairPt")
+#ww_AvgTopPtWeightHisto = ww.getHist(folder+"/weight_topPt")
+#ww_AvgNIsrWeightHisto = ww.getHist(folder+"/weight_nISR")
+#ww_AvgEWKinoWeightHisto = ww.getHist(folder+"/weight_EWKinoPairPt")
+#zz4l_AvgTopPtWeightHisto = zz4l.getHist(folder+"/weight_topPt")
+#zz4l_AvgNIsrWeightHisto = zz4l.getHist(folder+"/weight_nISR")
+#zz4l_AvgEWKinoWeightHisto = zz4l.getHist(folder+"/weight_EWKinoPairPt")
+#wg_AvgTopPtWeightHisto = wgamma.getHist(folder+"/weight_topPt")
+#wg_AvgNIsrWeightHisto = wgamma.getHist(folder+"/weight_nISR")
+#wg_AvgEWKinoWeightHisto = wgamma.getHist(folder+"/weight_EWKinoPairPt")
 
 histsToScale = [zgHist, ttgHist, zzHist, wwgHist, wzgHist, dyHist,
                 wjetsHist, ttHist, singletopHist, wzHist, wwHist, zz4lHist, wgHist]
+# topWeightHists=[zg_AvgTopPtWeightHisto,ttg_AvgTopPtWeightHisto,zz_AvgTopPtWeightHisto,wwg_AvgTopPtWeightHisto,wzg_AvgTopPtWeightHisto,dy_AvgTopPtWeightHisto,wjets_AvgTopPtWeightHisto,tt_AvgTopPtWeightHisto,singletop_AvgTopPtWeightHisto,wz_AvgTopPtWeightHisto,ww_AvgTopPtWeightHisto,zz4l_AvgTopPtWeightHisto,wg_AvgTopPtWeightHisto]
+# nISRWeightHists=[zg_AvgNIsrWeightHisto,ttg_AvgNIsrWeightHisto,zz_AvgNIsrWeightHisto,wwg_AvgNIsrWeightHisto,wzg_AvgNIsrWeightHisto,dy_AvgNIsrWeightHisto,wjets_AvgNIsrWeightHisto,tt_AvgNIsrWeightHisto,singletop_AvgNIsrWeightHisto,wz_AvgNIsrWeightHisto,ww_AvgNIsrWeightHisto,zz4l_AvgNIsrWeightHisto,wg_AvgNIsrWeightHisto]
+# EWKinoWeightHists=[zg_AvgEWKinoWeightHisto,ttg_AvgEWKinoWeightHisto,zz_AvgEWKinoWeightHisto,wwg_AvgEWKinoWeightHisto,wzg_AvgEWKinoWeightHisto,dy_AvgEWKinoWeightHisto,wjets_AvgEWKinoWeightHisto,tt_AvgEWKinoWeightHisto,singletop_AvgEWKinoWeightHisto,wz_AvgEWKinoWeightHisto,ww_AvgEWKinoWeightHisto,zz4l_AvgEWKinoWeightHisto,wg_AvgEWKinoWeightHisto]
+
+
+# for i in range(len(histsToScale)):
+# if topWeightHists[i].Integral()>0.:
+# histsToScale[i].Scale(1./topWeightHists[i].GetMean())
+# if nISRWeightHists[i].Integral()>0.:
+# histsToScale[i].Scale(1./nISRWeightHists[i].GetMean())
+# if EWKinoWeightHists[i].Integral()>0.:
+# histsToScale[i].Scale(1./EWKinoWeightHists[i].GetMean())
 
 
 pklZZ = pkl.load(open("plots_CR_zz/factors/CRZZ.pkl", "rb"))
@@ -118,14 +171,13 @@ contM1M2 = {}
 contM1M3 = {}
 contT6 = {}
 
-
 if(True):
 
     i = 0
     for key in dirs:
         #print key
         name, m1, m2 = key.split("_")
-        folder = "CRTT/EM/nom/"
+        folder = "CRDY/LL/nom/"
         hName = "met"
         point = getPointFromDir(key)
         mNLSP = point[1]
@@ -140,6 +192,7 @@ if(True):
             path + weakSampleName, histoName="weightHisto" + "_" + str(mNLSP), whichWeight="pu_mc_ewk")
 
         histo.Scale(sftoppt * sfnisr * sfewk)
+
         #print point[1]
 
         xSec = xSec_tching_total[point[1]][0]
@@ -172,6 +225,8 @@ for key in dirs:
     mNeutralino = point[2]
     histo = file_strong.Get(key + "/" + folder + hName)
 
+    xSec = xSec_t5zg[mGluino][0]
+
     sftoppt = aux.getWeightForWeights(path + strongSampleName, histoName="weightHisto" + "_" + str(
         mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_toppt")
     sfnisr = aux.getWeightForWeights(path + strongSampleName, histoName="weightHisto" + "_" + str(
@@ -179,14 +234,10 @@ for key in dirs:
     sfewk = aux.getWeightForWeights(path + strongSampleName, histoName="weightHisto" +
                                     "_" + str(mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_ewk")
 
-    xSec = xSec_t5zg[mGluino][0]
-
     histo.Scale(sftoppt * sfnisr * sfewk)
 
     acc = histo.Integral()
-
     yieldSignal = acc * xSec * lumi
-
     cont = yieldSignal / yieldBKG * 100.
 
     strong.SetPoint(i, mGluino, mNeutralino, cont)
@@ -194,7 +245,6 @@ for key in dirs:
         contSTRONG[mGluino] = {}
     contSTRONG[mGluino][mNeutralino] = cont / 100.
     i += 1
-
 
 file_t6 = ROOT.TFile(path + t6SampleName)
 dirs = [k.GetName() for k in file_t6.GetListOfKeys()
@@ -211,6 +261,8 @@ for key in dirs:
     mNeutralino = point[2]
     histo = file_t6.Get(key + "/" + folder + hName)
 
+    xSec = xSec_t6[mGluino][0]
+
     sftoppt = aux.getWeightForWeights(path + t6SampleName, histoName="weightHisto" + "_" + str(
         mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_toppt")
     sfnisr = aux.getWeightForWeights(path + t6SampleName, histoName="weightHisto" + "_" + str(
@@ -218,14 +270,10 @@ for key in dirs:
     sfewk = aux.getWeightForWeights(path + t6SampleName, histoName="weightHisto" +
                                     "_" + str(mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_ewk")
 
-    xSec = xSec_t6[mGluino][0]
-
     histo.Scale(sftoppt * sfnisr * sfewk)
 
     acc = histo.Integral()
-
     yieldSignal = acc * xSec * lumi
-
     cont = yieldSignal / yieldBKG * 100.
 
     t6.SetPoint(i, mGluino, mNeutralino, cont)
@@ -234,7 +282,6 @@ for key in dirs:
     contT6[mGluino][mNeutralino] = cont / 100.
     i += 1
 
-########################################################################################
 file_gmsb = ROOT.TFile(path + gmsbSampleName)
 dirs = [k.GetName() for k in file_gmsb.GetListOfKeys()
         if k.GetName().startswith("GMSB")]
@@ -244,11 +291,15 @@ gmsb = TGraph2D()
 k = 0
 for key in dirs:
     #print k,"/",len(dirs)
-    folder = "CRTT/EM/nom/"
+    folder = "CRDY/LL/nom"
     hName = "/met"
     point = getPointFromDir(key)
     mGluino = point[1]
     mNeutralino = point[2]
+
+    xSec = xSec_gmsb[point[1]][point[2]][0]
+
+    histo = file_gmsb.Get(key + "/" + folder + hName)
 
     sftoppt = aux.getWeightForWeights(path + gmsbSampleName, histoName="weightHisto" + "_" + str(
         mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_toppt")
@@ -256,30 +307,8 @@ for key in dirs:
         mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_nisr")
     sfewk = aux.getWeightForWeights(path + gmsbSampleName, histoName="weightHisto" + "_" + str(
         mGluino) + "_" + str(mNeutralino), whichWeight="pu_mc_ewk")
-    histo = file_gmsb.Get(key + "/" + folder + hName)
+
     histo.Scale(sftoppt * sfnisr * sfewk)
-
-    xSec = xSec_gmsb[point[1]][point[2]][0]
-
-    #avgTopPtWeightHisto = file_gmsb.Get(key+"/"+folder+"/weight_topPt")
-    #avgNIsrWeightHisto = file_gmsb.Get(key+"/"+folder+"/weight_nISR")
-    #avgEWKinoWeightHisto = file_gmsb.Get(key+"/"+folder+"/weight_EWKinoPairPt")
-
-    # if avgTopPtWeightHisto.Integral()>0.:
-    #avgTopPtWeight = avgTopPtWeightHisto.GetMean()
-    # else:
-    # avgTopPtWeight=1.
-    # if avgNIsrWeightHisto.Integral()>0.:
-    #avgNIsrWeight = avgNIsrWeightHisto.GetMean()
-    # else:
-    # avgNIsrWeight=1.
-    # if avgEWKinoWeightHisto.Integral()>0.:
-    #avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
-    # else: avgEWKinoWeight=1.
-
-    # histo.Scale(1./avgTopPtWeight)
-    # histo.Scale(1./avgNIsrWeight)
-    # histo.Scale(1./avgEWKinoWeight)
 
     acc = histo.Integral()
     yieldSignal = acc * xSec * lumi
@@ -292,7 +321,7 @@ for key in dirs:
     contGMSB[mGluino][mNeutralino] = cont / 100.
     k += 1
 
-########################################################################
+
 file_GGM12 = ROOT.TFile(path + GGM12SampleName)
 dirs = [k.GetName() for k in file_GGM12.GetListOfKeys()
         if k.GetName().startswith("GGM")]
@@ -318,8 +347,6 @@ for key in dirs:
 
     histo = file_GGM12.Get(key + "/" + folder + hName)
     histo.Scale(sftoppt * sfnisr * sfewk)
-
-    #acc = histo.Integral(histo.FindFixBin(150.),-1)*100.
     acc = histo.Integral() * 100.
     yieldSignal = acc * xSec * lumi
     cont = yieldSignal / yieldBKG * 100.
@@ -391,7 +418,7 @@ lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
 lum.SetNDC()
 lum.Draw()
 c.Update()
-c.SaveAs('contamination/tching_TT.pdf')
+c.SaveAs('contamination/tching_DY.pdf')
 
 
 style.style2d()
@@ -406,10 +433,9 @@ ggm1m3.SetTitle(
     "; m_{#tilde{B}} (GeV);m_{#tilde{W}} (GeV); signal fraction [%]")
 strong.SetTitle(
     "; m_{#tilde{B}} (GeV);m_{#tilde{W}} (GeV); signal fraction [%]")
+#ggm1m2.SetTitle("; M1;M2; Acceptance x Efficiency [%]")
 t6.SetTitle(
     "; m_{#tilde{t}} (GeV);m_{#tilde{#chi}_0^1} (GeV); signal fraction [%]")
-#ggm1m2.SetTitle("; M1;M2; Acceptance x Efficiency [%]")
-
 lum = ROOT.TLatex(.62, .95, "#scale[0.76]{%.1f fb^{-1} (%s TeV)}" %
                   (aux.intLumi / 1000., aux.Label.cmsEnergy))
 lum.SetNDC()
@@ -418,21 +444,21 @@ l.Draw()
 l2.Draw()
 lum.Draw()
 c.Update()
-c.SaveAs("contamination/t5zg_TT.pdf")
+c.SaveAs("contamination/t5zg_DY.pdf")
 
 ggm1m2.Draw("COLZ")
 l.Draw()
 lum.Draw()
 l2.Draw()
 c.Update()
-c.SaveAs("contamination/ggm1m2_TT.pdf")
+c.SaveAs("contamination/ggm1m2_DY.pdf")
 
 t6.Draw("COLZ")
 l.Draw()
 lum.Draw()
 l2.Draw()
 c.Update()
-c.SaveAs("contamination/t6_TT.pdf")
+c.SaveAs("contamination/t6_DY.pdf")
 
 
 gmsb.Draw("COLZ")
@@ -440,25 +466,25 @@ l.Draw()
 lum.Draw()
 l2.Draw()
 c.Update()
-c.SaveAs("contamination/gmsb_TT.pdf")
+c.SaveAs("contamination/gmsb_DY.pdf")
 
 import pickle as pkl
-pkl.dump(contWEAK, open("contamination/TT_tching.pkl", "wb"))
-print "Created contamination/TT_tching.pkl."
-pkl.dump(contSTRONG, open("contamination/TT_t5zg.pkl", "wb"))
-print "Created contamination/TT_t5zg.pkl."
-pkl.dump(contGMSB, open("contamination/TT_gmsb.pkl", "wb"))
-print "Created contamination/TT_gmsb.pkl."
-pkl.dump(contM1M2, open("contamination/TT_m1m2.pkl", "wb"))
-print "Created contamination/TT_m1m2.pkl."
-pkl.dump(contM1M3, open("contamination/TT_m1m3.pkl", "wb"))
-print "Created contamination/TT_m1m3.pkl."
-pkl.dump(contT6, open("contamination/TT_t6.pkl", "wb"))
-print "Created contamination/TT_t6.pkl."
+pkl.dump(contWEAK, open("contamination/DY_tching.pkl", "wb"))
+print "Created contamination/DY_tching.pkl."
+pkl.dump(contSTRONG, open("contamination/DY_t5zg.pkl", "wb"))
+print "Created contamination/DY_t5zg.pkl."
+pkl.dump(contGMSB, open("contamination/DY_gmsb.pkl", "wb"))
+print "Created contamination/DY_gmsb.pkl."
+pkl.dump(contM1M2, open("contamination/DY_m1m2.pkl", "wb"))
+print "Created contamination/DY_m1m2.pkl."
+pkl.dump(contM1M3, open("contamination/DY_m1m3.pkl", "wb"))
+print "Created contamination/DY_m1m3.pkl."
+pkl.dump(contT6, open("contamination/DY_t6.pkl", "wb"))
+print "Created contamination/DY_t6.pkl."
 
 ggm1m3.Draw("COLZ")
 l.Draw()
 lum.Draw()
 l2.Draw()
 c.Update()
-c.SaveAs("contamination/ggm1m3_TT.pdf")
+c.SaveAs("contamination/ggm1m3_DY.pdf")

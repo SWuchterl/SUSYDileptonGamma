@@ -24,8 +24,7 @@ binnings = {
     # 'met':               frange(100,155,10),
     'met':               frange(100, 280, 20),
     # 'met':               frange(100,200,10)+frange(220,300,20),
-    # 'm_ll':             frange(80.,111.,10),
-    'm_ll':             frange(80., 100., 2),
+    'm_ll':             frange(80., 111., 10),
     'm_llg':             frange(0, 100, 10) + frange(100, 200, 10) + frange(200, 500, 50),
     'pt_llg':             frange(0, 100, 10) + frange(100, 200, 10) + frange(200, 500, 50),
     'n_jets':           frange(0., 7., 1),
@@ -319,7 +318,16 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     signal2 = aux.stdHistWithWeights(
         gmsb_240_230, name, ["nISR", "topPt", "ewk"], binning)
     signal1 = aux.stdHistWithWeights(
-        gmsb_290_205, name, ["nISR", "topPt", "ewk"], binning)
+        # gmsb_290_205, name, ["nISR", "topPt", "ewk"], binning)
+        gmsb_415_355, name, ["nISR", "topPt", "ewk"], binning)
+    signal3 = aux.stdHistWithWeights(
+        tching_400, name, ["nISR", "topPt", "ewk"], binning)
+    signal4 = aux.stdHistWithWeights(
+        tching_600, name, ["nISR", "topPt", "ewk"], binning)
+    signal5 = aux.stdHistWithWeights(
+        t5bbbbzg_1500_400, name, ["nISR", "topPt", "ewk"], binning)
+    signal6 = aux.stdHistWithWeights(
+        t5bbbbzg_1500_1400, name, ["nISR", "topPt", "ewk"], binning)
     #signal1 = aux.stdHist(tching_400, name, binning)
 
     #signal2_AvgTopPtWeightHisto = t5bbbbzg_1500_400.getHist(folder+"/weight_topPt")
@@ -338,9 +346,37 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
 
     for h in signal1, signal2:
         aux.drawOpt(h, "signal")
+    for h in signal3, signal4:
+        aux.drawOpt(h, "signal")
+    for h in signal5, signal6:
+        aux.drawOpt(h, "signal")
     signal1.SetLineColor(ROOT.kBlue + 3)
     signal2.SetLineColor(ROOT.kBlue + 3)
     signal2.SetLineStyle(2)
+    signal3.SetLineStyle(1)
+    signal4.SetLineStyle(2)
+    signal5.SetLineStyle(1)
+    signal6.SetLineStyle(2)
+
+    signal3.SetLineColor(ROOT.kRed - 4)
+    signal4.SetLineColor(ROOT.kRed - 4)
+    signal5.SetLineColor(ROOT.kCyan)
+    signal6.SetLineColor(ROOT.kCyan)
+
+    #m.add(signal2, "T5bbbbZg")
+    #m.add(signal1, "TChiNg")
+    if not "Fakes" in name:
+        m.add(signal2, "GMSB m(#tilde{W})=240 m(#tilde{B})=230")
+        # m.add(signal1, "GMSB m(#tilde{W})=290 m(#tilde{B})=205")
+        m.add(signal1, "GMSB m(#tilde{W})=415 m(#tilde{B})=355")
+        m.add(signal3, "TChiZG m(NLSP)=600")
+        m.add(signal4, "TChiZG m(NLSP)=400")
+        m.add(
+            signal5, "T5bbbbzg m(#tilde{g})=1500 m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=400")
+        m.add(
+            signal6, "T5bbbbzg m(#tilde{g})=1500 m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=1400")
+        # m.add(signal6, "T5bbbbzg 1500 1400")
+        # m.add(signal1, "GMSB 290_205")
 
     if "Fakes" in name:
         labels = ["all", "genPhoton",
@@ -356,16 +392,6 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
             final_zzHist.LabelsOption("d", "X")
             final_zzHist.SetLabelOffset(10.5, "X")
             final_zzHist.GetXaxis().SetLabelOffset(10.5)
-            final_dyHist.GetXaxis().SetBinLabel(i + 1, labels[i])
-            final_dyHist.GetXaxis().LabelsOption("d")
-            final_dyHist.LabelsOption("d", "X")
-            final_dyHist.SetLabelOffset(10.5, "X")
-            final_dyHist.GetXaxis().SetLabelOffset(10.5)
-            wzHist.GetXaxis().SetBinLabel(i + 1, labels[i])
-            wzHist.GetXaxis().LabelsOption("d")
-            wzHist.LabelsOption("d", "X")
-            wzHist.SetLabelOffset(10.5, "X")
-            wzHist.GetXaxis().SetLabelOffset(10.5)
             final_otherHist.GetXaxis().SetBinLabel(i + 1, labels[i])
             final_otherHist.GetXaxis().LabelsOption("d")
             final_otherHist.LabelsOption("d", "X")
@@ -379,24 +405,10 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
             final_zzHist.SetYTitle("arbitrary units")
             final_otherHist.SetYTitle("arbitrary units")
             dataHist.SetYTitle("arbitrary units")
-            final_dyHist.SetYTitle("arbitrary units")
-            wzHist.SetYTitle("arbitrary units")
-
-    dataHist.GetXaxis().SetTitle(xTitle)
-    final_otherHist.GetXaxis().SetTitle(xTitle)
-    final_zzHist.GetXaxis().SetTitle(xTitle)
-    final_ttHist.GetXaxis().SetTitle(xTitle)
-    wzHist.GetXaxis().SetTitle(xTitle)
-    final_dyHist.GetXaxis().SetTitle(xTitle)
-
-    #m.add(signal2, "T5bbbbZg")
-    #m.add(signal1, "TChiNg")
-    # if not "Fakes" in name:
-    #m.add(signal2, "GMSB 240 230")
-    #m.add(signal1, "GMSB 290 205")
-
-    # m.add(signal2, "GMSB m(#tilde{W}=240 m(#tilde{B})=230")
-    # m.add(signal1, "GMSB m(#tilde{W}=290 m(#tilde{B})=205")
+    else:
+        final_ttHist.GetXaxis().SetTitle(xTitle)
+        final_zzHist.GetXaxis().SetTitle(xTitle)
+        final_otherHist.GetXaxis().SetTitle(xTitle)
 
     # m.addStack(zgHist, "Z#gamma")
     # m.addStack(ttgHist, "t#bar{t}#gamma")
@@ -419,9 +431,9 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     # m.addStack(aux.addHists(zz4lHist,zzHist),"ZZ")
 
     m.addStack(final_otherHist, "other")
-    m.addStack(final_ttHist, "t#bar{t}(+#gamma)")
+    m.addStack(final_ttHist, "t#bar{t}(#gamma)")
     # m.addStack(aux.addHists(tt080Hist,tt80Hist,ttg080Hist,ttg80Hist),"t#bar{t}#gamma(+#gamma)")
-    m.addStack(final_dyHist, "Drell-Yan/Z(+#gamma)")
+    m.addStack(final_dyHist, "Drell-Yan/Z(#gamma)")
     m.addStack(final_zzHist, "ZZ")
 
     # for bin in range(signal1.GetNbinsX()+1):
@@ -432,13 +444,13 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
 
     m.sortStackByIntegral()
 
-    if not "Fakes" in name:
-        m.add(dataHist, "Data")
-        m.add(totUnc, "Total uncertainty")
-        m.add(totSyst, "syst. uncertainty")
+    # if not "Fakes" in name:
+    # m.add(dataHist, "Data")
+    # m.add(totUnc, "Total uncertainty")
+    # m.add(totSyst, "syst. uncertainty")
 
-    legInfo = "Validation Region"
-    m.leg.SetHeader(legInfo)
+    #legInfo = "Validation Region"
+    # m.leg.SetHeader(legInfo)
     # m.leg.SetY1(.56)
     # m.leg.SetX1(.56)
     # m.leg.SetX1(.46)
@@ -447,17 +459,17 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
 
     m.Draw()
     if not "Fakes" in name:
-        KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UO")
-        ksText = ROOT.TLatex()
-        ksText.SetTextSize(0.45 * ksText.GetTextSize())
-        ksText.DrawLatexNDC(0.57, 0.65, "KS Value= " + str(np.round(KS, 5)))
+        # KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UO")
+        # ksText = ROOT.TLatex()
+        # ksText.SetTextSize(0.45 * ksText.GetTextSize())
+        # ksText.DrawLatexNDC(0.57, 0.65, "KS Value= " + str(np.round(KS, 5)))
 
-        r = ratio.Ratio(
-            "#scale[.9]{#lower[.24]{#splitline{Data/Pred.}{Bkg. frac.}}}", dataHist, totStat, sysHisto=totSyst)
+        # r = ratio.Ratio(
+        #     "#scale[.9]{#lower[.24]{#splitline{Data/Pred.}{Bkg. frac.}}}", dataHist, totStat, sysHisto=totSyst)
         #rMax = 1.5
         rMax = 2.
         #r.draw(0., rMax, m.getStack(), True)
-        r.draw(0., rMax, m.getStack())
+        # r.draw(0., rMax, m.getStack())
     else:
         r = ratio.Ratio(
             "#scale[.9]{#lower[.24]{#splitline{Data/Pred.}{Bkg. frac.}}}", dataHist, totStat)
@@ -466,9 +478,9 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
         #r.draw(0., rMax, m.getStack(), True)
         r.draw(0., rMax, m.getStack())
 
-    aux.Label(sim=False, status="Work in Progress")
+    aux.Label(sim=True, status="Work in Progress")
     #aux.save(name, normal=False, changeMinMax=False)
-    directory = "plots_VR/"
+    directory = "plots/"
     if not os.path.exists(directory):
         os.makedirs(directory)
     if not "Fakes" in name:
@@ -480,20 +492,22 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     # return sf,sferr
 
 
-variables = ["mt2", "eta1", "eta2", "pt1", "pt2", "n_jets", "n_vtx", "phi1", "phi2", "m_ll", "ht",
-             "n_photons", "pt_g1", "met", "nElectrons", "nMuons", "deltaR1_g1", "deltaR2_g1", "deltaRLL", "Fakes"]
-# variables = ["pt_g1"]
+# variables=["mt2","eta1","eta2","pt1","pt2","n_jets","n_vtx","phi1","phi2","m_ll","ht","n_photons","pt_g1","met","nElectrons","nMuons","deltaR1_g1","deltaR2_g1","deltaRLL","Fakes"]
+# variables = ["Fakes"]
+variables = ["mt2", "met"]
+# variables=["pt_g1"]
 bkgs = [DYjetsNLO, zgamma, tt, ttgamma, wwgamma, wzgamma,
         zz, wjets, wgamma, singletop, zz4l, wz, zz, ww]
 # groups=["ValidationRegion"]
-groups = ["VR"]
+groups = ["onZ"]
 binnings_ = binnings.copy()
 # binnings_["pt_g1"]=frange(25,80,5)+frange(80,140,10)+frange(140,200,20)
 # 'pt_g1':            frange(25,126,25),
 # binnings_["pt_g1"]=frange(20,60,10)+frange(60,80,20)+frange(80,160,40)
 # binnings_["pt_g1"]=frange(20,150,10)
 binnings_["pt_g1"] = frange(20, 100, 10)
-binnings_["mt2"] = frange(80, 200, 20)
+binnings_["mt2"] = frange(80, 250, 10)
+binnings_["met"] = frange(0, 440, 20)
 #pklZZ = pkl.load( open( "plots_CR_zz/factors/ControlRegionZZ.pkl", "rb" ) )
 #pklDY = pkl.load( open( "plots_CR_dy/factors/ControlRegionDY.pkl", "rb" ) )
 #pklTT = pkl.load( open( "plots_CR_tt/factors/ControlRegionTT.pkl", "rb" ) )
@@ -506,6 +520,7 @@ ZZsf = pklZZ["LL"]["m_ll"]
 DYsf = pklDY["LL"]["eta1"]
 TTsf = pklTT["EM"]["eta1"]
 WZsf = pklWZ["LL"]["eta1"]
+print labels["met"][0]
 for group in groups:
     for variable in variables:
         # drawVR("EE",group+"/EE/"+variable,binning=binnings_[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)

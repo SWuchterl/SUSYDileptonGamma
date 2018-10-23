@@ -112,46 +112,46 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
     for d in bkg[-1::-1]:
         h = d.getHist( name )
         
-        avgTopPtWeightHisto = d.getHist(folder+"/weight_topPt")
-        avgNIsrWeightHisto = d.getHist(folder+"/weight_nISR")
-        avgEWKinoWeightHisto = d.getHist(folder+"/weight_EWKinoPairPt")
-        avgleptonWeightHisto = d.getHist(folder+"/weight_leptonPairPt")
+        #avgTopPtWeightHisto = d.getHist(folder+"/weight_topPt")
+        #avgNIsrWeightHisto = d.getHist(folder+"/weight_nISR")
+        #avgEWKinoWeightHisto = d.getHist(folder+"/weight_EWKinoPairPt")
+        #avgleptonWeightHisto = d.getHist(folder+"/weight_leptonPairPt")
         
-        if avgTopPtWeightHisto:
-            avgTopPtWeight= avgTopPtWeightHisto.GetMean()
-        else:
-            avgTopPtWeight=1.
-        if avgNIsrWeightHisto :
-            avgNIsrWeight= avgNIsrWeightHisto.GetMean()
-        else:
-            avgNIsrWeight=1.
-        if avgEWKinoWeightHisto:
-            avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
-        else:
-            avgEWKinoWeight=1.
-        if avgleptonWeightHisto: 
-            avgleptonWeight = avgleptonWeightHisto.GetMean()
-        else:
-            avgleptonWeight=1.
+        #if avgTopPtWeightHisto:
+            #avgTopPtWeight= avgTopPtWeightHisto.GetMean()
+        #else:
+            #avgTopPtWeight=1.
+        #if avgNIsrWeightHisto :
+            #avgNIsrWeight= avgNIsrWeightHisto.GetMean()
+        #else:
+            #avgNIsrWeight=1.
+        #if avgEWKinoWeightHisto:
+            #avgEWKinoWeight = avgEWKinoWeightHisto.GetMean()
+        #else:
+            #avgEWKinoWeight=1.
+        #if avgleptonWeightHisto: 
+            #avgleptonWeight = avgleptonWeightHisto.GetMean()
+        #else:
+            #avgleptonWeight=1.
         
         if not h: continue
         if not h.Integral(): continue
         h.Scale(scale)
         
         
-        if d in [tt,ttgamma]:
-            h.Scale(sfTT[0])
-        if d in [DYjetsNLO,zgamma]:
-            h.Scale(sfDY[0])
-        if d in [zz,zz4l]:
-            h.Scale(sfZZ[0])
-        if d in [wz]:
-            h.Scale(sfWZ[0])
+        #if d in [tt,ttgamma]:
+            #h.Scale(sfTT[0])
+        #if d in [DYjetsNLO,zgamma]:
+            #h.Scale(sfDY[0])
+        #if d in [zz,zz4l]:
+            #h.Scale(sfZZ[0])
+        #if d in [wz]:
+            #h.Scale(sfWZ[0])
         
-        h.Scale(1./avgTopPtWeight)
-        h.Scale(1./avgNIsrWeight)
-        h.Scale(1./avgEWKinoWeight)
-        h.Scale(1./avgleptonWeight)
+        #h.Scale(1./avgTopPtWeight)
+        #h.Scale(1./avgNIsrWeight)
+        #h.Scale(1./avgEWKinoWeight)
+        #h.Scale(1./avgleptonWeight)
         
         
         if binning: 
@@ -252,11 +252,11 @@ def drawSameHistogram( sampleNames, name, bkg=[], additional=[], binning=None, b
 def main():
     bkgs=[DYjetsNLO,zgamma,tt,ttgamma,wwgamma,wzgamma,zz,wjets,wgamma,singletop,zz4l,wz,ww]
     variables=["eta1","eta2","pt1","pt2","n_jets","n_vtx","phi1","phi2","m_ll","ht","n_photons","pt_g1","met"]
-    groups=["ValidationRegion"]
-    pklZZ = pkl.load( open( "plots_CR/factors/ControlRegionZZ.pkl", "rb" ) )
-    pklDY = pkl.load( open( "plots_CR/factors/ControlRegionDY.pkl", "rb" ) )
-    pklTT = pkl.load( open( "plots_CR/factors/ControlRegionTT.pkl", "rb" ) )
-    pklWZ = pkl.load( open( "plots_CR/factors/ControlRegionWZ.pkl", "rb" ) )
+    groups=["VR"]
+    pklZZ = pkl.load( open( "plots_CR_zz/factors/CRZZ.pkl", "rb" ) )
+    pklDY = pkl.load( open( "plots_CR_dy/factors/CRDY.pkl", "rb" ) )
+    pklTT = pkl.load( open( "plots_CR_tt/factors/CRTT.pkl", "rb" ) )
+    pklWZ = pkl.load( open( "plots_CR_wz/factors/CRWZ.pkl", "rb" ) )
     ZZsf=pklZZ["LL"]["m_ll"]
     DYsf=pklDY["LL"]["pt1"]
     TTsf=pklTT["EM"]["pt1"]
@@ -267,7 +267,7 @@ def main():
             #drawSameHistogram("EE",group+"EE/"+variable, bkgs, additional=[dataDoubleEG],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("MM",group+"MM/"+variable, bkgs, additional=[dataDoubleMuon],binning=binnings[variable],xTitle=labels[variable][0])
             #drawSameHistogram("EM",group+"EM/"+variable, bkgs, additional=[dataMuonEG],binning=binnings[variable],xTitle=labels[variable][0])
-            drawSameHistogram("LL",group+"/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
+            drawSameHistogram("LL",group+"/LL/"+variable, bkgs, additional=[t5bbbbzg_1800_1700,t5bbbbzg_1800_400,t5bbbbzg_1800_600,tching_1200,tching_400],binning=binnings[variable],xTitle=labels[variable][0],sfZZ=ZZsf,sfDY=DYsf,sfTT=TTsf,sfWZ=WZsf)
 
 
 

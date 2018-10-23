@@ -16,7 +16,7 @@ const float photonsEtaMaxEndcap = 2.5;
 
 //|eta|1: 0-0.8
 //|eta|2: 0.8-1.479
-//|eta|3: 1.479-2.5  
+//|eta|3: 1.479-2.5
 
 const float aWPeta1 = 0.77;
 const float bWPeta1 = 0.52;
@@ -46,51 +46,51 @@ bool isRunABCDEF(int No){
    //float slope;
    //if (pt<15.){
       //if (fabs(eta)<0.8){
-         //cut = aWPeta1; 
+         //cut = aWPeta1;
       //}else{
          //if (fabs(eta)<1.479){
-            //cut = aWPeta2; 
+            //cut = aWPeta2;
          //}else{
             //if(fabs(eta)<2.5){
-               //cut = aWPeta3; 
+               //cut = aWPeta3;
             //}else{
-               //cut = 9999.; 
+               //cut = 9999.;
             //}
          //}
       //}
    //}else{
       //if ((pt>15.) && (pt<25.)){
          //if (fabs(eta)<0.8){
-            //slope = (bWPeta1-aWPeta1)/10.; 
+            //slope = (bWPeta1-aWPeta1)/10.;
             //cut = fmin( aWPeta1, fmax(bWPeta1 , aWPeta1 + slope*(pt-15.) ) );
          //}else{
             //if (fabs(eta)<1.479){
-               //slope = (bWPeta2-aWPeta2)/10.; 
-               //cut = fmin( aWPeta2, fmax(bWPeta2 , aWPeta2 + slope*(pt-15.) ) ); 
+               //slope = (bWPeta2-aWPeta2)/10.;
+               //cut = fmin( aWPeta2, fmax(bWPeta2 , aWPeta2 + slope*(pt-15.) ) );
             //}else{
                //if(fabs(eta)<2.5){
-                  //slope = (bWPeta3-aWPeta3)/10.; 
+                  //slope = (bWPeta3-aWPeta3)/10.;
                   //cut = fmin( aWPeta3, fmax(bWPeta3 , aWPeta3 + slope*(pt-15) ) );
                //}else{
-                  //cut = 9999.; 
+                  //cut = 9999.;
                //}
             //}
-         //}         
+         //}
       //}else{
          //if (pt > 25.){
             //if (fabs(eta)<0.8){
-               //cut = bWPeta1; 
+               //cut = bWPeta1;
             //}else{
                //if (fabs(eta)<1.479){
-                  //cut = bWPeta2; 
+                  //cut = bWPeta2;
                //}else{
                   //if(fabs(eta)<2.5){
-                     //cut = bWPeta3; 
+                     //cut = bWPeta3;
                   //}else{
-                     //cut = 9999.; 
+                     //cut = 9999.;
                   //}
                //}
-            //}    
+            //}
          //}else{
             //cut=9999.;
          //}
@@ -103,10 +103,10 @@ bool isRunABCDEF(int No){
    //}
 //}
 bool ElectronTightMVA(const float eta, const float pt, const float mvaValue){
-  
+
    float cut;
    float slope;
-   
+
    float workingPoint = -9999.;
 		if (fabs(eta) < 0.8) {
 			slope = (workingPointCentralBarrelHighPt - workingPointCentralBarrelLowPt) / 10.;
@@ -633,9 +633,9 @@ float isrReweighting(unsigned nJet, bool err=false) {
 }
 
 
-bool unMatchedSuspiciousJet(const vector<tree::Jet>& jets, const vector<tree::Particle>& genJets) {
-  for (const auto& j: jets) {
-    if (fabs(j.p.Eta())<2.5 && j.chf<.1 && !count_if(genJets.begin(), genJets.end(), [&j] (const tree::Particle& p) { return p.p.DeltaR(j.p)<.3;})) return true;
-  }
-  return false;
-}
+// bool unMatchedSuspiciousJet(const vector<tree::Jet>& jets, const vector<tree::Particle>& genJets) {
+//   for (const auto& j: jets) {
+//     if (fabs(j.p.Eta())<2.5 && j.chf<.1 && !count_if(genJets.begin(), genJets.end(), [&j] (const tree::Particle& p) { return p.p.DeltaR(j.p)<.3;})) return true;
+//   }
+//   return false;
+// }

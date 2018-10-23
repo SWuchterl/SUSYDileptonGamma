@@ -633,9 +633,9 @@ float isrReweighting(unsigned nJet, bool err=false) {
 }
 
 
-bool unMatchedSuspiciousJet(const vector<tree::Jet>& jets, const vector<tree::Particle>& genJets) {
-  for (const auto& j: jets) {
-    if (fabs(j.p.Eta())<2.5 && j.chf<.1 && !count_if(genJets.begin(), genJets.end(), [&j] (const tree::Particle& p) { return p.p.DeltaR(j.p)<.3;})) return true;
-  }
-  return false;
-}
+//bool unMatchedSuspiciousJet(const vector<tree::Jet>& jets, const vector<tree::Particle>& genJets) {
+  //for (const auto& j: jets) {
+    //if (fabs(j.p.Eta())<2.5 && j.chf<.1 && !count_if(genJets.begin(), genJets.end(), [&j] (const tree::Particle& p) { return p.p.DeltaR(j.p)<.3;})) return true;
+  //}
+  //return false;
+//}

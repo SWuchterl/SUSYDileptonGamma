@@ -53,14 +53,14 @@ print "------- DY --------"
         #print variable, pklDY[key][variable]
         #dy.append(pklDY[key][variable][0])
 #for key in pklDY:
-for variable in pklDY["EE"]:
-    print variable, pklDY["EE"][variable]
-    dyEE.append(pklDY["EE"][variable][0])
-    dyEEErr.append(pklDY["EE"][variable][1])
-for variable in pklDY["MM"]:
-    print variable, pklDY["MM"][variable]
-    dyMM.append(pklDY["MM"][variable][0])
-    dyMMErr.append(pklDY["MM"][variable][1])
+#for variable in pklDY["EE"]:
+    #print variable, pklDY["EE"][variable]
+    #dyEE.append(pklDY["EE"][variable][0])
+    #dyEEErr.append(pklDY["EE"][variable][1])
+#for variable in pklDY["MM"]:
+    #print variable, pklDY["MM"][variable]
+    #dyMM.append(pklDY["MM"][variable][0])
+    #dyMMErr.append(pklDY["MM"][variable][1])
 for variable in pklDY["LL"]:
     print variable, pklDY["LL"][variable]
     dyLL.append(pklDY["LL"][variable][0])
@@ -83,10 +83,10 @@ print "ZZ:"
 print "mean: ", np.mean(zz), " (+-) ", np.std(zz), " +- ", np.mean(zzErr), " ", np.mean(zzErr)/np.mean(zz)*100.,"%"
 print "TT:"
 print "mean: ", np.mean(tt), " (+-) ", np.std(tt), " +- ", np.mean(ttErr), " ", np.mean(ttErr)/np.mean(tt)*100.,"%"
-print "DYEE:"
-print "mean: ", np.mean(dyEE), " (+-) ", np.std(dyEE), " +- ", np.mean(dyEEErr), " ", np.mean(dyEEErr)/np.mean(dyEE)*100.,"%"
-print "DYMM:"
-print "mean: ", np.mean(dyMM), " (+-) ", np.std(dyMM), " +- ", np.mean(dyMMErr), " ", np.mean(dyMMErr)/np.mean(dyMM)*100.,"%"
+#print "DYEE:"
+#print "mean: ", np.mean(dyEE), " (+-) ", np.std(dyEE), " +- ", np.mean(dyEEErr), " ", np.mean(dyEEErr)/np.mean(dyEE)*100.,"%"
+#print "DYMM:"
+#print "mean: ", np.mean(dyMM), " (+-) ", np.std(dyMM), " +- ", np.mean(dyMMErr), " ", np.mean(dyMMErr)/np.mean(dyMM)*100.,"%"
 print "DYLL:"
 print "mean: ", np.mean(dyLL), " (+-) ", np.std(dyLL), " +- ", np.mean(dyLLErr), " ", np.mean(dyLLErr)/np.mean(dyLL)*100.,"%"
 print "WZ:"

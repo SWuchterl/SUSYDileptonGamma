@@ -198,9 +198,22 @@ class myAnalyzer : public TSelector {
     changePHOTONSF changePhotonSF=normalPHOTONSF,
     changeISR changeisr=normalISR,
     changeEWK changeewk=normalEWK);
-  void Filler2D(map<Histograms2D,TH2F>& m,bool withPhoton);
+  //void Filler2D(map<Histograms2D,TH2F>& m,bool withPhoton);
+  void Filler2D(map<Histograms2D,TH2F>& m,bool withPhoton,bool slimmed=false,int changePDF=9999,changemet changeMET=normal,
+    changepu changePU=normalPU,
+    changeLEPSF changeLepSF=normalLEPSF,
+    changePHOTONSF changePhotonSF=normalPHOTONSF,
+    changeISR changeisr=normalISR,
+    changeEWK changeewk=normalEWK);
   //void FillerSignal(map<Histograms1D,TH1F>& m,float divideFactor=1.);
   void FillerSignal(map<Histograms1D,TH1F>& m,float divideFactor=1.,int changePDF=9999,
+    changemet changeMET=normal,
+    changepu changePU=normalPU,
+    changeLEPSF changeLepSF=normalLEPSF,
+    changePHOTONSF changePhotonSF=normalPHOTONSF,
+    changeISR changeisr=normalISR,
+    changeEWK changeewk=normalEWK);
+  void FillerSignal(map<Histograms2D,TH2F>& m,float divideFactor=1.,int changePDF=9999,
     changemet changeMET=normal,
     changepu changePU=normalPU,
     changeLEPSF changeLepSF=normalLEPSF,
@@ -227,6 +240,7 @@ class myAnalyzer : public TSelector {
   map<Histograms1D,TH1F> InitCutFlowHistograms(const selectionType selection);
   map<Histograms1D,TH1F> InitCutFlowHistograms_Fine(const selectionType selection);
   map<Histograms1D,TH1F> InitSignalScanHistograms(const selectionType selection);
+  map<Histograms2D,TH2F> InitSignalScanHistograms2D(const selectionType selection);
   void InitWeightHistos(map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>& map_,const selectionType selection_, selectionFolderName name_);
   
   
@@ -241,7 +255,8 @@ class myAnalyzer : public TSelector {
 
   void FillCutFlowHistograms_Fine();
   
-
+  bool GenPhotonTTVeto();
+  float GetZZKFactor();
 
   // config.ini
   boost::property_tree::ptree propertyTree;
@@ -253,6 +268,22 @@ class myAnalyzer : public TSelector {
   bool config_dosignalscanSplit;
   float config_eventpercentage;
   bool config_doTrigger;
+  bool config_doTriggerPure;
+  bool config_doTriggerMET;
+  
+  
+  bool config_doPdfSplit;
+  int config_pdfStart;
+  int config_pdfStep;
+  
+  float config_eeWeight;
+  float config_emWeight;
+  float config_mmWeight;
+  float config_eeEff;
+  float config_emEff;
+  float config_mmEff;
+  
+  
   string config_outputfolder;
 
 
@@ -300,6 +331,7 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<bool> evtHasGenPhotonVeto;
   
   TTreeReaderValue<bool> trigHt;
+  TTreeReaderValue<bool> trigMET;
   TTreeReaderValue<bool> trigDiEle;
   TTreeReaderValue<bool> trigDiMu;
   TTreeReaderValue<bool> trigMuEle;
@@ -308,6 +340,7 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<bool> trigMuEleMatch;
   
   TTreeReaderValue<float> calcHt;
+  TTreeReaderValue<float> Mt2;
   
   TTreeReaderValue<float> lepSF_weight;
   TTreeReaderValue<float> lepSF_weightUp;
@@ -333,6 +366,7 @@ class myAnalyzer : public TSelector {
   TTreeReaderValue<tree::MET> met;
   TTreeReaderValue<tree::MET> metRaw;
   TTreeReaderValue<tree::MET> met_JESu;
+  TTreeReaderValue<tree::MET> met_gen;
   TTreeReaderValue<tree::MET> met_JESd;
   TTreeReaderValue<tree::MET> met_JERu;
   TTreeReaderValue<tree::MET> met_JERd;
@@ -376,7 +410,8 @@ class myAnalyzer : public TSelector {
   long nEntries;
   SignalPoint sp_;
 
-  float puWeights[3];
+  //float puWeights[3];
+  float puWeights[6];
   float lepSfWeights[3];
   float photonSfWeights[3];
   float ewkWeights[3];
@@ -398,6 +433,7 @@ class myAnalyzer : public TSelector {
   map<cutFlowMapName,map<Histograms1D,TH1F>> c1Maps;
 
   map<SignalPoint,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>>> s1Maps;
+  map<SignalPoint,map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms2D,TH2F>>>>> s2Maps;
 
   map<selectionFolderName,map<selectionFolderName,map<selectionFolderName,map<Histograms1D,TH1F>>>> cr1Maps;
 
@@ -407,6 +443,8 @@ class myAnalyzer : public TSelector {
   void clearCutFlowMap();
   
   TH1F cutFlow;
+  TH1F weightHisto;
+  map<string,TH1F> weightHistoMap;
   float nGen;
   string inputName;
 
@@ -417,8 +455,12 @@ class myAnalyzer : public TSelector {
   float totalWeight;
   float totalWeightCalc;
   
+  float zzKFactor;
   
-
+  
+  //const char *emptyLabelPtr="";
+  //const char *weightLabelPtr="weight";
+  //const char *metLabelPtr=";#it{p}_{T}^{miss} (GeV)";
 
 
   //cutflow booleans
@@ -438,6 +480,10 @@ class myAnalyzer : public TSelector {
   bool isData;
   bool isSignal;
   bool isTotalSignal;
+  
+  bool isTTInclusive;
+  bool isZZ4L;
+  bool isZZ2L;
   
 
   double startTime;

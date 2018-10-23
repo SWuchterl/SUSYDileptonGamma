@@ -6,7 +6,7 @@ using namespace std;
 enum selectionType{UNCUT,DILEP,PHOTON,SEL,ONZ,TRIGDILEP,TRIGSEL,TRIGONZ,
     TRIGDILEP_ptcuts,TRIGONZ_ptcuts,TRIGSEL_ptcuts,TRIGDILEP_pt1cut,TRIGDILEP_pt2cut,
     ONZMET,ONZG,ABOVEZG,EXO,EGRegression,ONZMET100,ONZMET200,ONZMET100200,ONZMET200300,ONZMET100300,ONZMET0100,ONZMET100150,ONZMET150,
-    ControlRegionDY,ControlRegionTT,ControlRegionTT080,ControlRegionTT80,ValidationRegion,ValidationRegion080,ValidationRegion80,ControlRegionZZ,LooseLeptons,ControlRegionWZ,ControlRegionWW};
+    ControlRegionDY,ControlRegionTT,ControlRegionTT080,ControlRegionTT80,ValidationRegion,ValidationRegion080,ValidationRegion80,ControlRegionZZ,LooseLeptons,LooseLeptonsTrigger,ControlRegionWZ,ControlRegionWW};
     //CRDY,CRTT,CRTT080,CRTT80,VR,VR080,VR80,CRZZ,LooseLeptons,CRWZ,CRWW};
 enum Histograms1D{PT1,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
     HT,GENHT,NVTX,ETAG1,PHIG1,PTG1,SIGMAIETAIETAG1,DeltaEtaLL,DeltaPhiLL,

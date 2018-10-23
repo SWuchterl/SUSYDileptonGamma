@@ -50,11 +50,23 @@ observation %s\n"""%(nBins," ".join(["b%d"%i for i in range(nBins)])," ".join([s
 bkgSet = zgamma+ ttgamma+ zz+ wwgamma+ wzgamma+DYjetsNLO+wjets+tt+singletop+wz+ww+zz4l+wjets
 #sigSet = signal["T5Wg_1550_100"]
 sigSet = tching_600
+#sigSet = gmsb_240_230
+#sigSet = gmsb_290_205
+#sigSet = t5bbbbzg_1500_600
+#sigSet = t5bbbbzg_1500_1400
 
 #bkgHist = bkgSet.getHist("tr/met")
 #sigHist = sigSet.getHist("tr/met")
-bkgHist = bkgSet.getHist("onZMet150/LL/met")
-sigHist = sigSet.getHist("onZMet150/LL/met")
+#bkgHist = bkgSet.getHist("onZMet150/LL/met")
+bkgHist = bkgSet.getHistWithoutNGen("xx_0_0/sig/LL/nom/met")
+#sigHist = sigSet.getHist("onZMet150/LL/met")
+sigHist = sigSet.getHistWithoutNGen("Ng_0_0/sig/LL/nom/met")
+#bkgHist = bkgSet.getHist("onZMet150/LL/m_llg")
+#sigHist = sigSet.getHist("onZMet150/LL/m_llg")
+#bkgHist = bkgSet.getHist("onZMet150/LL/zpt")
+#sigHist = sigSet.getHist("onZMet150/LL/zpt")
+#bkgHist = bkgSet.getHist("onZMet150/LL/deltaPhiLL")
+#sigHist = sigSet.getHist("onZMet150/LL/deltaPhiLL")
 
 def frange(start, end, step):
     a=[]
@@ -64,7 +76,10 @@ def frange(start, end, step):
         tmp += step
     return a
 
-rebinning=frange(150.,5001.,5.)
+#rebinning=frange(150.,5001.,5.)
+#rebinning=frange(0.,1501.,25.)
+rebinning=frange(0.,1501.,50.)
+#rebinning=frange(0.,4.5,0.1)
 
 bkgHist=aux.rebin(bkgHist,rebinning)
 sigHist=aux.rebin(sigHist,rebinning)
@@ -89,8 +104,8 @@ for bin in range( sigHist.GetNbinsX()+2, 0, -1 ):
     if min(sigInts) <1e-6: continue
 
 
-    writeSimplifiedDatacard( bkgInts, sigInts )
-    r = limitTools.infosFromDatacard("tmpDataCard.txt")["exp"]
+    writeSimplifiedDatacard( bkgInts, sigInts,name = "tmpDataCard_"+sigSet.names[0]+"_.txt" )
+    r = limitTools.infosFromDatacard("tmpDataCard_"+sigSet.names[0]+"_.txt")["exp"]
     print bin,bkgHist.GetBinLowEdge(bin),r
     if (r - oldR)/r>0.05: #change must me larger than 5%
         print "append"

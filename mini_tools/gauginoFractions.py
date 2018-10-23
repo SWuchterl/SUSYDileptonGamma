@@ -140,6 +140,10 @@ hToG = ROOT.TF1("hToG", func_hToG, xMin, xMax, 4 )
 hToZ = ROOT.TF1("hToZ", func_hToZ, xMin, xMax, 4 )
 hToH = ROOT.TF1("hToH", func_hToH, xMin, xMax, 4 )
 
+# ~ m1 = 500
+# ~ m2 = 1000
+# ~ tanb = 1.5
+# ~ n = -1
 m1 = 500
 m2 = 1000
 tanb = 1.5

@@ -937,9 +937,7 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     #l.DrawLine(100, 0, 100, totUnc.GetBinContent(totUnc.FindBin(100)))
 
     # r = ratio.Ratio("#scale[.9]{#lower[.24]{#splitline{Data/Pred.}{Bkg. frac.}}}", dirHist, totStat)
-    # r = ratio.Ratio("#scale[.9]{#lower[.24]{Bkg. frac.}}",
-    #                 dataHist, totStat, sysHisto=totSyst)
-    r = ratio.Ratio("#scale[.9]{#lower[.24]{#splitline{Data/Pred.}{Bkg. frac.}}}",
+    r = ratio.Ratio("#scale[.9]{#lower[.24]{Bkg. frac.}}",
                     dataHist, totStat, sysHisto=totSyst)
     # r = ratio.Ratio("#scale[.9]{#lower[.24]{Bkg. frac.}}", dirHist, totStat)
     hsm = m.hists[0].GetStack().Last()
@@ -948,8 +946,7 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     # rMax = 1.1
     #if name == "final_lowEMHT": rMax = 1.6
     #if name == "final_highEMHT": rMax = 3.6
-    # r.draw(0., rMax, m.getStack(), True)
-    r.draw(0., rMax, m.getStack())
+    r.draw(0., rMax, m.getStack(), True)
     #r.draw(0., rMax, m.getStack())
 
     #aux.Label(sim= not dirSet==data, status="" if "allMC" not in name else "Private Work")

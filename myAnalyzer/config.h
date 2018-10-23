@@ -18,13 +18,15 @@ enum Histograms1D{PT1=0,PT2,ETA1,ETA2,PHI1,PHI2,MLL,NJETS,NPHOTONS,ETMISS,
     PT3,PT4,ETA3,ETA4,PHI3,PHI4,MLL2,ZPT2,MTL3MET,MLLLL,
     JetPt1,JetPt2,JetPt3,JetPt4,JetPhi1,JetPhi2,JetPhi3,JetPhi4,JetEta1,JetEta2,JetEta3,JetEta4,
     DeltaEtaLL_neg,DeltaPhiLL_neg,DeltaRLL_neg,NBJETS,DeltaPhiGMet,DeltaRGMet,
-    FakeElectron,FakeJet,FakePhoton,Fakes};
-enum Histograms2D{ISRVFSR=0,PTGvsMLLG};
+    FakeElectron,FakeJet,FakePhoton,Fakes,
+    DeltaPhiL1G,DeltaPhiL2G,ML1G,ML2G,justMCPUWeight,withNISRWeight,withTopPtWeight,withEWKWeight,withPDFWeight,ETMISSRAW};
+enum Histograms2D{ISRVFSR=0,PTGvsMLLG,
+    MetZpt,MetDeltaPhiLL,MetMllg,MetMt2};
 enum particleType{E=0,M,DUMMYPARTICLE,ElMu,MuEl};
 
 enum cutFlowFlags{TRIGGERED=0,TRIGGEREDMATCHED,LEPTONID_leading,LEPTONPT_leading,LEPTONID_trailing,LEPTONPT_trailing,PHOTON1,PHOTON1ID,PHOTON1PT,PHOTON1DR,M50,ZMASS,DIELECTRON,DIMUON,GENVETO,
     LEPTONIDPure_leading,LEPTONIDIso_leading,LEPTONIDImpact_leading,LEPTONIDEta_leading,LEPTONIDPure_trailing,LEPTONIDIso_trailing,LEPTONIDImpact_trailing,LEPTONIDEta_trailing,
-    LEPTONIDDeltaR_leading,LEPTONIDDeltaR_trailing,genZLL,PHOTON1SEED,PHOTON1ETA,EMUON};
+    LEPTONIDDeltaR_leading,LEPTONIDDeltaR_trailing,genZLL,PHOTON1SEED,PHOTON1ETA,EMUON,ex2LEP,MT2Cut,MetCut};
 
 
 enum cutFlowMapName{
@@ -71,7 +73,7 @@ enum selectionFolderName{
     controlregionZZ,ControlRegionZZEE,ControlRegionZZMM,ControlRegionZZEM,ControlRegionZZLL,
     controlregionWZ,ControlRegionWZEE,ControlRegionWZMM,ControlRegionWZEM,ControlRegionWZLL,
     JESu,JESd,JERu,JERd,
-    LEPSFUP,LEPSFDOWN,PHOTONSFUP,PHOTONSFDOWN,PUUP,PUDOWN,ISRUP,ISRDOWN,EWKUP,EWKDOWN,
+    LEPSFUP,LEPSFDOWN,PHOTONSFUP,PHOTONSFDOWN,PUUP,PUDOWN,ISRUP,ISRDOWN,EWKUP,EWKDOWN,NOPUUP,NOPUDOWN,NOPU,
     EE,LL,MM,EM,nom,
     PDF0,PDF1,PDF2,PDF3,PDF4,PDF5,PDF6,PDF7,PDF8,PDF9,
     PDF10,PDF11,PDF12,PDF13,PDF14,PDF15,PDF16,PDF17,PDF18,PDF19,
@@ -84,7 +86,7 @@ enum selectionFolderName{
     PDF80,PDF81,PDF82,PDF83,PDF84,PDF85,PDF86,PDF87,PDF88,PDF89,
     PDF90,PDF91,PDF92,PDF93,PDF94,PDF95,PDF96,PDF97,PDF98,PDF99,
     PDF100,PDF101,PDF102,PDF103,PDF104,PDF105,PDF106,PDF107,PDF108,PDF109,
-    sig,sig_zz,sig_gz,sig_gg,sig80,sig080
+    sig,sig_zz,sig_gz,sig_gg,sig80,sig080,GENMET,sigMt2,sig80Mt2,sig080Mt2
     //PDF110,PDF111,PDF112,PDF113,PDF114,PDF115,PDF116,PDF117,PDF118,PDF119,
     };
 
@@ -102,8 +104,8 @@ selectionFolderName PDFNAMES[110] = {
     PDF100,PDF101,PDF102,PDF103,PDF104,PDF105,PDF106,PDF107,PDF108,PDF109,
     };
 
-enum changemet{normal=0,JESUP,JESDOWN,JERUP,JERDOWN};
-enum changepu{normalPU=0,upPU,downPU};
+enum changemet{normal=0,JESUP,JESDOWN,JERUP,JERDOWN,METGEN};
+enum changepu{normalPU=0,upPU,downPU,noPU,noPUDown,noPUUp};
 enum changeLEPSF{normalLEPSF=0,upLEPSF,downLEPSF};
 enum changePHOTONSF{normalPHOTONSF=0,upPHOTONSF,downPHOTONSF};
 enum changeISR{normalISR=0,upISR,downISR};
@@ -148,11 +150,15 @@ selectionFolderNameString[LEPSFDOWN]="lepSFd";
 selectionFolderNameString[PHOTONSFUP]="photonSFu"; 
 selectionFolderNameString[PHOTONSFDOWN]="photonSFd"; 
 selectionFolderNameString[PUUP]="PUu"; 
+selectionFolderNameString[NOPUUP]="NoPUu"; 
+selectionFolderNameString[NOPU]="NoPU"; 
 selectionFolderNameString[PUDOWN]="PUd"; 
+selectionFolderNameString[NOPUDOWN]="NoPUd"; 
 selectionFolderNameString[ISRUP]="ISRu"; 
 selectionFolderNameString[ISRDOWN]="ISRd"; 
 selectionFolderNameString[EWKUP]="EWKu"; 
 selectionFolderNameString[EWKDOWN]="EWKd"; 
+selectionFolderNameString[GENMET]="genmet"; 
 
 selectionFolderNameString[EE]="EE"; selectionFolderNameString[MM]="MM"; selectionFolderNameString[EM]="EM"; selectionFolderNameString[LL]="LL";
 selectionFolderNameString[nom]="nom"; 
@@ -269,6 +275,9 @@ selectionFolderNameString[PDF109]="109";
 selectionFolderNameString[sig]="sig"; 
 selectionFolderNameString[sig80]="sig80"; 
 selectionFolderNameString[sig080]="sig080"; 
+selectionFolderNameString[sigMt2]="sigMt2"; 
+selectionFolderNameString[sig80Mt2]="sig80Mt2"; 
+selectionFolderNameString[sig080Mt2]="sig080Mt2"; 
 selectionFolderNameString[sig_gg]="sig_gg"; 
 selectionFolderNameString[sig_zz]="sig_zz"; 
 selectionFolderNameString[sig_gz]="sig_gz"; 
@@ -298,6 +307,7 @@ histoNames[NJETS]= "n_jets";
 histoNames[NBJETS]= "n_bjets";
 histoNames[NPHOTONS]= "n_photons";
 histoNames[ETMISS]= "met";
+histoNames[ETMISSRAW]= "met_RAW";
 histoNames[HT]= "ht";
 histoNames[GENHT]= "gen_ht";
 histoNames[NVTX]= "n_vtx";
@@ -362,6 +372,10 @@ histoNames[JetEta1] = "jetEta1";
 histoNames[JetEta2] = "jetEta2";
 histoNames[JetEta3] = "jetEta3";
 histoNames[JetEta4] = "jetEta4";
+histoNames[DeltaPhiL1G] = "DeltaPhiL1G";
+histoNames[DeltaPhiL2G] = "DeltaPhiL2G";
+histoNames[ML1G] = "m_l1g";
+histoNames[ML2G] = "m_l2g";
 
 
 
@@ -382,6 +396,10 @@ histoNames[Fakes] = "Fakes";
 
 histoNames2D[PTGvsMLLG] = "ptg_mllg";
 histoNames2D[ISRVFSR] = "ISRvFSR";
+histoNames2D[MetZpt] = "MetZpt";
+histoNames2D[MetDeltaPhiLL] = "MetDeltaPhiLL";
+histoNames2D[MetMllg] = "MetMllg";
+histoNames2D[MetMt2] = "MetMt2";
 };
 
 

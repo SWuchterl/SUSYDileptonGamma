@@ -25,6 +25,14 @@ plotter/plots_CR_tt/
 plotter/plots_CR_wz/
 plotter/plots_CR_zz/
 plotter/limitCalculations/
+
+myAnalyzer/.nfs*
+SplitTrees/.nfs*
+plotter/combine_logger.out
+plotter/contamination/
+plotter/systBKG/
+plotter/triggerStudies/
+
 minimal/TreeParticlesDanilo.hpp
 minimal/AutoDict_map_int_pair_int_int___.cxx
 
