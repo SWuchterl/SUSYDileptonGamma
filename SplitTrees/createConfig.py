@@ -3,13 +3,13 @@ import ConfigParser
 
 generalSettings = {
     "eventPercentage": 100.,
-    # "eventPercentage" : 1.,
+     #"eventPercentage" : 1.,
     # "eventPercentage" : 50.,
     # "eventPercentage" : 10.,
     # "eventPercentage" : 5.,
     # "eventPercentage" : 0.5,
     "veto": 6,      # 5=PromptFinalState, 6=isPromptFinalState, 7= None,
-    "ht": 0,
+    "ht": 1,
     "met": 0,
     "htpure": 0
 }
@@ -21,7 +21,8 @@ generalSettings = {
 #outputFolder = "mediumIDPOG_noTopPt_noNIsr"
 #outputFolder = "mediumIDPOG_TopPt_noNIsr"
 #outputFolder = "mediumIDPOG_TopPt_NIsr"
-outputFolder = "AN"
+#outputFolder = "AN"
+outputFolder = "addtrigger"
 # outputFolder = "LesyaCheck"
 #outputFolder = "AN_rishi"
 
@@ -38,6 +39,7 @@ outputFolders = {
     "mediumIDPOG_noTopPt_noNIsr": outputPath + "/mediumIDPOG_noTopPt_noNIsr",
     "mediumIDPOG_TopPt_noNIsr": outputPath + "/mediumIDPOG_TopPt_noNIsr",
     "mediumIDPOG_TopPt_NIsr": outputPath + "/mediumIDPOG_TopPt_NIsr",
+    "addtrigger": outputPath + "/addtrigger",
     "LesyaCheck": outputPath + "/LesyaCheck",
 }
 

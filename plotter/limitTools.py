@@ -260,6 +260,11 @@ def getFineHisto2(gr):
         xIn), (np.max(xIn) - np.min(xIn)) / 140)
     yOut = np.arange(np.min(yIn), np.max(
         yIn), (np.max(yIn) - np.min(yIn)) / 140)
+
+    #xOut = np.arange(np.min(xIn), np.max(
+        #xIn), (np.max(xIn) - np.min(xIn)) / 30)
+    #yOut = np.arange(np.min(yIn), np.max(
+        #yIn), (np.max(yIn) - np.min(yIn)) / 30)
     zOut = f(xOut, yOut)
     # print xOut
     # print yOut

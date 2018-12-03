@@ -366,15 +366,15 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     #m.add(signal2, "T5bbbbZg")
     #m.add(signal1, "TChiNg")
     if not "Fakes" in name:
-        m.add(signal2, "GMSB m(#tilde{W})=240 m(#tilde{B})=230")
+        m.add(signal2, "#splitline{GMSB m(#tilde{W})=240 GeV}{m(#tilde{B})=230 GeV}")
         # m.add(signal1, "GMSB m(#tilde{W})=290 m(#tilde{B})=205")
-        m.add(signal1, "GMSB m(#tilde{W})=415 m(#tilde{B})=355")
-        m.add(signal3, "TChiZG m(NLSP)=600")
-        m.add(signal4, "TChiZG m(NLSP)=400")
+        m.add(signal1, "#splitline{GMSB m(#tilde{W})=415 GeV}{m(#tilde{B})=355 GeV}")
+        m.add(signal3, "TChiZG m(NLSP)=600 GeV")
+        m.add(signal4, "TChiZG m(NLSP)=400 GeV")
         m.add(
-            signal5, "T5bbbbzg m(#tilde{g})=1500 m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=400")
+            signal5, "#splitline{T5bbbbZG m(#tilde{g})=1500 GeV}{m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=400 GeV}")
         m.add(
-            signal6, "T5bbbbzg m(#tilde{g})=1500 m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=1400")
+            signal6, "#splitline{T5bbbbZG m(#tilde{g})=1500 GeV}{m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=1400 GeV}")
         # m.add(signal6, "T5bbbbzg 1500 1400")
         # m.add(signal1, "GMSB 290_205")
 
@@ -458,6 +458,7 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
     # m.leg.SetX2(.89)
 
     m.Draw()
+    gPad.RedrawAxis()
     if not "Fakes" in name:
         # KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UO")
         # ksText = ROOT.TLatex()
@@ -478,7 +479,10 @@ def drawVR(sampleNames, name, binning=None, binningName="", xTitle=None, yTitle=
         #r.draw(0., rMax, m.getStack(), True)
         r.draw(0., rMax, m.getStack())
 
-    aux.Label(sim=True, status="Work in Progress")
+    # aux.Label(sim=True, status="Work in Progress")
+    # aux.Label(sim=True, status="Private Work")
+    # aux.Label(sim=False, status="Simulation")
+    aux.Label(status="Simulation")
     #aux.save(name, normal=False, changeMinMax=False)
     directory = "plots/"
     if not os.path.exists(directory):

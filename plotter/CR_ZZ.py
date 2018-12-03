@@ -8,6 +8,29 @@ import numpy as np
 import pickle as pkl
 import os
 
+
+# if(os.path.exists("plots_CR_zz/factors/CRZZ.pkl")):
+#     pklZZ = pkl.load(open("plots_CR_zz/factors/CRZZ.pkl", "rb"))
+#     ZZsf = pklZZ["LL"]["m_ll"][0]
+# else:
+#     ZZsf = 1.
+if(os.path.exists("plots_CR_dy/factors/CRDY.pkl")):
+    pklDY = pkl.load(open("plots_CR_dy/factors/CRDY.pkl", "rb"))
+    DYsf = pklDY["LL"]["eta1"][0]
+else:
+    DYsf = 1.
+if(os.path.exists("plots_CR_wz/factors/CRWZ.pkl")):
+    pklWZ = pkl.load(open("plots_CR_wz/factors/CRWZ.pkl", "rb"))
+    WZsf = pklWZ["LL"]["eta1"][0]
+else:
+    WZsf = 1.
+if(os.path.exists("plots_CR_tt/factors/CRTT.pkl")):
+    pklTT = pkl.load(open("plots_CR_tt/factors/CRTT.pkl", "rb"))
+    TTsf = pklTT["EM"]["eta1"][0]
+else:
+    TTsf = 1.
+
+
 binnings = {
     # 'pt1':              frange(20,100,10)+frange(100,200,25)+range(200,350,50),
     # 'pt1':              frange(20,150,10),
@@ -32,7 +55,8 @@ binnings = {
     # 'met':               frange(0., 80.,10),
     # 'met':               frange(0., 50.,10)+frange(60,120,20),
     # 'met':               frange(0., 120.,10),
-    'met':               frange(0., 100., 10),
+    # 'met':               frange(0., 100., 10),
+    'met':               frange(0., 80., 4),
     # 'met':               frange(0., 90.,5),
     # 'met':               frange(0., 40.,5)+frange(50,80,10),
     # 'met':               frange(0., 100.,20),
@@ -71,7 +95,8 @@ binnings = {
     'mtl2met':            frange(0, 200, 25) + frange(200, 500, 50) + frange(500, 1750, 250),
     'mtllmet':            frange(0, 200, 25) + frange(200, 500, 50) + frange(500, 1750, 250),
     'mtllgmet':            frange(0, 200, 25) + frange(200, 500, 50) + frange(500, 1750, 250),
-    'mt2':            frange(0., 425., 25.),
+    # 'mt2':            frange(0., 425., 25.),
+    'mt2':            frange(40., 300., 15.),
     'mzg_exo':            frange(0, 100, 50) + frange(100, 200, 50) + frange(200, 500, 50),
     'gammaMotherID':            frange(0., 200., 1.),
     'genPhotonPT':            np.concatenate((np.arange(0, 100, 10), np.arange(100, 350, 50)), axis=0),
@@ -104,10 +129,16 @@ def calculateSFAndError(numerator_data, denominator_toScale, additional_fix):
     alphaErr = np.sqrt((num_dataErr / den_toScale)**2. + (add_fixError / den_toScale)
                        ** 2. + (den_toScaleErr * (num_data - add_fix) / (den_toScale)**2.)**2.)
 
+    if __name__ == "__main__":
+
+        print "data", num_data, "fix", add_fix, "toScale", den_toScale
+        print "raw fix", additional_fix.GetEntries(
+        ), "toScaleFix", denominator_toScale.GetEntries()
+
     return [alpha, alphaErr / alpha] if den_toScale else [1., 0.]
 
 
-def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTitle=None, yTitle=None, weightsToUse=["nISR", "topPt", "ewk"]):
+def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTitle=None, yTitle=None, weightsToUse=["nISR", "topPt", "ewk"], SF_TT=TTsf, SF_WZ=WZsf, SF_DY=DYsf, SF_ZZ=1.):
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
 
@@ -147,7 +178,8 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     zz4lHist = aux.stdHistWithWeights(zz4l, name, weightsToUse, binning)
     wgHist = aux.stdHistWithWeights(wgamma, name, weightsToUse, binning)
 
-    final_dyHist = aux.addHists(dyHist, zgHist)
+    # final_dyHist = aux.addHists(dyHist, zgHist)
+    final_dyHist = aux.addHists(zgHist)
     final_ttHist = aux.addHists(ttHist, ttgHist)
     final_zzHist = aux.addHists(zzHist, zz4lHist)
     final_wzHist = aux.addHists(wzHist)
@@ -175,15 +207,30 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     zz4lHist.SetLineColor(ROOT.kOrange - 2)
     wgHist.SetLineColor(ROOT.kRed + 3)
 
+    final_wzHist.Scale(SF_WZ)
+    final_ttHist.Scale(SF_TT)
+    final_dyHist.Scale(SF_DY)
+    # final_wzHist.Scale(WZsf)
+    # final_ttHist.Scale(TTsf)
+    # final_dyHist.Scale(DYsf)
+
     # scaleHist=aux.addHists(zz4lHist)
     scaleHist = final_zzHist.Clone()
     # fixHist=aux.addHists(ttgHist,wzHist,wwgHist,wzgHist,ttHist,wjetsHist,singletopHist,dyHist,wwHist,zzHist,wgHist,zgHist)
     fixHist = aux.addHists(final_otherHist, final_wzHist,
                            final_ttHist, final_dyHist)
+    # print final_otherHist.Integral(), final_wzHist.Integral(
+    # ), final_ttHist.Integral(), final_dyHist.Integral()
+    # print dyHist.Integral(), zgHist.Integral()
+    # fixHist = aux.addHists(final_otherHist, final_wzHist,
+    #                        final_ttHist)
+    if __name__ == "__main__":
+        print "zz4lRaw", zz4lHist.GetEntries(), "zz2lRaw", zzHist.GetEntries()
+        print "zz4l", zz4lHist.Integral(), "zz2l", zzHist.Integral()
 
     sf, sferr = calculateSFAndError(dataHist, scaleHist, fixHist)
-
-    #print sf
+    if __name__ == "__main__":
+        print "SF", sf, sferr
 
     zz4lHist.Scale(sf)
     scaleHist.Scale(sf)
@@ -227,7 +274,8 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     final_dySFSyst = aux.getSysHistoWithMeanWeight(
         final_dyHist, mcSystUncert, final_dyHist.Integral() / (sum(DYjetsNLO.ngens) + sum(zgamma.ngens)))
 
-    print final_dyHist.Integral(), (sum(DYjetsNLO.ngens) + sum(zgamma.ngens))
+    if __name__ == "__main__":
+        print final_dyHist.Integral(), (sum(DYjetsNLO.ngens) + sum(zgamma.ngens))
 
     totStat = aux.addHists(final_zzHist, final_dyHist,
                            final_ttHist, final_wzHist, final_otherHist)
@@ -302,8 +350,12 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     # m.leg.SetX2(.89)
 
     m.Draw()
-    # KS=totStat.Clone().KolmogorovTest(dataHist.Clone(),"UO")
-    KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UOD")
+    KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UO")
+    # KS4 = dataHist.Clone().KolmogorovTest(totStat.Clone(), "UO")
+    # KS2 = dataHist.Clone().KolmogorovTest(totStat.Clone(), "UOX")
+    # KS3 = dataHist.Clone().Chi2Test(totStat.Clone(), "UW")
+    # print KS, KS2, KS3, KS4
+    # KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UOD")
     # KS=totStat.Clone().KolmogorovTest(dataHist.Clone())
     # KS=totStat.Clone().KolmogorovTest(dataHist.Clone(),"UOXN")
     ksText = ROOT.TLatex()
@@ -312,6 +364,8 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
 
     purity = aux.addHists(zzHist, zz4lHist).Integral() / aux.addHists(ttHist, ttgHist,
                                                                       final_otherHist, final_dyHist, final_zzHist, final_wzHist).Integral() * 100.
+    if purity > 100:
+        purity = 99.9
     purText = ROOT.TLatex()
     purText.SetTextSize(0.45 * purText.GetTextSize())
     purText.DrawLatexNDC(0.57, 0.6, "purity= " +
@@ -324,7 +378,9 @@ def drawCRZZ(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     #r.draw(0., rMax, m.getStack(), True)
     r.draw(0., rMax, m.getStack())
 
-    aux.Label(sim=False, status="Work in Progress")
+    #aux.Label(sim=False, status="Work in Progress")
+    # aux.Label(sim=False, status="Private Work")
+    aux.Label(status="")
     #aux.save(name, normal=False, changeMinMax=False)
     directory = "plots_CR_zz/"
     if not os.path.exists(directory):

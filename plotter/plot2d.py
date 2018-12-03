@@ -12,11 +12,12 @@ from dataMC import frange
 
 
 def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, binningName="", scaleToData=False, xTitle=None, yTitle=None):
-    style.defaultStyle()
+    can = ROOT.TCanvas()
+    # style.defaultStyle()
     style.style2d()
-    gStyle.SetCanvasDefH(200)
-    gStyle.SetCanvasDefW(600)
-    can = ROOT.TCanvas("", "", 600, 300)
+    # gStyle.SetCanvasDefH(200)
+    # gStyle.SetCanvasDefW(600)
+    # can = ROOT.TCanvas("", "", 600, 300)
     # can = ROOT.TCanvas()
 
     scale = 1.
@@ -41,7 +42,7 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     zz4lHist = aux.stdHist2dWithWeights(zz4l, name, arWeightsToUse, binning)
     wgHist = aux.stdHist2dWithWeights(wgamma, name, arWeightsToUse, binning)
 
-    #print folder+"/weight_topPt"
+    # print folder+"/weight_topPt"
 
     # histsToScale=[zgHist,ttgHist,ttg080Hist,ttg80Hist,zzHist,wwgHist,wzgHist,dyHist,wjetsHist,ttHist,tt080Hist,tt80Hist,singletopHist,wzHist,wwHist,zz4lHist,wgHist]
     #
@@ -82,19 +83,19 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     # if (s+b)==0:
     # value=0
     # else:
-    ##print s,b
+    # print s,b
     # value=s/np.sqrt(s+b)
     # h.SetBinContent(i,j,value)
 
-    #print bkg.GetNcells(),bkg.GetNbinsX(),bkg.GetNbinsY()
-    #print signal1.GetNcells(),signal1.GetNbinsX (),signal1.GetNbinsY()
+    # print bkg.GetNcells(),bkg.GetNbinsX(),bkg.GetNbinsY()
+    # print signal1.GetNcells(),signal1.GetNbinsX (),signal1.GetNbinsY()
 
-    #bkg.SetYTitle( aux.getYAxisTitle( bkg ) )
+    # bkg.SetYTitle( aux.getYAxisTitle( bkg ) )
     if yTitle:
         bkg.SetYTitle(yTitle)
     if xTitle:
         bkg.SetXTitle(xTitle)
-    #signal1.SetYTitle( aux.getYAxisTitle( signal1 ) )
+    # signal1.SetYTitle( aux.getYAxisTitle( signal1 ) )
     if yTitle:
         signal1.SetYTitle(yTitle)
         signal2.SetYTitle(yTitle)
@@ -109,27 +110,27 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
         signal5.SetXTitle(xTitle)
 
     # h.SetZTitle("Events/Bin")
-    bkg.SetZTitle("Events/Bin")
-    signal1.SetZTitle("Events/Bin")
-    signal2.SetZTitle("Events/Bin")
-    signal3.SetZTitle("Events/Bin")
-    signal4.SetZTitle("Events/Bin")
-    signal5.SetZTitle("Events/Bin")
+    bkg.SetZTitle("Events / Bin")
+    signal1.SetZTitle("Events / Bin")
+    signal2.SetZTitle("Events / Bin")
+    signal3.SetZTitle("Events / Bin")
+    signal4.SetZTitle("Events / Bin")
+    signal5.SetZTitle("Events / Bin")
     # bkg.SetZTitle("#frac{s}#sqrt{{s+b}}")
     # bkg.SetZTitle("s/#sqrt{s+b}")
     # signal1.SetZTitle("s/#sqrt{s+b}")
 
     # h.GetZaxis().SetRangeUser(0.,0.3)
-    #bkg.Draw("same colz")
+    # bkg.Draw("same colz")
 
-    #dataHist = None
+    # dataHist = None
     # for d in additional:
-    #h = d.getHist2D( name )
+    # h = d.getHist2D( name )
     # if not h: continue
     # if not h.Integral(): continue
     # if (binning):
-    #h = aux.rebin2d( h, binning[0],binning[1] )
-    #aux.appendFlowBin2d( h )
+    # h = aux.rebin2d( h, binning[0],binning[1] )
+    # aux.appendFlowBin2d( h )
 
     sigS1 = signal1.Clone()
     sigS2 = signal1.Clone()
@@ -176,11 +177,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
             sigS4.SetBinContent(i, j, value4)
             sigS5.SetBinContent(i, j, value5)
 
-    sigS1.SetZTitle("Events / bin")
-    sigS2.SetZTitle("Events / bin")
-    sigS3.SetZTitle("Events / bin")
-    sigS4.SetZTitle("Events / bin")
-    sigS5.SetZTitle("Events / bin")
+    sigS1.SetZTitle("Events / Bin")
+    sigS2.SetZTitle("Events / Bin")
+    sigS3.SetZTitle("Events / Bin")
+    sigS4.SetZTitle("Events / Bin")
+    sigS5.SetZTitle("Events / Bin")
     # sigS1.SetZTitle("s/#sqrt{s+b}")
     # sigS2.SetZTitle("s/#sqrt{s+b}")
     # sigS3.SetZTitle("s/#sqrt{s+b}")
@@ -201,11 +202,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     sigS4.GetZaxis().SetRangeUser(0., sigS4.GetMaximum() * 1.1)
     sigS5.GetZaxis().SetRangeUser(0., sigS5.GetMaximum() * 1.1)
 
-    #print sigS1.GetMaximum()
-    #print sigS2.GetMaximum()
-    #print sigS3.GetMaximum()
-    #print sigS4.GetMaximum()
-    #print sigS5.GetMaximum()
+    # print sigS1.GetMaximum()
+    # print sigS2.GetMaximum()
+    # print sigS3.GetMaximum()
+    # print sigS4.GetMaximum()
+    # print sigS5.GetMaximum()
 
     info = ""
     l = aux.Label(info="#scale[0.7]{%s}" % info, sim=not((dataDoubleMuon in additional)or(
@@ -215,19 +216,21 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
         binningName = "_" + binningName
     name = name.replace("/", "__")
     saveName = "sameHistograms_{}_{}{}".format(sampleNames, name, binningName)
-    #aux.save("DataMC_"+saveName+"_bkg_",folder="plots_2d/" ,log=False)
+    # aux.save("DataMC_"+saveName+"_bkg_",folder="plots_2d/" ,log=False)
 
     style.style2d()
     s = style.style2d()
-    s.SetPadLeftMargin(0.18)
-    l = ROOT.TLatex(
-        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
-    l2 = ROOT.TLatex(0.31, .88, "#scale[0.76]{#font[52]{Simulation}}")
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{Background}}")
-    cr = ROOT.TLatex(0.22, 0.5, "#scale[0.4]{DY/Z(#gamma) Control Region}")
-    vr = ROOT.TLatex(0.45, 0.15, "#scale[0.4]{Validation Region}")
-    sr = ROOT.TLatex(0.51, 0.8, "#scale[0.4]{Signal Region}")
-    l.SetNDC()
+    # s.SetPadLeftMargin(0.18)
+    # l = ROOT.TLatex(
+    # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+    # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
+    # l2 = ROOT.TLatex(0.31, .88, "#scale[0.76]{#font[52]{Simulation}}")
+    l2 = ROOT.TLatex(0.18, .95, "#scale[0.76]{#font[52]{Simulation}}")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{Background}}")
+    cr = ROOT.TLatex(0.22, 0.5, "#scale[0.6]{DY/Z(#gamma) Control Region}")
+    vr = ROOT.TLatex(0.45, 0.15, "#scale[0.6]{Validation Region}")
+    sr = ROOT.TLatex(0.35, 0.8, "#scale[0.6]{Signal Region}")
+    # l.SetNDC()
     l2.SetNDC()
     l3.SetNDC()
     cr.SetNDC()
@@ -243,7 +246,7 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     # lineMet200.SetLineStyle(10)
     lineMt2100.SetLineStyle(9)
 
-    lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
+    lum = ROOT.TLatex(.52, .95, "%.1f fb^{-1} (%s TeV)" %
                       (aux.intLumi / 1000., aux.Label.cmsEnergy))
     lum.SetNDC()
 
@@ -256,8 +259,9 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     bkg.SetMinimum(0.0001)
     bkg.Draw("colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
+    # aux.Label2D(status="Simulation")
     l3.Draw()
     cr.Draw()
     vr.Draw()
@@ -275,10 +279,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     signal1.Draw("same colz")
     # aux.save("DataMC_" + saveName + "_tching400_",
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
+    # aux.Label2D(status="Simulation")
     l3 = ROOT.TLatex(
-        0.51, .88, "#scale[0.46]{#font[12]{TChiZG m(NLSP)=600 GeV}}")
+        0.35, .88, "#scale[0.46]{#font[12]{TChiZG m(NLSP)=600 GeV}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -292,10 +297,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can = ROOT.TCanvas()
     can.SetLogz()
     signal2.Draw("same colz")
-    lum.Draw()
-    l.Draw()
+    # lum.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{GMSB 240 230}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{GMSB 240 230}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -311,9 +317,10 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     signal3.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{T5bbbbZG 1500 400}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{T5bbbbZG 1500 400}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -329,9 +336,10 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     signal4.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{GMSB 290 205}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{GMSB 290 205}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -347,9 +355,10 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     signal5.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{T5bbbbZG 1500 1400}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{T5bbbbZG 1500 1400}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -366,9 +375,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     sigS1.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{TChiZG 600}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(
+        0.35, .88, "#scale[0.66]{#font[12]{TChiZG m(NLSP)=600 GeV}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -385,9 +396,10 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     sigS2.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{GMSB 240 230}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{GMSB 240 230}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -403,10 +415,11 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     sigS3.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
+    # aux.Label2D(status="Simulation")
     l3 = ROOT.TLatex(
-        0.51, .88, "#scale[0.46]{#font[12]{T5bbbbzg m(#tilde{g})=1500 m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=400}}")
+        0.35, .88, "#scale[0.66]{#font[12]{T5bbbbzg m(#tilde{g})=1500 GeV m(#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}})=400 GeV}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -422,11 +435,12 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     sigS4.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
+    # aux.Label2D(status="Simulation")
     # l3 = ROOT.TLatex(0.61, .88, "#scale[0.46]{#font[12]{GMSB 290 205}}")
     l3 = ROOT.TLatex(
-        0.51, .88, "#scale[0.46]{#font[12]{GMSB m(#tilde{W})=415 m(#tilde{B})=355}}")
+        0.35, .88, "#scale[0.66]{#font[12]{GMSB m(#tilde{W})=415 GeV m(#tilde{B})=355 GeV}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -444,9 +458,10 @@ def drawSameHistogram(sampleNames, name, bkg=[], additional=[], binning=None, bi
     can.SetLogz()
     sigS5.Draw("same colz")
     lum.Draw()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    l3 = ROOT.TLatex(0.51, .88, "#scale[0.46]{#font[12]{T5bbbbZG 1500 1400}}")
+    # aux.Label2D(status="Simulation")
+    l3 = ROOT.TLatex(0.35, .88, "#scale[0.66]{#font[12]{T5bbbbZG 1500 1400}}")
     l3.SetNDC()
     l3.Draw()
     cr.Draw()
@@ -486,10 +501,10 @@ def main2():
     }
     for group in groups:
         for variable in variables:
-            #drawSameHistogram("LL+signal",group+"/LL/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400,gmsb_240_230,gmsb_290_205],binning=binnings_[variable],xTitle=labels_[variable][0],yTitle=labels_[variable])
+            # drawSameHistogram("LL+signal",group+"/LL/"+variable, bkgs, additional=[t5bbbbzg_1500_1400,t5bbbbzg_1500_400,t5bbbbzg_1500_600,tching_600,tching_400,gmsb_240_230,gmsb_290_205],binning=binnings_[variable],xTitle=labels_[variable][0],yTitle=labels_[variable])
             drawSameHistogram("LL+signal", group + "/LL/" + variable, bkgs, additional=[],
                               binning=binnings_[variable], xTitle=labels_[variable][0], yTitle=labels_[variable][1])
-            #drawSameHistogram("LL+signal",group+"/LL/"+variable, bkgs, additional=[],xTitle=labels_[variable][0],yTitle=labels_[variable][1])
+            # drawSameHistogram("LL+signal",group+"/LL/"+variable, bkgs, additional=[],xTitle=labels_[variable][0],yTitle=labels_[variable][1])
 
 
 if __name__ == "__main__":

@@ -40,7 +40,7 @@ def convertToTH1(profile):
 
 
 class Ratio:
-    def __init__(self, title, numerator, denominator, sysHisto=None):
+    def __init__(self, title, numerator, denominator, sysHisto=None, isTrig=False):
 
         # convcert TProfiles to histograms
         if isinstance(numerator, ROOT.TProfile):
@@ -59,7 +59,12 @@ class Ratio:
         self.totalUncert = denominator.Clone(aux.randomName())
         self.allowUnsymmetricYaxis = False
 
-        #self.ratio.drawOption_ = "e0"
+        self.leg = ROOT.TLegend(0.2, 0.22, 0.28, 0.28)
+        self.leg.SetFillStyle(0)
+
+        self.isTrig = isTrig
+
+        # self.ratio.drawOption_ = "e0"
         self.ratio.drawOption_ = "e0e1"
 
         # Set ratio properties
@@ -157,17 +162,35 @@ class Ratio:
         if stack:
             aux.drawContributions(stack, yMin, yMax, self.title)
 
-        self.ratioStat.Draw("e x0" + "same" if stack else "")
-        #self.ratioStat.Draw("same e2")
+        # leg2 = ROOT.TLegend(0.05, 0.05, 0.9, 0.9)
+
+        # leg.AddEntry(self.ratio, "ratio", "l")
+        # leg.AddEntry(self.ratioSys, "ratioSys", "l")
+        # leg.AddEntry(self.totalUncert, "total", "l")
+
+        if not self.isTrig:
+            self.ratioStat.Draw("e x0" + "same" if stack else "")
+        # leg = ROOT.TLegend()
+            self.leg.AddEntry(self.ratioStat, "#sigma_{stat}^{sim.}", "lf")
+        else:
+            self.ratioStat.SetLineColor(ROOT.kWhite)
+            self.ratioStat.Draw("e x0" + "same" if stack else "")
+        # self.ratioStat.Draw("same e2")
         if self.sysHisto:
             if not onlyTotal:
                 self.ratioSys.Draw("same e2")
-            self.totalUncert.Draw("same e2")
+            if not self.isTrig:
+                self.totalUncert.Draw("same e2")
         #self.ratio.Draw("same "+self.ratio.drawOption_)
         #self.ratioGraph.Draw("same pz0")
         self.ratioGraph.SetMarkerColor(ROOT.kBlack)
         self.ratioGraph.SetLineColor(ROOT.kBlack)
-        self.ratioGraph.Draw("same p0")
+        if not self.isTrig:
+            self.ratioGraph.Draw("same p0")
+        else:
+            self.ratioGraph.Draw("p0")
+
+        # print "leg"
 
         if yMin < 1 and yMax > 1:
             oneLine = ROOT.TLine()
@@ -175,3 +198,5 @@ class Ratio:
             axis = self.ratio.GetXaxis()
             oneLine.DrawLine(axis.GetBinLowEdge(axis.GetFirst()),
                              1.0, axis.GetBinLowEdge(1 + axis.GetLast()), 1.0)
+        if not self.isTrig:
+            self.leg.Draw()

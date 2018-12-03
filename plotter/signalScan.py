@@ -350,7 +350,8 @@ def proceedWithWeakScan(outputDir, scanName, xsecFile):
         t.DrawLatexNDC(.24, .86, "#scale[0.76]{pp#rightarrow#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}/#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}}")
         t.DrawLatexNDC(.24, .81, "#scale[0.76]{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#rightarrow#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}+soft}")
         t.DrawLatexNDC(.24, .76, "#scale[0.76]{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}(#tilde{G}#gamma) #lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}(#tilde{G}Z)}")
-    aux.Label(sim=True)
+    # aux.Label(sim=True)
+    aux.Label(sim=False)
     ROOT.gPad.SetLogy()
     axisHist.Draw("same axis")
     axisHist.GetXaxis().SetRangeUser(300, 1300)
@@ -360,6 +361,93 @@ def proceedWithWeakScan(outputDir, scanName, xsecFile):
     ROOT.gPad.Modified()
     # c.SaveAs("testLIMIT.pdf")
     aux.save("{}_limit".format(scanName), log=False)
+
+
+def draw1DXSEC(outputDir, scanName, xsecFile):
+
+    c = ROOT.TCanvas()
+    axisHist = ROOT.TH1F("", "", 10, 300, 1300)
+    axisHist.SetStats(0)
+
+    axisHist.Draw("axis")
+    scanRes = {}
+    for fname in glob.glob("{}/*.txt.limit".format(outputDir)):
+        m = re.match(".*_(\d+)_(\d+).txt.limit", fname)
+        with open(fname) as f:
+            scanRes[int(m.group(1))] = limitTools.infoFromOut(f.read())
+
+    xsecGr = ROOT.TGraph()
+    xsecGrUp = ROOT.TGraph()
+    xsecGrDn = ROOT.TGraph()
+
+    for i, m in enumerate(sorted(scanRes)):
+        xsec, xsec_unc = aux.getXsecInfoSMS(m, xsecFile)
+        xsecGr.SetPoint(i, m, xsec)
+        xsecGrUp.SetPoint(i, m, xsec * (1 + xsec_unc))
+        xsecGrDn.SetPoint(i, m, xsec * (1 - xsec_unc))
+
+    for g in xsecGr, xsecGrUp, xsecGrDn:
+        # g.SetLineColor(ROOT.kBlue)
+        g.SetLineColor(ROOT.kBlack)
+        g.SetLineWidth(2)
+    xsecGrUp.SetLineStyle(2)
+    xsecGrDn.SetLineStyle(2)
+    xsecGrUp.SetLineColor(ROOT.kGray + 2)
+    xsecGrDn.SetLineColor(ROOT.kGray + 2)
+
+    lsp_ = "#lower[-0.12]{#tilde{G}}#lower[0.2]{#scale[0.85]{}}#scale[0.85]{_{1}}"
+    lsp_0 = "NLSP"
+    lsp_pm = "#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}"
+
+    scanParticle = lsp_0 if "NG" in scanName else lsp_
+    axisHist.SetTitle(
+        ";m_{{{}}} (GeV);signal cross section (pb)".format(scanParticle))
+
+    xsecGrUp.GetXaxis().SetLimits(300, 1300)
+    xsecGrDn.GetXaxis().SetLimits(300, 1300)
+
+    xsecGrUp.GetXaxis().SetRangeUser(300, 1300)
+    xsecGrDn.GetXaxis().SetRangeUser(300, 1300)
+
+    xsecGr.Draw("xc same")
+    xsecGrUp.Draw("xc same")
+    xsecGrDn.Draw("xc same")
+    axisHist.GetYaxis().SetLimits(0.000001, 15)
+    axisHist.GetYaxis().SetRangeUser(0.000001, 15)
+    xsecGrDn.SetMinimum(0.000001)
+    xsecGrUp.SetMinimum(0.000001)
+    xsecGr.SetMinimum(0.000001)
+
+    leg = ROOT.TLegend(.45, .59, .94, .92)
+    leg.SetFillStyle(0)
+    leg.AddEntry(xsecGr, "Signal cross section #pm s.d._{theory}", "l")
+    leg.Draw()
+    leg4 = ROOT.TLegend(.45, .73, .94, .78)
+    leg4.SetFillStyle(0)
+    leg4.AddEntry(xsecGrUp, "", "l")
+    leg4.AddEntry(xsecGrUp, "", "l")
+    leg4.Draw()
+
+    t = ROOT.TLatex()
+    # t.DrawLatexNDC(.24, .81, "#scale[0.76]{TChiZG}")
+    # if "NG" in scanName:
+    # t.DrawLatexNDC(.24, .76, "#scale[0.76]{pp#rightarrow#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}/#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}}")
+    # t.DrawLatexNDC(.24, .81, "#scale[0.76]{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}#rightarrow#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}+soft}")
+    # t.DrawLatexNDC(.24, .76, "#scale[0.76]{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}(#tilde{G}#gamma) #lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}(#tilde{G}Z)}")
+    # aux.Label(sim=False)
+    aux.Label(status="")
+    ROOT.gPad.SetLogy()
+    axisHist.Draw("same axis")
+    axisHist.GetXaxis().SetRangeUser(300, 1300)
+    axisHist.GetXaxis().SetLimits(300, 1300)
+    axisHist.GetYaxis().SetLimits(0.0001, 15)
+    axisHist.GetYaxis().SetRangeUser(0.0001, 15)
+    gm = ROOT.TLatex()
+    gm.DrawLatexNDC(0.3, 0.85, "#scale[0.76]{TChiZG}")
+    c.Update()
+    c.Modified()
+    ROOT.gPad.Modified()
+    aux.save("{}_XSECGRAPH".format(scanName), log=False)
 
 
 def getPointFromDir(name):
@@ -389,11 +477,19 @@ def readDict(filename):
 
 
 def writeSMSLimitConfig(infile, configName):
+    # text = """
+    # HISTOGRAM {0} obs_hist
+    # EXPECTED {0} exp exp1up exp1dn kRed kOrange
+    # OBSERVED {0} obs obs1up obs1dn kBlack kGray
+    # PRELIMINARY Private Work
+    # LUMI {1:.1f}
+    # ENERGY 13
+    # """.format(infile, aux.intLumi / 1e3)
     text = """
 HISTOGRAM {0} obs_hist
 EXPECTED {0} exp exp1up exp1dn kRed kOrange
 OBSERVED {0} obs obs1up obs1dn kBlack kGray
-PRELIMINARY Private Work
+PRELIMINARY
 LUMI {1:.1f}
 ENERGY 13
 """.format(infile, aux.intLumi / 1e3)
@@ -891,12 +987,16 @@ def drawSignalScanHist(h, scanName, saveName):
     h.SetTitle("")
     if "T5" in scanName:
         h.GetXaxis().SetTitle("m_{#tilde{g}} (GeV)")
+        h.GetYaxis().SetTitle("m_{NLSP} (GeV)")
     if "T6" in scanName:
         h.GetXaxis().SetTitle("m_{#tilde{q}} (GeV)")
     if "gg" in scanName:
         h.GetYaxis().SetTitle("m_{#tilde{#chi}^{0}_{1}} (GeV)")
     if "Wg" in scanName:
         h.GetYaxis().SetTitle("m_{#tilde{#chi}^{0/#pm}_{1}} (GeV)")
+    if "GMSB" in scanName:
+        h.GetYaxis().SetTitle("m_{#tilde{W}} (GeV)")
+        h.GetXaxis().SetTitle("m_{#tilde{B}} (GeV)")
     hname = h.GetName()
     # print hname
     if hname == "significance":
@@ -908,8 +1008,13 @@ def drawSignalScanHist(h, scanName, saveName):
         h.GetZaxis().SetNdivisions(6, 0, 0)
         h.GetZaxis().SetTitle("Significance (s.d.)")
     elif hname == "xsec":
-        h.Scale(1000)
-        h.GetZaxis().SetTitle("signal cross section (fb)")
+        if "GMSB" not in scanName:
+            h.Scale(1000)
+            h.SetMinimum(0.01)
+            h.GetZaxis().SetTitle("signal cross section (fb)")
+        else:
+            h.Scale(1000)
+            h.GetZaxis().SetTitle("signal cross section (fb)")
     else:
         uncerts = {"isr": "ISR uncert", "jes": "Jet energy uncert", "pu": "Pile-up",
                    "scale": "Renorm.+Factor. scale uncert", "genMet": "FastSim p_{T}^{miss}"}
@@ -936,8 +1041,24 @@ def drawSignalScanHist(h, scanName, saveName):
     c = ROOT.TCanvas()
     h.Draw("colz")
     aux.drawDiagonal(h, smsScan.Xmin)
-    aux.Label2D(info="#scale[.76]{{{}}}".format(
-        latexScanName(scanName)), status="Preliminary")
+    if "GMSB" in scanName:
+        gm = ROOT.TLatex()
+        gm.DrawLatexNDC(0.3, 0.15, "#scale[0.76]{GMSB electroweak production}")
+        # h.SetMaximum(21000)
+        if hname == "xsec":
+            h.SetMaximum(2000)
+            h.SetMinimum(1)
+    if "Zg" in scanName:
+        gm = ROOT.TLatex()
+        gm.DrawLatexNDC(0.3, 0.85, "#scale[0.76]{T5bbbbZG}")
+        # h.SetMaximum(21000)
+        if hname == "xsec":
+            h.SetMaximum(200)
+            h.SetMinimum(0.1e-01)
+    # aux.Label2D(info="#scale[.76]{{{}}}".format(
+    #     latexScanName(scanName)), status="")
+    # latexScanName(scanName)), status="Preliminary")
+    aux.Label2D(status="")
     aux.save("{}_{}".format(scanName, saveName))
     style.defaultStyle()
 
@@ -1241,6 +1362,10 @@ def drawSignalUncertainties(outputDir, scanName, xsecFile):
     # graphs = dict([(x + "_" + y, ROOT.TGraph(x + "_" + y))
     #                for x in uncs for y in dc.bins])
     # print graphs
+    arUncDict = {}
+    for unc in uncs:
+        arUncDict[unc] = []
+
     for ifile, f in enumerate(files):
         m = re.match(".*_(\d+)_(\d+).txt", f)
         m1 = int(m.group(1))
@@ -1277,12 +1402,14 @@ def drawSignalUncertainties(outputDir, scanName, xsecFile):
                         # print m2,m1
                         # graphs[unc + "_" + b].SetPoint(ifile, m2, m1, 0.)
                         graphs[unc + "_" + b].SetPoint(ifile, m2, m1, 0.001)
+                        # arUncDict[unc].append(0.001)
                         # graphs[unc + "_" + b].SetPoint(ifile, m1, m2, 0.)
                     else:
                         # print graphs[unc + "_" +
                         #              b], ifile, m2, m1, (systDict[unc][4][b]["signal"] - 1.)
                         graphs[unc + "_" + b].SetPoint(ifile, m2,
                                                        m1, (systDict[unc][4][b]["signal"] - 1.))
+                        arUncDict[unc].append(systDict[unc][4][b]["signal"])
                         # graphs[unc + "_" + b].SetPoint(ifile, m1,
                         #                                m2, systDict[unc][4][b]["signal"] - 1.)
                 else:
@@ -1291,14 +1418,23 @@ def drawSignalUncertainties(outputDir, scanName, xsecFile):
                     if (not systDict.get(unc)):
                         # continue
                         graphs[unc + "_" + b].SetPoint(ifile, m1, m2, 0.)
+                        # arUncDict[unc].append(0.)
                     else:
                         if systDict[unc][4][b]["signal"] < 1.:
                             # print systDict[unc][4]
                             # print m2,m1
+                            #print "haeh"
                             graphs[unc + "_" + b].SetPoint(ifile, m1, m2, 0.)
+                            # arUncDict[unc].append(0.)
                         else:
+                            arUncDict[unc].append(
+                                systDict[unc][4][b]["signal"])
                             graphs[unc + "_" + b].SetPoint(
-                                ifile, m1, m2, systDict[unc][4][b]["signal"] - 1.)
+                                ifile, m1, m2, systDict[unc][4][b]["signal"])
+                            # ifile, m1, m2, systDict[unc][4][b]["signal"] - 1.)
+    for unc in uncs:
+        print unc, min(arUncDict[unc]), sorted(arUncDict[unc])[-7], sorted(arUncDict[unc])[-6], sorted(arUncDict[unc])[-5], sorted(
+            arUncDict[unc])[-4], sorted(arUncDict[unc])[-3], sorted(arUncDict[unc])[-2], sorted(arUncDict[unc])[-1]
     writeDict(graphs, "testSHIT.root")
     for name, gr in graphs.iteritems():
         # h = gr.GetHistogram()
@@ -1321,6 +1457,11 @@ def drawSignalUncertainties1D(outputDir, scanName, xsecFile):
     # graphs.update(dict([(x+"_"+y,defaultGr.Clone(x+"_"+y)) for x in uncerts for y in dc.bins]))
     graphs = dict([(x + "_" + y, defaultGr.Clone(x + "_" + y))
                    for x in uncs for y in dc.bins])
+
+    arUncDict = {}
+    for unc in uncs:
+        arUncDict[unc] = []
+
     for ifile, f in enumerate(files):
         m = re.match(".*_(\d+)_(\d+).txt", f)
         m1 = int(m.group(1))
@@ -1360,16 +1501,25 @@ def drawSignalUncertainties1D(outputDir, scanName, xsecFile):
                         # continue
                         # graphs[unc + "_" + b].SetPoint(ifile, m1, m2, 0.)
                         graphs[unc + "_" + b].SetPoint(ifile, m1, 0.)
+                        # arUncDict[unc].append(0.)
                     else:
                         if systDict[unc][4][b]["signal"] < 1.:
                             # print systDict[unc][4]
                             # print m2,m1
                             # graphs[unc + "_" + b].SetPoint(ifile, m1, m2, 0.)
-                            graphs[unc + "_" + b].SetPoint(ifile, m1, 0.)
+                            arUncDict[unc].append(0.)
+                            #graphs[unc + "_" + b].SetPoint(ifile, m1, 0.)
                         else:
+                            arUncDict[unc].append(
+                                systDict[unc][4][b]["signal"])
                             graphs[unc + "_" + b].SetPoint(
                                 # ifile, m1, m2, systDict[unc][4][b]["signal"] - 1.)
                                 ifile, m1,  systDict[unc][4][b]["signal"] - 1.)
+    for unc in uncs:
+        #print unc,min(arUncDict[unc]),sorted(arUncDict[unc])[-7],sorted(arUncDict[unc])[-6],sorted(arUncDict[unc])[-5],sorted(arUncDict[unc])[-4],sorted(arUncDict[unc])[-3],sorted(arUncDict[unc])[-2],sorted(arUncDict[unc])[-1]
+        if unc != "pdf" and unc != "ISR":
+            print unc, sorted(arUncDict[unc])[0], sorted(arUncDict[unc])[-7], sorted(arUncDict[unc])[-6], sorted(arUncDict[unc])[-5], sorted(
+                arUncDict[unc])[-4], sorted(arUncDict[unc])[-3], sorted(arUncDict[unc])[-2], sorted(arUncDict[unc])[-1]
 
     for name, gr in graphs.iteritems():
         # h = gr.GetHistogram()
@@ -1565,7 +1715,9 @@ def getHistForModel(model):
     if "T5" in model:
         # h = ROOT.TH2F("", "", 35, 775, 2525, 500, 0, 2500)
         # h = ROOT.TH2F("", "", 30, 1000, 2500, 480, 100, 2500)
-        h = ROOT.TH2F("", "", 140, 1000, 2600, 480, 100, 2600)  # toUse
+        # h = ROOT.TH2F("", "", 140, 1000, 2600, 480, 100, 2600)  # toUse
+        h = ROOT.TH2F("", "", 280, 1000, 2600, 480, 100, 2600)  # toUse
+        # h = ROOT.TH2F("", "", 35, 1000, 2600, 35, 100, 2600)  # toUse
         # h = ROOT.TH2F("", "", 280, 0, 2600, 480, 0, 2600)
     elif "T6" in model:
         # h = ROOT.TH2F("", "", 24, 975, 2175, 220, 0, 2200)
@@ -1585,6 +1737,8 @@ def getHistForModel(model):
     h.SetTitle("{};{};{};".format(
         model, smsScan.sParticle, smsScan.LSP))
     h.SetMinimum(0)
+    # for i in range(500):
+    #     h.Smooth()
     return h
 
 
@@ -1718,18 +1872,20 @@ def signalScan(combi, version, inputData, inputSignal):
         os.mkdir(outputDir)
     xsecFile = getXsecFile(inputSignal)
     print xsecFile
-    # writeDataCards(outputDir, inputData, inputSignal, combi, xsecFile)
+    #writeDataCards(outputDir, inputData, inputSignal, combi, xsecFile)
     # drawLimitInput(outputDir, scanName, xsecFile)
-    # drawSignalUncertainties(outputDir, scanName, xsecFile)
+    # if "TChi" in inputSignal:
+    #     return draw1DXSEC(outputDir, scanName, xsecFile)
+    #drawSignalUncertainties(outputDir, scanName, xsecFile)
     # drawSignalUncertainties1D(outputDir, scanName, xsecFile)
     # callMultiCombine(outputDir)
     # callMultiSignificance(outputDir)
     # clearWrongCombineOutputs(outputDir)
     # if "TChi" in inputSignal:
-    #     return proceedWithWeakScan(outputDir, scanName, xsecFile)
+    # return proceedWithWeakScan(outputDir, scanName, xsecFile)
     build2dGraphs(outputDir, xsecFile)
     build1dGraphs(outputDir, xsecFile, scanName)
-    # drawSignificance(outputDir, scanName)
+    # ##drawSignificance(outputDir, scanName)
     writeSMSLimitConfig(outputDir + "/saved_graphs1d_limit.root",
                         "../smsPlotter/config/SUS16047/%s_SUS16047.cfg" % scanName)
     writeSMSLimitConfig("/.automount/home/home__home4/institut_1b/swuchterl/SUSYDileptonGamma/plotter/" +
@@ -1763,6 +1919,8 @@ if __name__ == "__main__":
     #            "../myAnalyzer/output_AN/SMS-TChiNG_BF50N50G_hists.root")
     # signalScan("Ng", "v18", "limitCalculations/testDatacard.txt",
     #            "../myAnalyzer/output_AN/SMS-TChiNG_BF50N50G_hists.root")
+    # signalScan("Ng", "v20", "limitCalculations/testDatacard.txt",
+    #            "../myAnalyzer/output_AN/SMS-TChiNG_BF50N50G_hists.root")
     # signalScan("GMSB", "v14", "limitCalculations/testDatacard.txt", "../myAnalyzer/output_TopPt_noNIsr/GMSB_GravitinoLSP_N1decays_hists.root")
     # signalScan("GMSB", "v15", "limitCalculations/testDatacard.txt", "../myAnalyzer/output_2/GMSB_GravitinoLSP_N1decays_hists.root")
     # signalScan("GMSB", "v16", "limitCalculations/testDatacard.txt",
@@ -1771,14 +1929,18 @@ if __name__ == "__main__":
     #            "../myAnalyzer/output_AN/GMSB_GravitinoLSP_N1decays_hists.root")
     # signalScan("GMSB", "v18", "limitCalculations/testDatacard.txt",
     #            "../myAnalyzer/output_AN/GMSB_GravitinoLSP_N1decays_hists.root")
+    signalScan("GMSB", "v20", "limitCalculations/testDatacard.txt",
+               "../myAnalyzer/output_AN/GMSB_GravitinoLSP_N1decays_hists.root")
     # signalScan("Zg", "v14", "limitCalculations/testDatacard.txt", "../myAnalyzer/output_TopPt_noNIsr/SMS-T5bbbbZg_hists.root")
     # signalScan("Zg", "v14", "limitCalculations/testDatacard.txt", "../myAnalyzer/output/SMS-T5bbbbZg_hists.root")
     # signalScan("Zg", "v16", "limitCalculations/testDatacard.txt",
     #            "../myAnalyzer/output_2/SMS-T5bbbbZg_hists.root")
     # signalScan("Zg", "v17", "limitCalculations/testDatacard.txt",
     #            "../myAnalyzer/output_AN/SMS-T5bbbbZg_hists.root")
-    signalScan("Zg", "v18", "limitCalculations/testDatacard.txt",
-               "../myAnalyzer/output_AN/SMS-T5bbbbZg_hists.root")
+    # signalScan("Zg", "v18", "limitCalculations/testDatacard.txt",
+    #            "../myAnalyzer/output_AN/SMS-T5bbbbZg_hists.root")
+    # signalScan("Zg", "v20", "limitCalculations/testDatacard.txt",
+    #            "../myAnalyzer/output_AN/SMS-T5bbbbZg_hists.root")
     # signalScan("Zg", "v17", "limitCalculations/testDatacard.txt",
     #            "../myAnalyzer/output_AN/SMS-T6ttZg_hists.root")
     # signalScan("GGM", "v16", "limitCalculations/testDatacard.txt", "../myAnalyzer/output_2/GGM_GravitinoLSP_M1-200to1500_M2-200to1500_hists.root")

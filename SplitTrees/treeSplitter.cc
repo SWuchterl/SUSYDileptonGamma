@@ -679,27 +679,21 @@ Bool_t treeSplitter::Process(Long64_t entry){
         // float countReco=0;
 
         // cout<<"----"<<endl;
-        for (vector<tree::IntermediateGenParticle>::iterator it = intermediateGenParticles->begin(); it != intermediateGenParticles->end(); it++) {
-                for (vector<tree::GenParticle>::iterator itD = it->daughters.begin(); itD != it->daughters.end(); itD++) {
-                        if((abs(it->pdgId)>10000)&&(abs(itD->pdgId)==22)&&(itD->p.Pt()>20)) {
-                                // cout<<"gen:"<<itD->p.Pt()<<endl;
-                                countGen+=1;
-                                genHist.Fill(itD->p.Pt());
-                                for (vector<tree::Photon>::iterator it2 = photons->begin(); it2 !=photons->end(); it2++) {
-                                        // if((itD->p.DeltaR(it2->p)<0.3)) {
-                                        // if((it2->p.Pt()>20)&&(!(it2->hasPixelSeed))&& (fabs(it2->p.Eta())<1.4442) && (it2->isLoose)) {
-                                        if((it2->p.Pt()>20)&&(!(it2->hasPixelSeed))&& (it2->isLoose)) {
-                                                // if((abs(itD->p.Pt()-it2->p.Pt())/itD->p.Pt())<1.) {
-                                                // cout<<"reco:"<<it2->p.Pt()<<endl;
-                                                countReco+=1;
-                                                recoHist.Fill(it2->p.Pt());
-                                        }
+        //for (vector<tree::IntermediateGenParticle>::iterator it = intermediateGenParticles->begin(); it != intermediateGenParticles->end(); it++) {
+                //for (vector<tree::GenParticle>::iterator itD = it->daughters.begin(); itD != it->daughters.end(); itD++) {
+                        //if((abs(it->pdgId)>10000)&&(abs(itD->pdgId)==22)&&(itD->p.Pt()>20)) {
+                                //countGen+=1;
+                                //genHist.Fill(itD->p.Pt());
+                                //for (vector<tree::Photon>::iterator it2 = photons->begin(); it2 !=photons->end(); it2++) {
+                                        //if((it2->p.Pt()>20)&&(!(it2->hasPixelSeed))&& (it2->isLoose)) {
+                                                //countReco+=1;
+                                                //recoHist.Fill(it2->p.Pt());
+                                        //}
 
-                                        // }
-                                }
-                        }
-                }
-        }
+                                //}
+                        //}
+                //}
+        //}
         // cout<<countReco/countGen<<endl;
         // cout<<"----"<<endl;
 
@@ -2660,12 +2654,12 @@ void treeSplitter::Terminate()
         //cutFlow.Write("hCutFlow");
         //}
         //file.Close();
-        cout<<countReco/countGen<<endl;
+        //cout<<countReco/countGen<<endl;
 
-        recoHist.Write();
-        recoHist.SetDirectory(0);
-        genHist.Write();
-        genHist.SetDirectory(0);
+        //recoHist.Write();
+        //recoHist.SetDirectory(0);
+        //genHist.Write();
+        //genHist.SetDirectory(0);
 
         if(config_doHt||config_doMET||config_doHtPure) {
                 SaveHTTree();

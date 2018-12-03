@@ -6,12 +6,14 @@ import ROOT as rt
 #   Updated by:   Dinko Ferencek (Rutgers)
 #
 
-cmsText     = "CMS";
+#cmsText     = "CMS";
+cmsText     = "";
 cmsTextFont   = 61  
 
 writeExtraText = True
 #extraText   = "Preliminary"
-extraText   = "Work in Progress Simulation"
+#extraText   = "Work in Progress Simulation"
+extraText   = ""
 extraTextFont = 52 
 
 lumiTextSize     = 0.6

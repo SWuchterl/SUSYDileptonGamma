@@ -66,9 +66,9 @@ ds={
         #"JetHT_Run2016H-03Feb2017_ver2-v1_myTuple.root",
         #"JetHT_Run2016H-03Feb2017_ver3-v1_myTuple.root"
         #],
-    #"dy": [
-        #"DYJetsToLL_M-50-amcatnloFXFX_ext_myTuple.root"
-        #],
+    "dy": [
+        "DYJetsToLL_M-50-amcatnloFXFX_ext_myTuple.root"
+        ],
     "ttg": [
         "TTGamma_Dilept-amcatnlo_myTuple.root",
         "TTGamma_Hadronic-amcatnlo_myTuple.root",
@@ -88,12 +88,12 @@ ds={
     "wz": [
         "WZTo3LNu_Total_myTuple.root"
         ],
-    #"zg": [
+    "zg": [
         ######"ZGTo2LG_ext_myTuple.root",
-        #"ZGTo2LG_PtG-130_myTuple.root",
+        "ZGTo2LG_PtG-130_myTuple.root",
         #####"ZGTo2LG_myTuple.root"
-        #"ZGTo2LG_Total_myTuple.root"
-        #],
+        "ZGTo2LG_Total_myTuple.root"
+        ],
     "zz": [
         #######"ZZTo2L2Nu_powheg_ext1_myTuple.root",
         #######"ZZTo2L2Nu_powheg_myTuple.root",
@@ -127,20 +127,21 @@ ds={
         #"SMS-T5bbbbZg_1800_1700_myTuple.root",
         #"SMS-T5bbbbZg_1800_400_myTuple.root",
         #"SMS-T5bbbbZg_1800_600_myTuple.root",
-        #"SMS-T5bbbbZg_1500_1400_myTuple.root",
-        #"SMS-T5bbbbZg_1500_400_myTuple.root",
-        #"SMS-T5bbbbZg_1500_600_myTuple.root",
+        "SMS-T5bbbbZg_1500_1400_myTuple.root",
+        "SMS-T5bbbbZg_1500_400_myTuple.root",
+        "SMS-T5bbbbZg_1500_600_myTuple.root",
         #"SMS-T5bbbbZg_myTuple.root",
         #"SMS-T6ttZg_myTuple.root",
-        "SMS-T6ttZg_600_200_myTuple.root",
-        "SMS-T6ttZg_400_200_myTuple.root",
+        #"SMS-T6ttZg_600_200_myTuple.root",
+        #"SMS-T6ttZg_400_200_myTuple.root",
         #"SMS-TChiNG_BF50N50G_myTuple.root",
         #"GMSB_GravitinoLSP_N1decays_myTuple.root",
-        #"SMS-TChiNG_400_myTuple.root",
-        #"SMS-TChiNG_600_myTuple.root",
-        #"SMS-TChiNG_1200_myTuple.root",
-        #"SMS-GMSB_240_230_myTuple.root",
-        #"SMS-GMSB_290_205_myTuple.root",
+        "SMS-TChiNG_400_myTuple.root",
+        "SMS-TChiNG_600_myTuple.root",
+        "SMS-TChiNG_1200_myTuple.root",
+        "SMS-GMSB_240_230_myTuple.root",
+        "SMS-GMSB_290_205_myTuple.root",
+        "SMS-GMSB_415_355_myTuple.root",
         #"GGM_GravitinoLSP_M1-200to1500_M2-200to1500_myTuple.root",
         #"GGM_GravitinoLSP_M1-50to1500_M3-1000to2500_myTuple.root"
         ]

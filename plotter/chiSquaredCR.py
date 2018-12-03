@@ -236,6 +236,7 @@ def drawDY(binningToUse_=CR_DY.binnings.copy(), addName=""):
     if "photonSFd" in addName:
         additionalFolder = "photonSFd/"
 
+    # scaleFactors = frange(1.05, 1.09, 0.002)
     scaleFactors = frange(1.05, 1.09, 0.002)
     # saveValuesEE={}
     # saveValuesMM={}
@@ -347,9 +348,9 @@ def drawDY(binningToUse_=CR_DY.binnings.copy(), addName=""):
             # grMM.SetMarkerSize(0.5)
             # grMM.SetName("grDYMM")
 
-            grLL.SetTitle("; Scale Factor #alpha; #chi^{2}")
+            grLL.SetTitle("; Scale Factor #alpha_{DY/Z(#gamma)}; #chi^{2}")
             grLL.SetMarkerStyle(20)
-            grLL.SetMarkerSize(0.5)
+            grLL.SetMarkerSize(0.9)
             grLL.SetName("grDYLL")
 
             # grEE.Draw("ACP")
@@ -406,10 +407,11 @@ def drawDY(binningToUse_=CR_DY.binnings.copy(), addName=""):
 
             grLL.Draw("ACP")
             l = ROOT.TLatex(
-                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
             l.SetNDC()
-            l.Draw()
-            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
+            # l.Draw()
+            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha_{DY/Z(#gamma)}^{best fit} = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
                 sfResultLL, upLL, downLL))
             l2.SetNDC()
             l2.Draw()
@@ -418,7 +420,7 @@ def drawDY(binningToUse_=CR_DY.binnings.copy(), addName=""):
             l3.SetNDC()
             l3.Draw()
             l4 = ROOT.TLatex(
-                0.47, .7, "#scale[0.66]{#font[52]{DY/Z(#gamma) Control Region ee+#mu#mu}}")
+                0.47, .7, "#scale[0.66]{#font[52]{DY/Z(#gamma) Control Region}}")
             l4.SetNDC()
             l4.Draw()
             lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
@@ -426,9 +428,10 @@ def drawDY(binningToUse_=CR_DY.binnings.copy(), addName=""):
             lum.SetNDC()
             lum.Draw()
 
-            leg = TLegend(0.5, 0.8, 0.7, 0.9)
+            leg = TLegend(0.47, 0.74, 0.65, 0.9)
             leg.AddEntry("grDYLL", "measured points", "p")
             leg.AddEntry(grLL.GetFunction("pol4"), "polynomial fit")
+            leg.SetTextSize(0.03)
             leg.Draw()
 
             c.Update()
@@ -470,7 +473,8 @@ def drawZZ(binningToUse_=CR_ZZ.binnings.copy(), addName=""):
     bkgs = [DYjetsNLO, zgamma, tt, ttgamma, wwgamma,
             wzgamma, zz, wjets, wgamma, singletop, zz4l, wz, ww]
     groups = ["CRZZ"]
-    scaleFactors = frange(0.9, 1.4, 0.05)
+    # scaleFactors = frange(0.9, 1.4, 0.05)
+    scaleFactors = frange(0.9, 1.4, 0.01)
     chiValues = []
     binnings_ = CR_ZZ.binnings.copy()
 
@@ -529,17 +533,18 @@ def drawZZ(binningToUse_=CR_ZZ.binnings.copy(), addName=""):
             up = abs(sfResult - sfResultUp)
             down = abs(sfResult - sfResultDn)
 
-            gr.SetTitle("; Scale Factor #alpha; #chi^{2}")
+            gr.SetTitle("; Scale Factor #alpha_{ZZ}; #chi^{2}")
             gr.SetName("gr")
             gr.SetMarkerStyle(20)
-            gr.SetMarkerSize(0.7)
+            gr.SetMarkerSize(0.9)
 
             gr.Draw("ACP")
             l = ROOT.TLatex(
-                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
             l.SetNDC()
-            l.Draw()
-            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
+            # l.Draw()
+            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha_{ZZ}^{best fit} = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
                 sfResult, up, down))
             l2.SetNDC()
             l2.Draw()
@@ -556,9 +561,10 @@ def drawZZ(binningToUse_=CR_ZZ.binnings.copy(), addName=""):
             lum.SetNDC()
             lum.Draw()
 
-            leg = TLegend(0.5, 0.8, 0.7, 0.9)
+            leg = TLegend(0.47, 0.74, 0.65, 0.9)
             leg.AddEntry("gr", "measured points", "p")
             leg.AddEntry(gr.GetFunction("pol4"), "polynomial fit")
+            leg.SetTextSize(0.03)
             leg.Draw()
 
             c.Update()
@@ -586,7 +592,8 @@ def drawWZ(binningToUse_=CR_WZ.binnings.copy(), addName=""):
     bkgs = [DYjetsNLO, zgamma, tt, ttgamma, wwgamma,
             wzgamma, zz, wjets, wgamma, singletop, zz4l, wz, ww]
     groups = ["CRWZ"]
-    scaleFactors = frange(0.9, 1.4, 0.05)
+    # scaleFactors = frange(0.9, 1.4, 0.05)
+    scaleFactors = frange(0.9, 1.4, 0.01)
     chiValues = []
     binnings_ = CR_WZ.binnings.copy()
 
@@ -645,17 +652,18 @@ def drawWZ(binningToUse_=CR_WZ.binnings.copy(), addName=""):
             up = abs(sfResult - sfResultUp)
             down = abs(sfResult - sfResultDn)
 
-            gr.SetTitle("; Scale Factor #alpha; #chi^{2}")
+            gr.SetTitle("; Scale Factor #alpha_{WZ}; #chi^{2}")
             gr.SetMarkerStyle(20)
-            gr.SetMarkerSize(0.7)
+            gr.SetMarkerSize(0.9)
             gr.SetName("grWZ")
 
             gr.Draw("ACP")
             l = ROOT.TLatex(
-                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
             l.SetNDC()
-            l.Draw()
-            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
+            # l.Draw()
+            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha_{WZ}^{best fit} = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
                 sfResult, up, down))
             l2.SetNDC()
             l2.Draw()
@@ -672,9 +680,10 @@ def drawWZ(binningToUse_=CR_WZ.binnings.copy(), addName=""):
             lum.SetNDC()
             lum.Draw()
 
-            leg = TLegend(0.5, 0.8, 0.7, 0.9)
+            leg = TLegend(0.47, 0.74, 0.65, 0.9)
             leg.AddEntry("grWZ", "measured points", "p")
             leg.AddEntry(gr.GetFunction("pol4"), "polynomial fit")
+            leg.SetTextSize(0.03)
             leg.Draw()
 
             c.Update()
@@ -776,17 +785,18 @@ def drawTT(binningToUse_=CR_tt.binnings.copy(), addName=""):
             up = abs(sfResult - sfResultUp)
             down = abs(sfResult - sfResultDn)
 
-            gr.SetTitle("; Scale Factor #alpha; #chi^{2}")
+            gr.SetTitle("; Scale Factor #alpha_{t#bar{t}(#gamma)}; #chi^{2}")
             gr.SetMarkerStyle(20)
-            gr.SetMarkerSize(0.5)
+            gr.SetMarkerSize(0.9)
             gr.SetName("grTT")
 
             gr.Draw("ACP")
             l = ROOT.TLatex(
-                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+                0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
             l.SetNDC()
-            l.Draw()
-            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
+            # l.Draw()
+            l2 = ROOT.TLatex(0.47, .65, "#scale[0.66]{#font[52]{#alpha_{t#bar{t}(#gamma)^{best fit}} = %.3f^{#plus%.3f}_{#minus%.3f}}}" % (
                 sfResult, up, down))
             l2.SetNDC()
             l2.Draw()
@@ -803,9 +813,10 @@ def drawTT(binningToUse_=CR_tt.binnings.copy(), addName=""):
             lum.SetNDC()
             lum.Draw()
 
-            leg = TLegend(0.5, 0.8, 0.7, 0.9)
+            leg = TLegend(0.47, 0.74, 0.65, 0.9)
             leg.AddEntry("grTT", "measured points", "p")
             leg.AddEntry(gr.GetFunction("pol4"), "polynomial fit")
+            leg.SetTextSize(0.03)
             leg.Draw()
 
             c.Update()
@@ -991,9 +1002,9 @@ def main():
     biggerBinningZZ["m_ll"] = frange(82., 98., 4.)
     biggerBinningZZ["m_ll2"] = frange(60., 120., 10.)
 
-    drawZZ(binningToUse_=nominalBinningZZ, addName="")
-    drawZZ(binningToUse_=smallerBinningZZ, addName="_small")
-    drawZZ(binningToUse_=biggerBinningZZ, addName="_big")
+    # drawZZ(binningToUse_=nominalBinningZZ, addName="")
+    # drawZZ(binningToUse_=smallerBinningZZ, addName="_small")
+    # drawZZ(binningToUse_=biggerBinningZZ, addName="_big")
 
     # drawZZ(binningToUse_=nominalBinningZZ,addName="_JESu")
     # drawZZ(binningToUse_=nominalBinningZZ,addName="_JESd")
@@ -1049,9 +1060,9 @@ def main():
     biggerBinningWZ["met"] = frange(0., 500., 100)
     biggerBinningWZ["m_ll"] = frange(75., 110., 5.)
 
-    drawWZ(binningToUse_=nominalBinningWZ, addName="")
-    drawWZ(binningToUse_=smallerBinningWZ, addName="_small")
-    drawWZ(binningToUse_=biggerBinningWZ, addName="_big")
+    # drawWZ(binningToUse_=nominalBinningWZ, addName="")
+    # drawWZ(binningToUse_=smallerBinningWZ, addName="_small")
+    # drawWZ(binningToUse_=biggerBinningWZ, addName="_big")
 
     # drawWZ(binningToUse_=nominalBinningWZ,addName="_JESu")
     # drawWZ(binningToUse_=nominalBinningWZ,addName="_JESd")
@@ -1062,6 +1073,22 @@ def main():
     # drawWZ(binningToUse_=nominalBinningWZ,addName="_lepSFd")
     # drawWZ(binningToUse_=nominalBinningWZ,addName="_photonSFu")
     # drawWZ(binningToUse_=nominalBinningWZ,addName="_photonSFd")
+
+    drawZZ(binningToUse_=nominalBinningZZ, addName="")
+    drawZZ(binningToUse_=smallerBinningZZ, addName="_small")
+    drawZZ(binningToUse_=biggerBinningZZ, addName="_big")
+
+    drawDY(binningToUse_=nominalBinningDY, addName="")
+    drawDY(binningToUse_=smallerBinningDY, addName="_small")
+    drawDY(binningToUse_=biggerBinningDY, addName="_big")
+
+    drawTT(binningToUse_=nominalBinningTT, addName="")
+    drawTT(binningToUse_=smallerBinningTT, addName="_small")
+    drawTT(binningToUse_=biggerBinningTT, addName="_big")
+
+    drawWZ(binningToUse_=nominalBinningWZ, addName="")
+    drawWZ(binningToUse_=smallerBinningWZ, addName="_small")
+    drawWZ(binningToUse_=biggerBinningWZ, addName="_big")
 
 
 if __name__ == "__main__":

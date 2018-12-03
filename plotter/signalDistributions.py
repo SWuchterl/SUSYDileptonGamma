@@ -129,6 +129,13 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     sfTT80Err = 0.4
     sfWZ, sfWZErr = pklWZ["LL"]["eta1"]
 
+    OrderUncs = pkl.load(open("plots_Order/orderUnc.pkl", "rb"))
+
+    orderUncDY = OrderUncs["DY"]
+    orderUncWZ = OrderUncs["WZ"]
+    orderUncZZ = OrderUncs["ZZ"]
+    orderUncTT = OrderUncs["TT"]
+
     zzHist.Scale(sfZZ)
     zz4lHist.Scale(sfZZ)
     dyHist.Scale(sfDY)
@@ -532,7 +539,9 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     #tt080SFSyst = aux.getSysHisto(tt080Hist,0.04)
     # singletopSFSyst=aux.getSysHistoWithMeanWeight(singletopHist,0.,singletopHist.Integral()/sum(singletop.ngens))
     # wzSFSyst=aux.getSysHisto(wzHist,sfWZErr)
-    wzSFSyst = aux.getSysHisto(wzHist, sfWZErr / sfWZ)
+    # wzSFSyst = aux.getSysHisto(wzHist, sfWZErr / sfWZ)
+    wzSFSyst = aux.getSysHisto(wzHist, np.sqrt(
+        (sfWZErr / sfWZ)**2. + orderUncWZ**2.))
     # wwSFSyst=aux.getSysHistoWithMeanWeight(wwHist,0.,wwHist.Integral()/sum(ww.ngens))
     # zz4lSFSyst=aux.getSysHisto(zz4lHist,sfZZErr)
     # wgSFSyst=aux.getSysHistoWithMeanWeight(wgHist,0.,wgHist.Integral()/sum(wgamma.ngens))
@@ -543,16 +552,23 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     final_tt80SFSyst = aux.getSysHisto(final_tt80Hist, 0.2)
     #final_ttSFSyst= aux.getSysHisto(final_tt80Hist,0.4)
     #final_zzSFSyst= aux.getSysHisto(final_zzHist,sfZZErr)
-    final_zzSFSyst = aux.getSysHisto(final_zzHist, sfZZErr / sfZZ)
+    # final_zzSFSyst = aux.getSysHisto(final_zzHist, sfZZErr / sfZZ)
+    final_zzSFSyst = aux.getSysHisto(final_zzHist, np.sqrt(
+        (sfZZErr / sfZZ)**2. + orderUncZZ**2.))
     #final_dySFSyst= aux.getSysHistoWithMeanWeight(final_dyHist,sfDYErr,final_dyHist.Integral()/(sum(DYjetsNLO.ngens)+sum(zgamma.ngens)))
+    # final_dySFSyst = aux.getSysHistoWithMeanWeight(
+    #     final_dyHist, sfDYErr / sfDY, final_dyHist.Integral() / (sum(DYjetsNLO.ngens) + sum(zgamma.ngens)))
     final_dySFSyst = aux.getSysHistoWithMeanWeight(
-        final_dyHist, sfDYErr / sfDY, final_dyHist.Integral() / (sum(DYjetsNLO.ngens) + sum(zgamma.ngens)))
+        final_dyHist, np.sqrt(
+            (sfDYErr / sfDY)**2. + orderUncDY**2.), final_dyHist.Integral() / (sum(DYjetsNLO.ngens) + sum(zgamma.ngens)))
 
     # ttgTotSFSyst=aux.addHists(ttg080SFSyst,ttg80SFSyst)
     # ttTotSFSyst=aux.addHists(tt080SFSyst,tt80SFSyst)
     # final_ttTotSFSyst=aux.addHists(final_tt080SFSyst,final_tt80SFSyst)
     #print sfTT,sfTTErr,sfTTErr/sfTT
-    final_ttTotSFSyst = aux.getSysHisto(final_ttHist, sfTTErr / sfTT)
+    # final_ttTotSFSyst = aux.getSysHisto(final_ttHist, sfTTErr / sfTT)
+    final_ttTotSFSyst = aux.getSysHisto(final_ttHist, np.sqrt(
+        (sfTTErr / sfTT)**2. + orderUncTT**2.))
     # ttgTotSFSyst=ttgSFSyst
     # ttTotSFSyst=ttSFSyst
 
@@ -700,9 +716,11 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     for h in signal1, signal2:
         aux.drawOpt(h, "signal")
     #    h.Add(totStat)
-    signal1.SetLineColor(ROOT.kBlue + 3)
+    # signal1.SetLineColor(ROOT.kBlue + 3)
     # signal2.SetLineColor(ROOT.kRed-3)
-    signal2.SetLineColor(ROOT.kBlue + 3)
+    # signal2.SetLineColor(ROOT.kBlue + 3)
+    signal2.SetLineColor(ROOT.kRed)
+    signal1.SetLineColor(ROOT.kCyan)
     signal2.SetLineStyle(2)
 
     #signal1_pre = aux.createHistoFromDatasetTree(t5wg_1600_100, "met*{}".format(info["shift"]), weight, nBins, "tr_jControl/simpleTree")
@@ -845,10 +863,10 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     # pie1=ROOT.TPie("pie1",r"100GeV<p_{T}^{miss}<200GeV",5)
     pie1.SetEntryVal(0, sizes1[0])
     pie1.SetEntryFillColor(0, ROOT.kOrange + 7)
-    pie1.SetEntryLabel(0, r"t#bar{t}(+#gamma)")
+    pie1.SetEntryLabel(0, r"t#bar{t}(#gamma)")
     pie1.SetEntryVal(1, sizes1[1])
     pie1.SetEntryFillColor(1, ROOT.kGreen + 3)
-    pie1.SetEntryLabel(1, r"DY/Z(+#gamma)")
+    pie1.SetEntryLabel(1, r"DY/Z(#gamma)")
     pie1.SetEntryVal(2, sizes1[2])
     pie1.SetEntryFillColor(2, ROOT.kOrange - 2)
     pie1.SetEntryLabel(2, r"ZZ")
@@ -875,6 +893,11 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     pie2.SetEntryFillColor(4, ROOT.kGray + 2)
     pie2.SetEntryLabel(4, r"other")
 
+    legTitle1 = ROOT.TLatex(
+        0.5, 0.91, "#scale[0.7]{150 GeV < p_{T}^{miss}< 200 GeV}")
+    legTitle1.SetNDC()
+    legTitle2 = ROOT.TLatex(0.5, 0.91, "#scale[0.7]{200 GeV < p_{T}^{miss}}")
+    legTitle1.SetNDC()
     # pie1.SetLabelFormat("#scale[0.76]{#splitline{%txt}{(%perc)}}")
     pie1.SetLabelFormat("#scale[0.76]{%perc}")
     pie1.SetRadius(.3)
@@ -886,26 +909,30 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     pie2.SetY(0.35)
 
     pie1.Draw()
+    legTitle1.Draw()
 
     l = ROOT.TLatex(
-        0.05, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        # 0.05, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        0.05, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
     l2 = ROOT.TLatex(0.07, .88, "#scale[0.76]{#font[52]{Simulation}}")
     l.SetNDC()
     l2.SetNDC()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    pieleg = pie1.MakeLegend()
-    pieleg.SetHeader(r"150 GeV < p_{T}^{miss} < 200 GeV")
+    pieleg = pie1.MakeLegend(0.6, 0.6, 0.85, 0.85)
+    #pieleg.SetHeader(r"150 GeV < p_{T}^{miss} < 200 GeV")
     c2.SaveAs("pie1.pdf")
 
     pie2.Draw()
+    legTitle2.Draw()
 
     l.SetNDC()
     l2.SetNDC()
-    l.Draw()
+    # l.Draw()
     l2.Draw()
-    pieleg2 = pie1.MakeLegend()
-    pieleg2.SetHeader(r"200 GeV < p_{T}^{miss}")
+    pieleg2 = pie1.MakeLegend(0.6, 0.6, 0.85, 0.85)
+    #pieleg2.SetHeader(r"200 GeV < p_{T}^{miss}")
+    # pieleg2.SetHeader(r"200 GeV < p_{T}^{miss}<#infty")
     c2.SaveAs("pie2.pdf")
 
     c = ROOT.TCanvas()
@@ -956,7 +983,9 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
     #aux.Label(sim= not dirSet==dataDoubleSF, status="" if "allMC" not in name else "Private Work")
     #aux.Label(sim= not dirSet==dataDoubleSF, status="" if "MC" not in name else "Private Work")
     #aux.Label(sim= not dirSet==dataDoubleSF, status="" if "MC" not in name else "Work in Progress")
-    aux.Label(sim=False, status="" if "MC" not in name else "Work in Progress")
+    #aux.Label(sim=False, status="" if "MC" not in name else "Work in Progress")
+    # aux.Label(sim=False, status="" if "MC" not in name else "Private Work")
+    aux.Label(status="")
     #aux.save(name, normal=False, changeMinMax=False)
     aux.save(name, normal=False, changeMinMax=True)
 
@@ -998,11 +1027,14 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
         #print "ww",wwHist.GetBinError(bin)
         #print "wg",wgHist.GetBinError(bin)
         #print "zz4l",zz4lHist.GetBinError(bin)
-        print "other", final_otherHist.GetBinContent(
-            bin), final_otherHist.GetBinError(bin)
-
-        print "stat. unc", (getDatacardUncertFromHist(
-            dirHist, bin) - 1.) * 100., "%"
+        # print "other", final_otherHist.GetBinContent(
+        # bin), final_otherHist.GetBinError(bin)
+        print dirHist.GetBinContent(bin)
+        print totUnc.GetBinError(bin)
+        print dataHist.GetBinContent(bin)
+        print dataHist.GetBinErrorLow(bin)
+        # print "stat. unc", (getDatacardUncertFromHist(
+        # dirHist, bin) - 1.) * 100., "%"
         #print (signal1.GetBinContent(bin-1)*bw)
         #print (signal1.GetBinContent(bin+1)*bw)
         # dc.addBin(binName, int(round(dirHist.GetBinContent(bin) * bw)),
@@ -1264,11 +1296,12 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
                 # "ww": 1.026,
                 # "wg": 1.026,
                 "other": 1.026,
-                "tt": 1.026,
-                "dy": 1.026,
-                "wz": 1.026,
+                # "tt": 1.026,
+                # "dy": 1.026,
+                # "wz": 1.026,
                 # "zz4l": 1.026},
-                "zz": 1.026},
+                "zz": 0.},
+            # "zz": 1.026},
             "genmet": {
                 "signal": 1. + abs(signal1.GetBinContent(bin) - signal1GenMetHisto.GetBinContent(bin)) / 2 / signal1.GetBinContent(bin) if signal1.GetBinContent(bin) else 1},
             # "ttg": 1.,
@@ -1297,7 +1330,7 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
             "SFDY": {
                 # "zg": (1.+sfDYErr),
                 # "zg": getDatacardUncertFromHist(zgSFSyst,bin),
-                "dy": (1. + sfDYErr / sfDY)},
+                "dy": (1. + np.sqrt(((sfDYErr / sfDY)**2. + orderUncDY**2.)))},
             "SFTT": {
                 # "tt": getDatacardUncertFromHist(),
                 # "ttg": getDatacardUncertFromHist()},
@@ -1305,13 +1338,15 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
                 # "ttg": (1.+0.04)},
                 # "tt": getDatacardUncertFromHist(ttTotSFSyst,bin),
                 # "ttg": getDatacardUncertFromHist(ttgTotSFSyst,bin)},
-                "tt": getDatacardUncertFromHist(final_ttTotSFSyst, bin)},
+                # "tt": getDatacardUncertFromHist(final_ttTotSFSyst, bin)},
+                "tt": (1. + np.sqrt(((sfTTErr / sfTT)**2. + orderUncTT**2.)))},
             "SFZZ": {
                 # "zz": (1.+sfZZErr),
                 # "zz4l": (1.+sfZZErr)},
-                "zz": (1. + sfZZErr / sfZZ)},
+                # "zz": (1. + sfZZErr / sfZZ)},
+                "zz": (1. + np.sqrt(((sfZZErr / sfZZ)**2. + orderUncZZ**2.)))},
             "SFWZ": {
-                "wz": (1. + sfWZErr / sfWZ)},
+                "wz": (1. + np.sqrt(((sfWZErr / sfWZ)**2. + orderUncWZ**2.)))},
             # "xSecWWG": {
             # "wwg": (1.5)},
             # "xSecWZG": {
@@ -1345,14 +1380,14 @@ def finalDistributionSignalHist(name, dirSet, dirDir):
                 "signal": 1.03,
                 # "ttg": 1.03,
                 # "zg": 1.03,
-                "zz": 1.03,
+                # "zz": 1.03,
                 # "wwg": 1.03,
                 # "wzg": 1.03,
-                "dy": 1.03,
+                # "dy": 1.03,
                 # "wjets": 1.03,
-                "tt": 1.03,
+                # "tt": 1.03,
                 # "singletop": 1.03,
-                "wz": 1.03,
+                # "wz": 1.03,
                 # "ww": 1.03,
                 # "wg": 1.03,
                 # "other": 1.03,

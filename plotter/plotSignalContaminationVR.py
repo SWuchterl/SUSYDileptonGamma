@@ -371,7 +371,8 @@ weak.SetMarkerSize(1)
 
 weak.Draw("A*")
 l = ROOT.TLatex(
-    0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+    0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
+# 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
 l2 = ROOT.TLatex(0.21, .88, "#scale[0.76]{#font[52]{Simulation}}")
 l.SetNDC()
 l2.SetNDC()

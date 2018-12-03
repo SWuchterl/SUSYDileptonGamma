@@ -328,7 +328,8 @@ void myAnalyzer::Init(TTree *tree)
                         config_pdfStep=((inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos)) ? 0 : 10;
                 }else{
 
-                        nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos)) ? 0 : 110;
+                        //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos)) ? 0 : 110;
+                        nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos)) ? 0 : 10;
                         //nWeights=(isData||(inputName.find("HadronicDecays") != string::npos)||(inputName.find("GGM") != string::npos)||(inputName.find("GMSB") != string::npos))? 0 : 10;
 
                         config_pdfStart=0;
@@ -3777,6 +3778,7 @@ void myAnalyzer::FillerSignal(map<Histograms1D,TH1F>& m, float divideFactor,int 
 
         if(changeMET==normal) {
                 m.at(ETMISS).Fill(*ETmiss, tempWeight*1./(nGen/divideFactor));
+                m.at(MT2).Fill(*Mt2, tempWeight*1./(nGen/divideFactor));
                 //m.at(ETMISSRAW).Fill(*ETmiss, *mc_weight);
                 if(*mc_weight>0) {
                         m.at(ETMISSRAW).Fill(*ETmiss, *mc_weight);
@@ -4354,7 +4356,7 @@ map<Histograms1D,TH1F> myAnalyzer::InitSignalScanHistograms(const selectionType 
 
         sMap[ETMISS] = TH1F(emptyLabelPtr, metLabelPtr, 500, 0, 5000);
         sMap[ETMISSRAW] = TH1F(emptyLabelPtr, metLabelPtr, 500, 0, 5000);
-        //sMap[MT2] = TH1F(emptyLabelPtr, metLabelPtr, 200, 0, 2000);
+        sMap[MT2] = TH1F(emptyLabelPtr, metLabelPtr, 100, 0, 2000);
 
         return sMap;
 }

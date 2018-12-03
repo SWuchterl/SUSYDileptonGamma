@@ -52,7 +52,8 @@ class smsPlotABS(object):
 
         # set x axis
         self.emptyHisto.GetXaxis().SetLabelFont(42)
-        self.emptyHisto.GetXaxis().SetLabelSize(0.035)
+        #self.emptyHisto.GetXaxis().SetLabelSize(0.035)
+        self.emptyHisto.GetXaxis().SetLabelSize(0.04)
         self.emptyHisto.GetXaxis().SetTitleFont(42)
         self.emptyHisto.GetXaxis().SetTitleSize(0.05)
         self.emptyHisto.GetXaxis().SetTitleOffset(1.2)
@@ -61,7 +62,8 @@ class smsPlotABS(object):
 
         # set y axis
         self.emptyHisto.GetYaxis().SetLabelFont(42)
-        self.emptyHisto.GetYaxis().SetLabelSize(0.035)
+        #self.emptyHisto.GetYaxis().SetLabelSize(0.035)
+        self.emptyHisto.GetYaxis().SetLabelSize(0.04)
         self.emptyHisto.GetYaxis().SetTitleFont(42)
         self.emptyHisto.GetYaxis().SetTitleSize(0.05)
         self.emptyHisto.GetYaxis().SetTitleOffset(1.3)

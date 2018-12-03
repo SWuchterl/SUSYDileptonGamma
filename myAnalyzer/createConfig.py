@@ -29,8 +29,8 @@ generalSettings = {
     "mmEff": triggerValues["mm"]["data"]
 }
 #outputFolder = "standard"
-outputFolder = "AN"
-#outputFolder = "AN_rishi"
+#outputFolder = "AN"
+outputFolder = "AN_rishi"
 #outputFolder = "standard2"
 #outputFolder = "noTopPt_noNIsr"
 #outputFolder = "TopPt_noNIsr"

@@ -12,8 +12,12 @@ class Multiplot:
         self.maximum = None
 
         #self.leg = ROOT.TLegend(.56,.59,.94,.915)
-        # self.leg = ROOT.TLegend(.56,.69,.94,.915)#normal use
-        self.leg = ROOT.TLegend(.4, .59, .94, .915)  # for Mt2Shape
+        #self.leg = ROOT.TLegend(.56, .69, .94, .915)  # normal use
+        # self.leg = ROOT.TLegend(.4, .59, .94, .915)  ##### old for Mt2Shape
+        # self.leg = ROOT.TLegend(.4, .49, .94, .915)  # for Mt2Shape old
+        self.leg = ROOT.TLegend(.3, .39, .94, .915)  # for Mt2Shape
+        # self.leg = ROOT.TLegend(.5, .49, .94, .915)  # for VR study
+        #self.leg = ROOT.TLegend(.35, .49, .94, .915)  # for VR study
         #self.leg = ROOT.TLegend(.16,.69,.94,.915)
         #self.leg = ROOT.TLegend(.76,.59,.94,.915)
         self.leg.SetFillColor(ROOT.kWhite)
@@ -103,7 +107,8 @@ class Multiplot:
                 self.leg.AddEntry(h, h.GetName(), "ep")
             elif "e2" in h.drawOption_:
                 h.SetLineColor(0)
-                self.leg.AddEntry(h, h.GetName(), "epf")
+                # self.leg.AddEntry(h, h.GetName(), "epf")
+                self.leg.AddEntry(h, h.GetName(), "ef")
             else:
                 self.leg.AddEntry(h, h.GetName(), "l")
 
@@ -122,6 +127,7 @@ class Multiplot:
                     gr.SetPointEYlow(p, edn / bw)
                     gr.SetPointEYhigh(p, eup / bw)
                 gr.Draw(gr.drawOption_ + "same")
+                # gr.RedrawAxis()
             else:
                 if not ih:
                     h.SetMinimum(minimum)
@@ -129,8 +135,12 @@ class Multiplot:
                 else:
                     h.drawOption_ += "same"
                 h.Draw(h.drawOption_)
+                # h.GetXaxis().RedrawAxis()
+
+        # gPad.RedrawAxis()
 
         self.leg.SetNColumns(2)
+        # self.leg.SetNColumns(3)
         self.leg.Draw()
 
         return True

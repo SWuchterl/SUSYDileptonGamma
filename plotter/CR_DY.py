@@ -8,6 +8,28 @@ import numpy as np
 import pickle as pkl
 import os
 
+if(os.path.exists("plots_CR_zz/factors/CRZZ.pkl")):
+    pklZZ = pkl.load(open("plots_CR_zz/factors/CRZZ.pkl", "rb"))
+    ZZsf = pklZZ["LL"]["m_ll"][0]
+else:
+    ZZsf = 1.
+# if(os.path.exists("plots_CR_dy/factors/CRDY.pkl")):
+#     pklDY = pkl.load(open("plots_CR_dy/factors/CRDY.pkl", "rb"))
+#     DYsf = pklDY["LL"]["eta1"][0]
+# else:
+#     DYsf = 1.
+if(os.path.exists("plots_CR_wz/factors/CRWZ.pkl")):
+    pklWZ = pkl.load(open("plots_CR_wz/factors/CRWZ.pkl", "rb"))
+    WZsf = pklWZ["LL"]["eta1"][0]
+else:
+    WZsf = 1.
+if(os.path.exists("plots_CR_tt/factors/CRTT.pkl")):
+    pklTT = pkl.load(open("plots_CR_tt/factors/CRTT.pkl", "rb"))
+    TTsf = pklTT["EM"]["eta1"][0]
+else:
+    TTsf = 1.
+
+
 binnings = {
     # 'pt1':              frange(0,100,10)+frange(100,200,25)+range(200,350,50),
     # 'pt1':              frange(20,100,10)+frange(100,200,25)+range(200,350,50),
@@ -96,11 +118,15 @@ def calculateSFAndError(numerator_data, denominator_toScale, additional_fix):
     alpha = (num_data - add_fix) / (den_toScale)
     alphaErr = np.sqrt((num_dataErr / den_toScale)**2. + (add_fixError / den_toScale)
                        ** 2. + (den_toScaleErr * (num_data - add_fix) / (den_toScale)**2.)**2.)
+    if __name__ == "__main__":
+        print "data", num_data, "fix", add_fix, "toScale", den_toScale
+        print "raw fix", additional_fix.GetEntries(
+        ), "toScaleFix", denominator_toScale.GetEntries()
 
     return [alpha, alphaErr / alpha] if den_toScale else [1., 0.]
 
 
-def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTitle=None, yTitle=None, weightsToUse=["nISR", "topPt", "ewk"]):
+def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTitle=None, yTitle=None, weightsToUse=["nISR", "topPt", "ewk"], SF_TT=TTsf, SF_WZ=WZsf, SF_DY=1., SF_ZZ=ZZsf):
     can = ROOT.TCanvas()
     m = multiplot.Multiplot()
 
@@ -168,15 +194,25 @@ def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     final_wzHist.SetLineColor(ROOT.kAzure - 5)
     final_dyHist.SetLineColor(ROOT.kGreen - 3)
 
+    final_ttHist.Scale(SF_TT)
+    final_wzHist.Scale(SF_WZ)
+    final_zzHist.Scale(SF_ZZ)
+    # final_ttHist.Scale(TTsf)
+    # final_wzHist.Scale(WZsf)
+    # final_zzHist.Scale(ZZsf)
+
     # scaleHist=aux.addHists(dyHist,zgHist)
     scaleHist = final_dyHist.Clone()
     # fixHist=aux.addHists(ttgHist,zzHist,wwgHist,wzgHist,ttHist,wjetsHist,singletopHist,wzHist,wwHist,zz4lHist,wgHist)
     fixHist = aux.addHists(final_otherHist, final_ttHist,
                            final_wzHist, final_zzHist)
+    if __name__ == "__main__":
+        print "dyRaw", dyHist.GetEntries(), "zgRaw", zgHist.GetEntries()
+        print "dy", dyHist.Integral(), "zg", zgHist.Integral()
 
     sf, sferr = calculateSFAndError(dataHist, scaleHist, fixHist)
-
-    #print sf
+    if __name__ == "__main__":
+        print "SF", sf, sferr
 
     dyHist.Scale(sf)
     zgHist.Scale(sf)
@@ -230,7 +266,8 @@ def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
     final_ttSFSyst = aux.getSysHisto(final_ttHist, mcSystUncert)
     #final_dySFSyst= aux.getSysHistoWithMeanWeight(final_dyHist,sferr,final_dyHist.Integral()/(sum(DYjetsNLO.ngens)+sum(zgamma.ngens)))
     final_dySFSyst = aux.getSysHisto(final_dyHist, sferr)
-    print sferr
+    if __name__ == "__main__":
+        print sferr
 
     totStat = aux.addHists(final_zzHist, final_dyHist,
                            final_ttHist, final_wzHist, final_otherHist)
@@ -341,8 +378,11 @@ def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
 
     m.Draw()
     if not "Fakes" in name:
-        # KS=totStat.Clone().KolmogorovTest(dataHist.Clone(),"UO")
-        KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UOD")
+        KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UO")
+        KS2 = dataHist.Clone().KolmogorovTest(totStat.Clone(), "UOX")
+        KS3 = dataHist.Clone().Chi2Test(totStat.Clone(), "UW")
+        # print KS, KS2, KS3
+        # KS = totStat.Clone().KolmogorovTest(dataHist.Clone(), "UOD")
         # KS=totStat.Clone().KolmogorovTest(dataHist.Clone())
         # KS=totStat.Clone().KolmogorovTest(dataHist.Clone(),"UOXN")
         ksText = ROOT.TLatex()
@@ -370,7 +410,9 @@ def drawDYCR(sampleNames, name, datasetToUse, binning=None, binningName="", xTit
         #r.draw(0., rMax, m.getStack(), True)
         r.draw(0., rMax, m.getStack())
 
-    aux.Label(sim=False, status="Work in Progress")
+    #aux.Label(sim=False, status="Work in Progress")
+    # aux.Label(sim=False, status="Private Work")
+    aux.Label(status="")
     #aux.save(name, normal=False, changeMinMax=False)
     directory = "plots_CR_dy/"
     # directory = "plots_CR_dy_rishi/"

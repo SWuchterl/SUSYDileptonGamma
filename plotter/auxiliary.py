@@ -988,23 +988,31 @@ def drawOpt(h, style):
         h.SetLineWidth(3)
         h.drawOption_ = "hist"
     elif style == "statUnc":
-        h.SetLineWidth(5)
+        # h.SetLineWidth(5)
+        h.SetLineWidth(10)
         h.SetMarkerStyle(0)
-        h.SetLineColor(ROOT.kGray + 2)
+        # h.SetLineColor(ROOT.kGray + 2)
+        h.SetLineColor(ROOT.kGray + 1)
+        # h.SetLineColor(ROOT.kGray)
         h.drawOption_ = "e2x0"
         # h.SetFillStyle(3254)
         #h.drawOption_ = "e2"
     elif style == "totUnc":
         # h.SetFillStyle(3254)
-        h.SetFillStyle(3454)
+        h.SetFillStyle(3354)
+        # h.SetFillStyle(3454)
         h.SetMarkerSize(0)
-        h.SetFillColor(ROOT.kBlack)
+        # h.SetFillColor(ROOT.kBlack)
+        h.SetFillColor(ROOT.kGray + 3)
         h.drawOption_ = "e2"
     elif style == "sysUnc":
         # h.SetFillStyle(3245)
-        h.SetFillStyle(3445)
+        h.SetFillStyle(3345)
+        # h.SetFillStyle(3445)
         h.SetMarkerSize(0)
-        h.SetFillColor(ROOT.kRed)
+        # h.SetFillColor(ROOT.kRed)
+        h.SetFillColor(ROOT.kRed + 1)
+        # ROOT.gStyle.SetHatchesLineWidth(1.5)
         h.drawOption_ = "e2"
     elif style == "sysUncGraph":
         # h.SetFillStyle(3245)
@@ -1395,11 +1403,18 @@ class Label:
         else:
             if sim:
                 self.cms = ROOT.TLatex(
-                    0.2, .887, "#font[61]{CMS} #scale[0.76]{#font[52]{Simulation}}")
+                    # 0.16, .948, "#font[61]{CMS} #scale[0.76]{#font[52]{%s}}" % status)
+                    0.16, .948, "#scale[0.76]{#font[52]{%s}}" % status)
+                # self.sim = ROOT.TLatex(
+                #     0.16, 0.902, "#scale[0.76]{#font[52]{  Simulation}}")
+                # 0.2, .887, "#font[61]{CMS} #scale[0.76]{#font[52]{Simulation}}")
             else:
-                self.cms = ROOT.TLatex(0.2, .887, "#font[61]{CMS}")
-            self.pub = ROOT.TLatex(
-                0.2, .857, "#scale[0.76]{#font[52]{%s}}" % status)
+                # self.cms = ROOT.TLatex(0.2, .887, "#font[61]{CMS}")
+                self.cms = ROOT.TLatex(
+                    # 0.16, .948, "#font[61]{CMS} #scale[0.76]{#font[52]{%s}}" % status)
+                    0.16, .948, "#scale[0.76]{#font[52]{%s}}" % status)
+            # self.pub = ROOT.TLatex(
+            #     0.2, .857, "#scale[0.76]{#font[52]{%s}}" % status)
         self.lum = ROOT.TLatex(.62, .95,
                                "%.1f fb^{-1} (%s TeV)" % (intLumi / 1000., self.cmsEnergy))
         if info:
@@ -1415,12 +1430,14 @@ class Label2D(Label):
         saveStuff.append(self)
         cmsText = ""
         if status != "Private Work":
-            cmsText += "#font[61]{CMS}"
+            # cmsText += "#font[61]{CMS}"
+            cmsText += ""
         if sim:
             cmsText += " #scale[0.76]{#font[52]{Simulation}}"
         if status:
             cmsText += "#scale[0.76]{#font[52]{%s}}" % status
         self.cms = ROOT.TLatex(.15, .95, cmsText)
+        cmsText = ""
         if info:
             self.info = ROOT.TLatex(0.2, .895, info)
         self.lum = ROOT.TLatex(.47, .95,

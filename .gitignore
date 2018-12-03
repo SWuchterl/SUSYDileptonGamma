@@ -24,6 +24,7 @@ plotter/plots_CR_dy/
 plotter/plots_CR_tt/
 plotter/plots_CR_wz/
 plotter/plots_CR_zz/
+plotter/plots_Order/
 plotter/limitCalculations/
 
 myAnalyzer/.nfs*
@@ -40,3 +41,6 @@ myAnalyzer/logs
 SplitTrees/logs
 
 minimal/example.ini
+
+plotter/tmpDataCard_SMS-TChiNG_600_.txt
+plotter/tmpDataCard_SMS-TChiNG_600_.txt.limit

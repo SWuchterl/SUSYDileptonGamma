@@ -87,7 +87,7 @@ def drawZZ():
     # print arZZChiDn
     # print arZZChiName
 
-    c = TCanvas("canvas", "", 800, 1200)
+    c = TCanvas("canvas", "", 800, 1000)
 
     x = [valueZZInt]
     ex = [errZZInt]
@@ -98,8 +98,11 @@ def drawZZ():
     for i in range(len(x)):
         ge.SetPoint(i, x[i], y[i])
         ge.SetPointError(i, ex[i], ex[i], eyD[i], eyU[i])
-    ge.SetFillStyle(3003)
-    ge.SetFillColor(ROOT.kBlue)
+    # ge.SetFillStyle(3003)
+    # ge.SetFillStyle(3004)
+    ge.SetLineColor(ROOT.kWhite)
+    # ge.SetFillColor(ROOT.kBlue)
+    ge.SetFillColorAlpha(ROOT.kBlue, 0.3)
     ge.Draw("same a2")
 
     gr = TGraphAsymmErrors()
@@ -109,8 +112,8 @@ def drawZZ():
         gr.SetPoint(i, arZZChi[i], y)
         gr.SetPointError(i, arZZChiDn[i], arZZChiUp[i], 0., 0.)
 
-    gr.SetTitle("; Scale Factor #alpha; ")
-    ge.SetTitle("; Scale Factor #alpha; ")
+    gr.SetTitle("; Scale Factor #alpha_{ZZ}; ")
+    ge.SetTitle("; Scale Factor #alpha_{ZZ}; ")
     # gr.SetMarkerColor(4)
     gr.SetMarkerColor(kRed)
     gr.SetMarkerStyle(21)
@@ -127,13 +130,16 @@ def drawZZ():
     lineMEAN.SetLineWidth(2)
     lineMEAN.Draw("SAME")
 
-    ge.GetXaxis().SetLimits(0.6, 1.6)
+    ge.GetXaxis().SetLimits(0.6, 1.5)
     ge.GetYaxis().SetLabelOffset(1)
-    ge.GetYaxis().SetNdivisions(len(arZZChi))
+    ge.GetYaxis().SetNdivisions(len(arZZChi) * 2)
 
     #t = TText()
     t = TLatex()
     t.SetTextAlign(32)
+    # t.SetTextAlign(42)
+    # t.SetTextAngle(30)
+    # t.SetNDC()
     t.SetTextSize(0.02)
     # t.SetTextFont(72)
     for i in range(len(arZZChi)):
@@ -144,42 +150,44 @@ def drawZZ():
     smallT.SetTextAngle(90)
     smallT.SetTextSize(0.025)
     smallT.SetTextFont(42)
-    smallT.DrawText(0.5, 3. * len(arZZChi) / 3. - 6, "NBins * 2")
-    smallT.DrawText(0.5, 2 * len(arZZChi) / 3. - 6, "normal binning")
-    smallT.DrawText(0.5, len(arZZChi) / 3. - 6, "NBins / 2")
+    # smallT.SetNDC()
+    smallT.DrawText(0.48, 3. * len(arZZChi) / 3. - 6, "double binning")
+    smallT.DrawText(0.48, 2 * len(arZZChi) / 3. - 6, "normal binning")
+    smallT.DrawText(0.48, len(arZZChi) / 3. - 6, "half binning")
 
     cutLine = TLine(0.6, 2 * len(arZZChi) / 3. + 0.5,
-                    1.75, 2 * len(arZZChi) / 3. + 0.5)
+                    1.5, 2 * len(arZZChi) / 3. + 0.5)
     cutLine.SetLineColor(kBlack)
     cutLine.SetLineWidth(2)
     cutLine.Draw("SAME")
 
     cutLine2 = TLine(0.6, len(arZZChi) / 3. + 0.5,
-                     1.75, len(arZZChi) / 3. + 0.5)
+                     1.5, len(arZZChi) / 3. + 0.5)
     cutLine2.SetLineColor(kBlack)
     cutLine2.SetLineWidth(2)
     cutLine2.Draw("SAME")
 
     l = ROOT.TLatex(
-        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
     l.SetNDC()
-    l.Draw()
+    # l.Draw()
 
     lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
                       (aux.intLumi / 1000., aux.Label.cmsEnergy))
     lum.SetNDC()
     lum.Draw()
 
-    l4 = ROOT.TLatex(0.17, .9, "#scale[0.66]{#font[52]{ZZ Control Region}}")
+    l4 = ROOT.TLatex(0.3, .89, "#scale[0.76]{#font[52]{ZZ Control Region}}")
     l4.SetNDC()
     l4.Draw()
 
-    leg = TLegend(0.18, 0.45, 0.4, 0.55)
-    leg.AddEntry(line, "#alpha from int. method", "l")
-    leg.AddEntry(ge, "stat. error from int. method", "f")
-    leg.AddEntry(gr, "#alpha from #chi^{2} method", "lep")
-    leg.AddEntry(lineMEAN, "mean from #chi^{2} method", "l")
-    leg.SetTextSize(0.02)
+    leg = TLegend(0.18, 0.45, 0.49, 0.55)
+    leg.AddEntry(line, "#alpha (int. method)", "l")
+    leg.AddEntry(ge, "stat. error (int. method)", "f")
+    leg.AddEntry(gr, "#alpha (#chi^{2} method)", "lep")
+    leg.AddEntry(lineMEAN, "mean (#chi^{2} method)", "l")
+    leg.SetTextSize(0.03)
     # leg.SetFillStyle(0)
     leg.Draw("same")
 
@@ -205,6 +213,7 @@ def drawDYLL():
             arDYChiName.append(variable)
     for comb in pklDYchiLL:
         for variable in pklDYchiLL[comb]:
+            print pklDYchiLL[comb][variable]
             arDYChi.append(pklDYchiLL[comb][variable]["value"])
             arDYChiUp.append(pklDYchiLL[comb][variable]["erUp"])
             arDYChiDn.append(pklDYchiLL[comb][variable]["erDown"])
@@ -216,12 +225,12 @@ def drawDYLL():
             arDYChiDn.append(pklDYchiLLSmall[comb][variable]["erDown"])
             arDYChiName.append(variable)
 
-    # print arDYChi
+    #print arDYChi
     # print arDYChiUp
     # print arDYChiDn
     # print arDYChiName
 
-    c = TCanvas("canvas", "", 800, 1200)
+    c = TCanvas("canvas", "", 800, 1000)
 
     x = [valueDYInt]
     ex = [errDYInt]
@@ -232,8 +241,12 @@ def drawDYLL():
     for i in range(len(x)):
         ge.SetPoint(i, x[i], y[i])
         ge.SetPointError(i, ex[i], ex[i], eyD[i], eyU[i])
-    ge.SetFillStyle(3003)
-    ge.SetFillColor(ROOT.kBlue)
+    # ge.SetFillStyle(3003)
+    # ge.SetFillStyle(3004)
+    # ge.SetFillStyle(3244)
+    # ge.SetFillColor(ROOT.kBlue)
+    ge.SetFillColorAlpha(ROOT.kBlue, 0.3)
+    ge.SetLineColor(ROOT.kWhite)
     ge.Draw("same a2")
 
     gr = TGraphAsymmErrors()
@@ -243,8 +256,8 @@ def drawDYLL():
         gr.SetPoint(i, arDYChi[i], y)
         gr.SetPointError(i, arDYChiDn[i], arDYChiUp[i], 0., 0.)
 
-    gr.SetTitle("; Scale Factor #alpha; ")
-    ge.SetTitle("; Scale Factor #alpha; ")
+    gr.SetTitle("; Scale Factor #alpha_{DY/Z(#gamma)}; ")
+    ge.SetTitle("; Scale Factor #alpha_{DY/Z(#gamma)}; ")
     # gr.SetMarkerColor(4)
     gr.SetMarkerColor(kRed)
     gr.SetMarkerStyle(21)
@@ -262,9 +275,9 @@ def drawDYLL():
     lineMEAN.Draw("SAME")
 
     # ge.GetXaxis().SetLimits(1.05,1.12)
-    ge.GetXaxis().SetLimits(1.02, 1.1)
+    ge.GetXaxis().SetLimits(1.02, 1.09)
     ge.GetYaxis().SetLabelOffset(1)
-    ge.GetYaxis().SetNdivisions(len(arDYChi))
+    ge.GetYaxis().SetNdivisions(len(arDYChi) * 2)
 
     #t = TText()
     t = TLatex()
@@ -279,26 +292,27 @@ def drawDYLL():
     smallT.SetTextAngle(90)
     smallT.SetTextSize(0.025)
     smallT.SetTextFont(42)
-    smallT.DrawText(1.01, 3. * len(arDYChi) / 3. - 6, "NBins * 2")
+    smallT.DrawText(1.01, 3. * len(arDYChi) / 3. - 6, "double binning")
     smallT.DrawText(1.01, 2 * len(arDYChi) / 3. - 6, "normal binning")
-    smallT.DrawText(1.01, len(arDYChi) / 3. - 6, "NBins / 2")
+    smallT.DrawText(1.01, len(arDYChi) / 3. - 6, "half binning")
 
     cutLine = TLine(1.02, 2 * len(arDYChi) / 3. + 0.5,
-                    1.1, 2 * len(arDYChi) / 3. + 0.5)
+                    1.09, 2 * len(arDYChi) / 3. + 0.5)
     cutLine.SetLineColor(kBlack)
     cutLine.SetLineWidth(2)
     cutLine.Draw("SAME")
 
     cutLine2 = TLine(1.02, len(arDYChi) / 3. + 0.5,
-                     1.1, len(arDYChi) / 3. + 0.5)
+                     1.09, len(arDYChi) / 3. + 0.5)
     cutLine2.SetLineColor(kBlack)
     cutLine2.SetLineWidth(2)
     cutLine2.Draw("SAME")
 
     l = ROOT.TLatex(
-        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
     l.SetNDC()
-    l.Draw()
+    # l.Draw()
 
     lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
                       (aux.intLumi / 1000., aux.Label.cmsEnergy))
@@ -306,17 +320,19 @@ def drawDYLL():
     lum.Draw()
 
     l4 = ROOT.TLatex(
-        0.17, .9, "#scale[0.66]{#font[52]{DY/Z(#gamma) Control Region}}")
+        0.25, .89, "#scale[0.76]{#font[52]{DY/Z(#gamma) Control Region}}")
     l4.SetNDC()
+    # l4.SetFillColor(0)
     l4.Draw()
 
-    leg = TLegend(0.18, 0.45, 0.4, 0.55)
-    leg.AddEntry(line, "#alpha from int. method", "l")
-    leg.AddEntry(ge, "stat. error from int. method", "f")
-    leg.AddEntry(gr, "#alpha from #chi^{2} method", "lep")
-    leg.AddEntry(lineMEAN, "mean from #chi^{2} method", "l")
-    leg.SetTextSize(0.02)
+    leg = TLegend(0.18, 0.45, 0.49, 0.55)
+    leg.AddEntry(line, "#alpha (int. method)", "l")
+    leg.AddEntry(ge, "stat. error (int. method)", "f")
+    leg.AddEntry(gr, "#alpha (#chi^{2} method)", "lep")
+    leg.AddEntry(lineMEAN, "mean (#chi^{2} method)", "l")
+    leg.SetTextSize(0.03)
     # leg.SetFillStyle(0)
+    leg.SetFillColor(0)
     leg.Draw("same")
 
     c.SetGridy()
@@ -604,7 +620,7 @@ def drawTT():
     #print arTTChiDn
     #print arTTChiName
 
-    c = TCanvas("canvas", "", 800, 1200)
+    c = TCanvas("canvas", "", 800, 1000)
 
     x = [valueTTInt]
     ex = [errTTInt]
@@ -615,8 +631,11 @@ def drawTT():
     for i in range(len(x)):
         ge.SetPoint(i, x[i], y[i])
         ge.SetPointError(i, ex[i], ex[i], eyD[i], eyU[i])
-    ge.SetFillStyle(3003)
-    ge.SetFillColor(ROOT.kBlue)
+    # ge.SetFillStyle(3004)
+    # ge.SetFillStyle(3001)
+    # ge.SetFillColor(ROOT.kBlue)
+    ge.SetFillColorAlpha(ROOT.kBlue, 0.3)
+    ge.SetLineColor(ROOT.kWhite)
     ge.Draw("same a2")
 
     gr = TGraphAsymmErrors()
@@ -626,8 +645,8 @@ def drawTT():
         gr.SetPoint(i, arTTChi[i], y)
         gr.SetPointError(i, arTTChiDn[i], arTTChiUp[i], 0., 0.)
 
-    gr.SetTitle("; Scale Factor #alpha; ")
-    ge.SetTitle("; Scale Factor #alpha; ")
+    gr.SetTitle("; Scale Factor #alpha_{t#bar{t}(#gamma)}; ")
+    ge.SetTitle("; Scale Factor #alpha_{t#bar{t}(#gamma)}; ")
     # gr.SetMarkerColor(4)
     gr.SetMarkerColor(kRed)
     gr.SetMarkerStyle(21)
@@ -645,7 +664,7 @@ def drawTT():
     lineMEAN.Draw("SAME")
 
     # ge.GetXaxis().SetLimits(0.6,1.1)
-    ge.GetXaxis().SetLimits(0.7, 0.9)
+    ge.GetXaxis().SetLimits(0.67, 0.88)
     ge.GetYaxis().SetLabelOffset(1)
     ge.GetYaxis().SetNdivisions(len(arTTChi) * 2)
 
@@ -656,33 +675,34 @@ def drawTT():
     # t.SetTextFont(72)
     for i in range(len(arTTChi)):
         # t.DrawLatex(0.79,(i+1),nameDict[arTTChiName[i]])
-        t.DrawLatex(0.695, (i + 1), nameDict[arTTChiName[i]])
+        t.DrawLatex(0.665, (i + 1), nameDict[arTTChiName[i]])
         # t.DrawText(0.8,i+1,arTTChiName[i])
 
     smallT = TText()
     smallT.SetTextAngle(90)
     smallT.SetTextSize(0.025)
     smallT.SetTextFont(42)
-    smallT.DrawText(0.68, 3. * len(arTTChi) / 3. - 6, "NBins * 2")
-    smallT.DrawText(0.68, 2 * len(arTTChi) / 3. - 6, "normal binning")
-    smallT.DrawText(0.68, len(arTTChi) / 3. - 6, "NBins / 2")
+    smallT.DrawText(0.64, 3. * len(arTTChi) / 3. - 6, "double binning")
+    smallT.DrawText(0.64, 2 * len(arTTChi) / 3. - 6, "normal binning")
+    smallT.DrawText(0.64, len(arTTChi) / 3. - 6, "half binning")
 
-    cutLine = TLine(0.7, 2 * len(arTTChi) / 3. + 0.5,
-                    0.9, 2 * len(arTTChi) / 3. + 0.5)
+    cutLine = TLine(0.67, 2 * len(arTTChi) / 3. + 0.5,
+                    0.88, 2 * len(arTTChi) / 3. + 0.5)
     cutLine.SetLineColor(kBlack)
     cutLine.SetLineWidth(2)
     cutLine.Draw("SAME")
 
-    cutLine2 = TLine(0.7, len(arTTChi) / 3. + 0.5,
-                     0.9, len(arTTChi) / 3. + 0.5)
+    cutLine2 = TLine(0.67, len(arTTChi) / 3. + 0.5,
+                     0.88, len(arTTChi) / 3. + 0.5)
     cutLine2.SetLineColor(kBlack)
     cutLine2.SetLineWidth(2)
     cutLine2.Draw("SAME")
 
     l = ROOT.TLatex(
-        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
     l.SetNDC()
-    l.Draw()
+    # l.Draw()
 
     lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
                       (aux.intLumi / 1000., aux.Label.cmsEnergy))
@@ -690,17 +710,18 @@ def drawTT():
     lum.Draw()
 
     l4 = ROOT.TLatex(
-        0.17, .9, "#scale[0.66]{#font[52]{t#bar{t}(#gamma) Control Region}}")
+        0.25, .89, "#scale[0.76]{#font[52]{t#bar{t}(#gamma) Control Region}}")
     l4.SetNDC()
     l4.Draw()
 
-    leg = TLegend(0.18, 0.45, 0.4, 0.55)
-    leg.AddEntry(line, "#alpha from int. method", "l")
-    leg.AddEntry(ge, "stat. error from int. method", "f")
-    leg.AddEntry(gr, "#alpha from #chi^{2} method", "lep")
-    leg.AddEntry(lineMEAN, "mean from #chi^{2} method", "l")
-    leg.SetTextSize(0.02)
+    leg = TLegend(0.18, 0.45, 0.45, 0.55)
+    leg.AddEntry(line, "#alpha (int. method)", "l")
+    leg.AddEntry(ge, "stat. error (int. method)", "f")
+    leg.AddEntry(gr, "#alpha (#chi^{2} method)", "lep")
+    leg.AddEntry(lineMEAN, "mean (#chi^{2} method)", "l")
+    leg.SetTextSize(0.03)
     # leg.SetFillStyle(0)
+    leg.SetFillColor(0)
     leg.Draw("same")
 
     c.SetGridy()
@@ -741,7 +762,7 @@ def drawWZ():
     # print arWZChiDn
     # print arWZChiName
 
-    c = TCanvas("canvas", "", 800, 1200)
+    c = TCanvas("canvas", "", 800, 1000)
 
     x = [valueWZInt]
     ex = [errWZInt]
@@ -752,8 +773,10 @@ def drawWZ():
     for i in range(len(x)):
         ge.SetPoint(i, x[i], y[i])
         ge.SetPointError(i, ex[i], ex[i], eyD[i], eyU[i])
-    ge.SetFillStyle(3003)
-    ge.SetFillColor(ROOT.kBlue)
+    # ge.SetFillStyle(3004)
+    ge.SetFillColorAlpha(ROOT.kBlue, 0.3)
+    # ge.SetFillColor(ROOT.kBlue)
+    ge.SetLineColor(ROOT.kWhite)
     ge.Draw("same a2")
 
     gr = TGraphAsymmErrors()
@@ -763,8 +786,8 @@ def drawWZ():
         gr.SetPoint(i, arWZChi[i], y)
         gr.SetPointError(i, arWZChiDn[i], arWZChiUp[i], 0., 0.)
 
-    gr.SetTitle("; Scale Factor #alpha; ")
-    ge.SetTitle("; Scale Factor #alpha; ")
+    gr.SetTitle("; Scale Factor #alpha_{WZ}; ")
+    ge.SetTitle("; Scale Factor #alpha_{WZ}; ")
     # gr.SetMarkerColor(4)
     gr.SetMarkerColor(kRed)
     gr.SetMarkerStyle(21)
@@ -781,7 +804,7 @@ def drawWZ():
     lineMEAN.SetLineWidth(2)
     lineMEAN.Draw("SAME")
 
-    ge.GetXaxis().SetLimits(0.9, 1.4)
+    ge.GetXaxis().SetLimits(0.9, 1.3)
     ge.GetYaxis().SetLabelOffset(1)
     ge.GetYaxis().SetNdivisions(len(arWZChi) * 2)
 
@@ -805,9 +828,9 @@ def drawWZ():
     smallT.SetTextAngle(90)
     smallT.SetTextSize(0.025)
     smallT.SetTextFont(42)
-    smallT.DrawText(0.84, 3. * len(arWZChi) / 3. - 6, "NBins * 2")
+    smallT.DrawText(0.84, 3. * len(arWZChi) / 3. - 6, "double binning")
     smallT.DrawText(0.84, 2 * len(arWZChi) / 3. - 6, "normal binning")
-    smallT.DrawText(0.84, len(arWZChi) / 3. - 6, "NBins / 2")
+    smallT.DrawText(0.84, len(arWZChi) / 3. - 6, "half binning")
 
     cutLine = TLine(0.9, 2 * len(arWZChi) / 3. + 0.5,
                     1.4, 2 * len(arWZChi) / 3. + 0.5)
@@ -822,25 +845,26 @@ def drawWZ():
     cutLine2.Draw("SAME")
 
     l = ROOT.TLatex(
-        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        # 0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Work in Progress}}")
+        0.17, .95, "#font[61]{CMS} #scale[0.76]{#font[52]{Private Work}}")
     l.SetNDC()
-    l.Draw()
+    # l.Draw()
 
     lum = ROOT.TLatex(.62, .95, "%.1f fb^{-1} (%s TeV)" %
                       (aux.intLumi / 1000., aux.Label.cmsEnergy))
     lum.SetNDC()
     lum.Draw()
 
-    l4 = ROOT.TLatex(0.17, .9, "#scale[0.66]{#font[52]{WZ Control Region}}")
+    l4 = ROOT.TLatex(0.25, .89, "#scale[0.76]{#font[52]{WZ Control Region}}")
     l4.SetNDC()
     l4.Draw()
 
-    leg = TLegend(0.18, 0.45, 0.4, 0.55)
-    leg.AddEntry(line, "#alpha from int. method", "l")
-    leg.AddEntry(ge, "stat. error from int. method", "f")
-    leg.AddEntry(gr, "#alpha from #chi^{2} method", "lep")
-    leg.AddEntry(lineMEAN, "mean from #chi^{2} method", "l")
-    leg.SetTextSize(0.02)
+    leg = TLegend(0.18, 0.45, 0.45, 0.55)
+    leg.AddEntry(line, "#alpha (int. method)", "l")
+    leg.AddEntry(ge, "stat. error (int. method)", "f")
+    leg.AddEntry(gr, "#alpha (#chi^{2} method)", "lep")
+    leg.AddEntry(lineMEAN, "mean (#chi^{2} method)", "l")
+    leg.SetTextSize(0.03)
     # leg.SetFillStyle(0)
     leg.Draw("same")
 

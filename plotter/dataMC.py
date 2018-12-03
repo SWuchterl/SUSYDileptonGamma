@@ -211,7 +211,7 @@ labels = {
     # 'm_ll': ["m_{ll} from all leptons (GeV)" ,"Events / 65 GeV"],
     'm_ll': ["m_{ll} (GeV)", "Events / Bin"],
     'm_llll': ["m_{llll} (GeV)", "Events / Bin"],
-    'm_ll2': ["m_{ll}2 (GeV)", "Events / Bin"],
+    'm_ll2': ["m_{l_{3}l_{4}} (GeV)", "Events / Bin"],
     'n_jets': ["N Jets", "Events / 1"],
     'n_bjets': ["N BJets", "Events / 1"],
     'n_photons': ["N Photons", "Events / 1"],

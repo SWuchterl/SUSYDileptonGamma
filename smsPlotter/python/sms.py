@@ -4,9 +4,10 @@ from array import *
 #commonZmax = 2e-2
 #commonZmin = 1e-2
 
-commonZmin = 5e-3  # used
+# commonZmin = 5e-3  # used
+commonZmin = 1.8e-2  # used
 # commonZmin = 5e-10  # used
-commonZmax = 5e-2
+commonZmax = 4.5e-2
 
 squarkZmin = commonZmin
 squarkZmax = commonZmax
@@ -164,7 +165,8 @@ class sms():
         # produce sparticle
         self.sParticle = "m#kern[0.1]{_{#lower[-0.12]{#tilde{g}}}} (GeV)"
         # LSP
-        self.LSP = "m#kern[0.1]{_{" + lsp_s + "}} (GeV)"
+        # self.LSP = "m#kern[0.1]{_{" + lsp_s + "}} (GeV)"
+        self.LSP = "m#kern[0.1]{_{NLSP}} (GeV)"
         # diagonal lines
         self.diagOn = True
 
@@ -241,7 +243,7 @@ class sms():
         # model name
         self.modelname = "GMSB"
         # decay chain
-        self.label = "GMSB"
+        self.label = "GMSB electroweak production"
         self.label2 = ""
         # scan range to plot
         # self.Xmin = 200 - 10

@@ -392,10 +392,10 @@ string inputName;
 selEvent selectedEvent;
 
 
-float countGen=0;
-float countReco=0;
-TH1F genHist=TH1F("gen", ";p_{T}^{#gamma} (GeV)", 5000, 0, 5000);
-TH1F recoHist=TH1F("reco", ";p_{T}^{#gamma} (GeV)", 5000, 0, 5000);
+//float countGen=0;
+//float countReco=0;
+//TH1F genHist=TH1F("gen", ";p_{T}^{#gamma} (GeV)", 5000, 0, 5000);
+//TH1F recoHist=TH1F("reco", ";p_{T}^{#gamma} (GeV)", 5000, 0, 5000);
 
 int nWeights;
 
